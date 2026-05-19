@@ -1,0 +1,7 @@
+node_modules/
+.chrome-gemini-profile/
+.chrome-gemini-cdp-profile/
+.chrome-olx-profile/
+.firefox-controlled-profile/
+.firefox*/
+.chrome*/

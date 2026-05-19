@@ -1,0 +1,48 @@
+name: Monitor Notebooks e Tenis
+
+on:
+  schedule:
+    - cron: '0 10 * * *'   # 07:00 BRT (UTC-3)
+    - cron: '0 15 * * *'   # 12:00 BRT
+    - cron: '0 23 * * *'   # 20:00 BRT
+  workflow_dispatch:        # disparo manual pela interface do GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Instalar Playwright + Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Rodar monitores e notificar
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+          CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          OLX_DATA_DIR: ${{ github.workspace }}/data/olx
+          ENJOEI_DATA_DIR: ${{ github.workspace }}/data/enjoei
+        run: node scripts/run-monitors-and-notify.mjs
+
+      - name: Salvar snapshots no repositorio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --staged --quiet || git commit -m "snapshots $(date -u +%Y-%m-%dT%H:%M)"
+          git push
