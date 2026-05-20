@@ -43,9 +43,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
           git add data/
           if ! git diff --staged --quiet; then
             git commit -m "snapshots $(date -u +%Y-%m-%dT%H:%M)"
-            git pull --rebase origin main
             git push
           fi
