@@ -1,11 +1,7 @@
 name: Monitor Notebooks e Tenis
 
 on:
-  schedule:
-    - cron: '0 10 * * *'   # 07:00 BRT (UTC-3)
-    - cron: '0 15 * * *'   # 12:00 BRT
-    - cron: '0 23 * * *'   # 20:00 BRT
-  workflow_dispatch:        # disparo manual pela interface do GitHub
+  workflow_dispatch:        # disparado pelo cron-job.org via API (07:00, 12:00, 20:00 BRT)
 
 permissions:
   contents: write
