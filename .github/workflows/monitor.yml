@@ -45,11 +45,19 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git pull --rebase origin main
           git add data/
-          if ! git diff --staged --quiet; then
-            git commit -m "snapshots $(date -u +%Y-%m-%dT%H:%M)"
-            for i in 1 2 3; do
-              git pull --rebase origin main && git push && break
-              echo "Tentativa $i falhou, aguardando $((i * 10))s..."
-              sleep $((i * 10))
-            done
+          if git diff --staged --quiet; then
+            echo "Sem mudancas para commitar."
+            exit 0
           fi
+          git commit -m "snapshots $(date -u +%Y-%m-%dT%H:%M)"
+          for i in 1 2 3; do
+            git pull --rebase origin main
+            if git push; then
+              echo "Push realizado na tentativa $i."
+              exit 0
+            fi
+            echo "Tentativa $i falhou, aguardando $((i * 10))s..."
+            sleep $((i * 10))
+          done
+          echo "Falha ao fazer push apos 3 tentativas."
+          exit 1
