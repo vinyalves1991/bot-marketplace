@@ -6,8 +6,8 @@ import nodemailer from "nodemailer";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const workspaceRoot = path.resolve(__dirname, "..");
-const OLX_DIR = path.join(process.env.USERPROFILE ?? "", ".codex", "automations", "monitor-olx-notebooks-por-cpu");
-const ENJOEI_DIR = path.join(process.env.USERPROFILE ?? "", ".codex", "automations", "monitor-enjoei-tenis-42");
+const OLX_DIR = process.env.OLX_DATA_DIR ?? path.join(process.env.USERPROFILE ?? process.env.HOME ?? "", ".codex", "automations", "monitor-olx-notebooks-por-cpu");
+const ENJOEI_DIR = process.env.ENJOEI_DATA_DIR ?? path.join(process.env.USERPROFILE ?? process.env.HOME ?? "", ".codex", "automations", "monitor-enjoei-tenis-42");
 
 const GMAIL_USER = process.env.GMAIL_USER ?? "docrash@gmail.com";
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
