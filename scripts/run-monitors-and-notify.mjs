@@ -110,7 +110,10 @@ function runScript(scriptName, extraArgs) {
 
 async function readLatestReport(dir) {
   const entries = await fs.readdir(dir).catch(() => []);
-  const reports = entries.filter((n) => n.startsWith("report-") && n.endsWith(".md")).sort().reverse();
+  const reports = entries
+    .filter((n) => n.startsWith("report-") && !n.startsWith("report-premium-") && n.endsWith(".md"))
+    .sort()
+    .reverse();
   if (!reports.length) return null;
   return fs.readFile(path.join(dir, reports[0]), "utf8");
 }
