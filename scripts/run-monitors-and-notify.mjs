@@ -58,11 +58,6 @@ async function main() {
     console.log("Nenhum item novo, mas --force-email ativo.");
   }
 
-  if (!GMAIL_APP_PASSWORD) {
-    console.warn("GMAIL_APP_PASSWORD não definida — email não enviado.");
-    return;
-  }
-
   const subject     = buildSubject(olxNew, enjoeiNew, enjoeiNbNew, errors);
   const body        = buildBody(olxReport, enjoeiReport, enjoeiNbReport, olxNew, enjoeiNew, enjoeiNbNew, errors);
   const whatsappMsg = buildWhatsAppMessage(olxReport, enjoeiReport, enjoeiNbReport, olxNew, enjoeiNew, enjoeiNbNew, errors);
@@ -170,6 +165,7 @@ function extractNewItems(report, sectionHeader) {
 // ── email / WhatsApp ──────────────────────────────────────────────────────────
 
 async function sendEmail(subject, body) {
+  if (!GMAIL_APP_PASSWORD) throw new Error("GMAIL_APP_PASSWORD não definida");
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com", port: 587, secure: false,
     auth: { user: GMAIL_USER, pass: GMAIL_APP_PASSWORD },
