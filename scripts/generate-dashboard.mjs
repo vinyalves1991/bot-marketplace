@@ -4,8 +4,9 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
-const OLX_DIR = process.env.OLX_DATA_DIR ?? path.join(ROOT, "data", "olx");
-const ENJOEI_DIR = process.env.ENJOEI_DATA_DIR ?? path.join(ROOT, "data", "enjoei");
+const OLX_DIR              = process.env.OLX_DATA_DIR              ?? path.join(ROOT, "data", "olx");
+const ENJOEI_DIR           = process.env.ENJOEI_DATA_DIR           ?? path.join(ROOT, "data", "enjoei");
+const ENJOEI_NOTEBOOKS_DIR = process.env.ENJOEI_NOTEBOOKS_DATA_DIR ?? path.join(ROOT, "data", "enjoei-notebooks");
 const OUTPUT = path.join(ROOT, "index.html");
 const REPO = "almeida3339/olx-daily";
 const BLOB = `https://github.com/${REPO}/blob/main`;
@@ -14,9 +15,10 @@ const MAX = 5;
 main().catch((e) => { console.error(e.message); process.exitCode = 1; });
 
 async function main() {
-  const [olx, premium, enjoei] = await Promise.all([
+  const [olx, premium, enjoeiNb, enjoei] = await Promise.all([
     gather(OLX_DIR, "report-", "report-premium-"),
     gather(OLX_DIR, "report-premium-", null),
+    gather(ENJOEI_NOTEBOOKS_DIR, "report-", null),
     gather(ENJOEI_DIR, "report-", null),
   ]);
   const now = new Date().toLocaleString("pt-BR", {
@@ -24,7 +26,7 @@ async function main() {
     dateStyle: "full",
     timeStyle: "short",
   });
-  await fs.writeFile(OUTPUT, buildHtml({ olx, premium, enjoei, now }), "utf8");
+  await fs.writeFile(OUTPUT, buildHtml({ olx, premium, enjoeiNb, enjoei, now }), "utf8");
   console.log(`Dashboard gerado: ${OUTPUT}`);
 }
 
@@ -107,7 +109,7 @@ function e(s) {
   return (s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function buildHtml({ olx, premium, enjoei, now }) {
+function buildHtml({ olx, premium, enjoeiNb, enjoei, now }) {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -155,6 +157,7 @@ h1{font-size:1.3rem;color:#f0f6fc;margin-bottom:5px}
 <div class="grid">
 ${renderSection("OLX Notebooks", "R$ 2.000 – R$ 4.000", olx, "data/olx")}
 ${renderSection("OLX Premium", "R$ 4.001 – R$ 8.000", premium, "data/olx")}
+${renderSection("Enjoei Notebooks", "R$ 1.500 – R$ 4.000", enjoeiNb, "data/enjoei-notebooks")}
 ${renderSection("Enjoei Tênis 42", "até R$ 500,00", enjoei, "data/enjoei")}
 </div>
 </body>

@@ -33,12 +33,14 @@ jobs:
           CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
           OLX_DATA_DIR: ${{ github.workspace }}/data/olx
           ENJOEI_DATA_DIR: ${{ github.workspace }}/data/enjoei
+          ENJOEI_NOTEBOOKS_DATA_DIR: ${{ github.workspace }}/data/enjoei-notebooks
         run: node scripts/run-monitors-and-notify.mjs
 
       - name: Gerar dashboard HTML
         env:
           OLX_DATA_DIR: ${{ github.workspace }}/data/olx
           ENJOEI_DATA_DIR: ${{ github.workspace }}/data/enjoei
+          ENJOEI_NOTEBOOKS_DATA_DIR: ${{ github.workspace }}/data/enjoei-notebooks
         run: node scripts/generate-dashboard.mjs
 
       - name: Salvar snapshots no repositorio
@@ -46,7 +48,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git pull --rebase origin main
-          git add data/ index.html
+          git add data/ index.html || true
           if git diff --staged --quiet; then
             echo "Sem mudancas para commitar."
             exit 0
