@@ -1,17 +1,18 @@
 {
-  "name": "gemini-web-transcriber",
+  "name": "monitor-olx-enjoei",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "transcrever:gemini": "node scripts/gemini-transcribe-web.mjs",
-    "monitor:olx-notebooks-por-cpu": "node scripts/monitor-olx-notebooks-por-cpu.mjs",
+    "monitor:olx": "node scripts/monitor-olx-notebooks-por-cpu.mjs --headless",
     "monitor:enjoei-tenis": "node scripts/monitor-enjoei-tenis.mjs",
-    "monitor:todos": "node scripts/run-monitors-and-notify.mjs"
+    "monitor:enjoei-notebooks": "node scripts/monitor-enjoei-notebooks.mjs",
+    "monitor:todos": "node scripts/run-monitors-and-notify.mjs",
+    "monitor:todos:forcar-email": "node scripts/run-monitors-and-notify.mjs --force-email",
+    "dashboard": "node scripts/generate-dashboard.mjs"
   },
   "dependencies": {
     "nodemailer": "^8.0.7",
-    "playwright": "^1.56.1",
-    "selenium-webdriver": "^4.44.0"
+    "playwright": "^1.56.1"
   }
 }
