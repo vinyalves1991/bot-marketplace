@@ -35,12 +35,18 @@ jobs:
           ENJOEI_DATA_DIR: ${{ github.workspace }}/data/enjoei
         run: node scripts/run-monitors-and-notify.mjs
 
+      - name: Gerar dashboard HTML
+        env:
+          OLX_DATA_DIR: ${{ github.workspace }}/data/olx
+          ENJOEI_DATA_DIR: ${{ github.workspace }}/data/enjoei
+        run: node scripts/generate-dashboard.mjs
+
       - name: Salvar snapshots no repositorio
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git pull --rebase origin main
-          git add data/
+          git add data/ index.html
           if git diff --staged --quiet; then
             echo "Sem mudancas para commitar."
             exit 0
