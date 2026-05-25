@@ -2,6 +2,18 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
+import {
+  parseBrlPrice,
+  extractRamGb,
+  extractStorageGb,
+  normalizeCpuText,
+  textContainsCpuTerm,
+  has32GbRam,
+  isNotebookCategoryUrl,
+  extractOlxId,
+  normalizeText,
+} from "./lib/parsers.mjs";
+import { mergeWithPreviousSnapshot as _mergeItems } from "./lib/snapshot.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const workspaceRoot = path.resolve(__dirname, "..");
@@ -99,10 +111,12 @@ const profileDirectory = getOptionValue(args, "--profile-directory") ?? "Default
 const cdpUrl = getOptionValue(args, "--cdp-url") ?? process.env.CHROME_CDP_URL ?? DEFAULT_CDP_URL;
 const blockAssets = !args.includes("--load-assets");
 
-main().catch((error) => {
-  console.error(`\nFalha: ${error.stack || error.message}`);
-  process.exitCode = 1;
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(`\nFalha: ${error.stack || error.message}`);
+    process.exitCode = 1;
+  });
+}
 
 async function main() {
   const now = new Date();
@@ -708,14 +722,6 @@ function normalizeComparableUrl(url) {
   }
 }
 
-function normalizeText(text) {
-  return (text ?? "")
-    .toString()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-}
-
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -998,127 +1004,22 @@ function formatItemLine(item) {
 }
 
 function mergeWithPreviousSnapshot({ runDate, collected, previousSnapshot }) {
-  const previousItems = previousSnapshot?.items ?? [];
-  const previousById = new Map(previousItems.map((x) => [x.id ?? x.url, x]));
-
-  const items = [];
-  for (const item of collected) {
-    const key = item.id ?? item.url;
-    const prev = previousById.get(key);
-    items.push({
-      ...item,
-      first_seen: prev?.first_seen ?? runDate,
-      last_seen: runDate,
-    });
-  }
-
-  const currentKeys = new Set(items.map((x) => x.id ?? x.url));
-  for (const prev of previousItems) {
-    const key = prev.id ?? prev.url;
-    if (!currentKeys.has(key)) {
-      items.push({
-        ...prev,
-        // Important: the crawler is listing-based and capped per CPU term; absence in a run
-        // does NOT guarantee the ad is offline. It only means "not seen in this run's results".
-        status: "not_seen",
-        last_seen: runDate,
-      });
-    }
-  }
-
-  return {
-    run: { date: runDate, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone },
-    price_range_brl: { min: PRICE_MIN_BRL, max: PRICE_MAX_BRL },
-    items,
-  };
+  return _mergeItems({
+    runDate,
+    collected,
+    previousSnapshot,
+    priceMin: PRICE_MIN_BRL,
+    priceMax: PRICE_MAX_BRL,
+  });
 }
 
-function isNotebookCategoryUrl(url) {
-  try {
-    const u = new URL(url);
-    return /\/informatica\/notebooks\//i.test(u.pathname);
-  } catch {
-    return false;
-  }
-}
+export { mergeWithPreviousSnapshot, getCheapCpuTerms };
 
 function hasExcludedKeyword(text) {
   const normalized = (text ?? "").toString().toLowerCase();
   return EXCLUDE_PATTERNS.some((term) => normalized.includes(term));
 }
 
-function textContainsCpuTerm(text, cpuTerm) {
-  const normalizedText = normalizeCpuText(text);
-  const normalizedTerm = normalizeCpuText(cpuTerm);
-  if (cpuTerm === "ai7350") {
-    // Accept a few variants seen in listings
-    return (
-      normalizedText.includes("ryzenai7350") ||
-      normalizedText.includes("ai7350") ||
-      (normalizedText.includes("ryzenai") && normalizedText.includes("350"))
-    );
-  }
-  // Allow 13650hx and 13650 hx variants by normalization.
-  return normalizedText.includes(normalizedTerm);
-}
-
-function normalizeCpuText(text) {
-  return (text ?? "")
-    .toString()
-    .toLowerCase()
-    .replace(/[\s\-_.]/g, "")
-    .replace(/[^a-z0-9]/g, "");
-}
-
-function extractRamGb(text) {
-  const normalized = (text ?? "").toString();
-  const patterns = [
-    /\b(\d{1,3})\s*gb\s*(?:de\s*)?(?:ram|mem[oó]ria)\b/i,
-    /\b(?:ram|mem[oó]ria)\s*:?\s*(\d{1,3})\s*gb\b/i,
-    /\b(\d{1,3})\s*gb\s*ddr\d\b/i,
-  ];
-  for (const re of patterns) {
-    const m = normalized.match(re);
-    if (m) {
-      const v = Number(m[1]);
-      if (Number.isFinite(v) && v >= 2 && v <= 256) return v;
-    }
-  }
-  return null;
-}
-
-function extractStorageGb(text) {
-  const t = (text ?? "").toString().toLowerCase();
-  const mTb = t.match(/\b(\d+(?:[\.,]\d+)?)\s*tb\b/);
-  if (mTb) {
-    const tb = Number(mTb[1].replace(",", "."));
-    if (Number.isFinite(tb)) return Math.round(tb * 1024);
-  }
-  const mGb = t.match(/\b(\d{2,5})\s*gb\s*(?:ssd|hd|nvme|m\.2|armazenamento|storage)\b/);
-  if (mGb) {
-    const gb = Number(mGb[1]);
-    if (Number.isFinite(gb) && gb >= 64 && gb <= 8192) return gb;
-  }
-  const mSsd = t.match(/\bssd\s*(\d{2,5})\s*gb\b/);
-  if (mSsd) {
-    const gb = Number(mSsd[1]);
-    if (Number.isFinite(gb) && gb >= 64 && gb <= 8192) return gb;
-  }
-  return null;
-}
-
-function parseBrlPrice(text) {
-  const raw = (text ?? "").toString();
-  const m = raw.match(/R\$\s*([\d\.]+)(?:,\d{2})?/);
-  if (!m) return null;
-  const n = Number(m[1].replace(/\./g, ""));
-  return Number.isFinite(n) ? n : null;
-}
-
-function extractOlxId(url) {
-  const m = (url ?? "").toString().match(/(\d{8,})\/?(?:\?|$)/);
-  return m ? m[1] : null;
-}
 
 function getCheapCpuTerms(snapshot) {
   const terms = new Set();
@@ -1134,11 +1035,6 @@ function getCheapCpuTerms(snapshot) {
     }
   }
   return terms;
-}
-
-function has32GbRam(item) {
-  if (item.ram_gb != null && item.ram_gb >= 32) return true;
-  return /\b32\s*gb\b/i.test(item.title ?? "");
 }
 
 function buildPremiumReport({ runDate, snapshot, previousSnapshot, cheapCpuTerms }) {

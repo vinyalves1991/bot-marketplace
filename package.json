@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test": "node --test tests/*.test.mjs",
     "monitor:olx": "node scripts/monitor-olx-notebooks-por-cpu.mjs --headless",
     "monitor:enjoei-tenis": "node scripts/monitor-enjoei-tenis.mjs",
     "monitor:enjoei-notebooks": "node scripts/monitor-enjoei-notebooks.mjs",

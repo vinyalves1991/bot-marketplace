@@ -12,7 +12,11 @@ const REPO = "almeida3339/olx-daily";
 const BLOB = `https://github.com/${REPO}/blob/main`;
 const MAX = 5;
 
-main().catch((e) => { console.error(e.message); process.exitCode = 1; });
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((e) => { console.error(e.message); process.exitCode = 1; });
+}
+
+export { parseReport };
 
 async function main() {
   const [olx, premium, enjoeiNb, enjoei] = await Promise.all([
@@ -60,6 +64,7 @@ function parseReport(txt) {
     /Novos an[úu]ncios v[aá]lidos[^:]*:\s*\*\*(\d+)\*\*/,
     /Novos an[úu]ncios:\s*\*\*(\d+)\*\*/,
     /Novos produtos:\s*\*\*(\d+)\*\*/,
+    /Novos notebooks[^:]*:\s*\*\*(\d+)\*\*/,
   ]);
   const priceCount = num([
     /Altera[cç][oõ]es de pre[cç]o[^:]*:\s*\*\*(\d+)\*\*/,
