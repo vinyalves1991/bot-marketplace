@@ -50,7 +50,7 @@ export function extractStorageGb(text) {
     const tb = Number(mTb[1].replace(",", "."));
     if (Number.isFinite(tb)) return Math.round(tb * 1024);
   }
-  const mGb = t.match(/\b(\d{2,5})\s*gb\s*(?:ssd|hd|nvme|m\.2|armazenamento|storage)\b/);
+  const mGb = t.match(/\b(\d{2,5})\s*(?:gb\s*)?(?:ssd|hd|nvme|m\.2|armazenamento|storage)\b/);
   if (mGb) {
     const gb = Number(mGb[1]);
     if (Number.isFinite(gb) && gb >= 64 && gb <= 8192) return gb;
@@ -79,19 +79,35 @@ export function normalizeCpuText(text) {
 }
 
 /**
- * Return true if text contains the CPU term after normalisation.
- * Special-cases "ai7350" (Ryzen AI 7 350 variants).
+ * Return true if text contains the CPU term as a whole word.
+ *
+ * Strategy: \b…\b with optional [\s\-]* inserted at every digit↔letter
+ * transition inside the term. This means:
+ *   • "14650hx" matches "14650 HX" and "14650-HX"  (split at digit→letter)
+ *   • "165h"    does NOT match "165hz"              (\b fails: h→z word char)
+ *   • "7945hx"  does NOT match "7945HX3D"           (\b fails: x→3 word char)
+ *
+ * Special-cases "ai7350" (multi-word brand + model).
  */
 export function textContainsCpuTerm(text, cpuTerm) {
-  const n = normalizeCpuText(text);
+  const raw = (text ?? "").toString();
+
   if (cpuTerm === "ai7350") {
+    const n = normalizeCpuText(raw);
     return (
       n.includes("ryzenai7350") ||
       n.includes("ai7350") ||
       (n.includes("ryzenai") && n.includes("350"))
     );
   }
-  return n.includes(normalizeCpuText(cpuTerm));
+
+  // Escape special regex chars (CPU terms are alphanumeric, but keep it safe).
+  const escaped = cpuTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  // Insert flexible separator at digit↔letter transitions within the term.
+  const pattern = escaped
+    .replace(/([0-9])([a-zA-Z])/g, "$1[\\s\\-]*$2")
+    .replace(/([a-zA-Z])([0-9])/g, "$1[\\s\\-]*$2");
+  return new RegExp(`\\b${pattern}\\b`, "i").test(raw);
 }
 
 /**

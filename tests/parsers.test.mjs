@@ -54,6 +54,7 @@ describe("extractStorageGb", () => {
   test("2TB", () => assert.equal(extractStorageGb("2TB SSD"), 2048));
   test("1,5 TB com vírgula", () => assert.equal(extractStorageGb("1,5 TB"), Math.round(1.5 * 1024)));
   test("256 GB nvme", () => assert.equal(extractStorageGb("256 GB nvme"), 256));
+  test("512 SSD sem unidade explícita", () => assert.equal(extractStorageGb("Notebook 512 SSD"), 512));
   test("SSD 512 GB (ordem invertida)", () => assert.equal(extractStorageGb("SSD 512 GB"), 512));
   test("RAM sozinha não é storage", () => assert.equal(extractStorageGb("16GB RAM"), null));
   test("string vazia retorna null", () => assert.equal(extractStorageGb(""), null));
@@ -77,6 +78,15 @@ describe("textContainsCpuTerm", () => {
     assert.equal(textContainsCpuTerm("Ryzen 9 8845HS gaming", "8845hs"), true));
   test("string vazia retorna false", () =>
     assert.equal(textContainsCpuTerm("", "13620h"), false));
+  // regressões de falsos positivos
+  test("165hz NÃO deve casar com CPU 165h", () =>
+    assert.equal(textContainsCpuTerm("monitor gamer pichau centauri quad hd 165hz freesync", "165h"), false));
+  test("165H em notebook deve casar com CPU 165h", () =>
+    assert.equal(textContainsCpuTerm("Notebook MSI Intel Core Ultra 5 165H 16GB", "165h"), true));
+  test("7945hx3d NÃO deve casar com termo 7945hx", () =>
+    assert.equal(textContainsCpuTerm("AMD Ryzen 9 7945HX3D notebook", "7945hx"), false));
+  test("7945hx sem sufixo deve casar com termo 7945hx", () =>
+    assert.equal(textContainsCpuTerm("Asus ROG 7945HX 32GB gaming", "7945hx"), true));
 });
 
 // ── has32GbRam ────────────────────────────────────────────────────────────────
@@ -217,6 +227,10 @@ describe("parseReport", () => {
 - Já vistos e ativos: **4**
 - Não vistos nesta rodada: **0**
 - Alterações de preço: **1**
+
+## Novos notebooks
+- R$ 2.000 — Notebook Acer i7-13620H — 16 GB RAM / 512 GB — https://www.enjoei.com.br/p/notebook-acer-1
+- R$ 3.000 — Notebook Asus Ryzen 7840HS — 32 GB RAM / 1 TB — https://www.enjoei.com.br/p/notebook-asus-2
 `.trim();
 
   test("newCount — OLX report", () => assert.equal(parseReport(olxReport).newCount, 3));
@@ -224,6 +238,12 @@ describe("parseReport", () => {
   test("date — extraído do cabeçalho", () => assert.equal(parseReport(olxReport).date, "2026-05-24"));
   test("newCount — Enjoei Notebooks report", () => assert.equal(parseReport(enjoeiNbReport).newCount, 2));
   test("priceCount — Enjoei Notebooks report", () => assert.equal(parseReport(enjoeiNbReport).priceCount, 1));
+  test("newItems — Enjoei Notebooks report", () => {
+    const { newItems } = parseReport(enjoeiNbReport);
+    assert.equal(newItems.length, 2);
+    assert.equal(newItems[0].price, "R$ 2.000");
+    assert.ok(newItems[0].url?.includes("enjoei.com.br"));
+  });
   test("relatório vazio retorna zeros", () => {
     const r = parseReport("# Monitor sem dados\n\n## Resumo\n- Sem itens.");
     assert.equal(r.newCount, 0);
