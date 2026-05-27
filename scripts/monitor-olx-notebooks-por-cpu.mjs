@@ -214,12 +214,26 @@ async function launchDedicatedChromeProfile(headlessMode) {
     viewport: null,
     locale: "pt-BR",
     args: isCI
-      ? ["--no-sandbox", "--disable-setuid-sandbox", "--window-size=1280,900"]
-      : ["--start-maximized"],
+      ? [
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+          "--window-size=1280,900",
+          "--disable-blink-features=AutomationControlled",
+        ]
+      : ["--start-maximized", "--disable-blink-features=AutomationControlled"],
   };
   if (!isCI) launchOptions.channel = "chrome";
+  if (isCI) {
+    launchOptions.userAgent =
+      "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+  }
 
   const context = await chromium.launchPersistentContext(USER_DATA_DIR, launchOptions);
+  // Remove navigator.webdriver to reduce bot-detection signal.
+  await context.addInitScript(() => {
+    try { delete Object.getPrototypeOf(navigator).webdriver; } catch (_) {}
+  });
   return { page: context.pages()[0] ?? (await context.newPage()), close: () => context.close() };
 }
 
@@ -694,18 +708,27 @@ function delay(ms) {
 }
 
 async function waitOutCloudflareIfNeeded(page) {
+  // In headless mode (CI) Cloudflare challenges can't be solved interactively.
+  // Wait a short time (10s) in case it resolves via JS challenge; in headed mode
+  // give the user up to 90s to solve a CAPTCHA manually.
+  const maxWait = headless ? 10_000 : 90_000;
   const started = Date.now();
-  while (Date.now() - started < 90_000) {
+  while (Date.now() - started < maxWait) {
     const title = await page.title().catch(() => "");
     if (!/cloudflare|attention required/i.test(title)) return;
-    // Give Cloudflare JS challenge a chance to pass in headed mode.
     await page.waitForTimeout(2500);
   }
   const title = await page.title().catch(() => "");
   if (/cloudflare|attention required/i.test(title)) {
-    throw new Error(
-      `Cloudflare ainda está bloqueando após 90s. Rode sem --headless e, se aparecer desafio/captcha, resolva uma vez no perfil ${USER_DATA_DIR} para persistir cookies.`
-    );
+    if (headless) {
+      throw new Error(
+        `Cloudflare bloqueando em modo headless após ${maxWait / 1000}s (IP de datacenter detectado). Sem resultados para este termo.`
+      );
+    } else {
+      throw new Error(
+        `Cloudflare ainda está bloqueando após 90s. Rode sem --headless e, se aparecer desafio/captcha, resolva uma vez no perfil ${USER_DATA_DIR} para persistir cookies.`
+      );
+    }
   }
 }
 

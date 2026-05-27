@@ -129,8 +129,12 @@ function buildWhatsAppMessage(olxReport, enjoeiReport, enjoeiNbReport, olxNew, e
   if (errors.length) lines.push(`Erros: ${errors.join(", ")}`);
 
   if (olxNew === 0 && enjoeiNew === 0 && enjoeiNbNew === 0) {
-    lines.push("Teste - sem itens novos");
-    lines.push("(email e whatsapp funcionando)");
+    if (errors.length === 0) {
+      lines.push("Teste - sem itens novos");
+      lines.push("(email e whatsapp funcionando)");
+    } else {
+      lines.push("Sem novos itens nesta rodada.");
+    }
     return lines.join("\n");
   }
 
