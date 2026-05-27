@@ -347,22 +347,23 @@ ${renderSection("Enjoei Tênis 42", "até R$ 500,00", enjoei, "data/enjoei")}
 }
 
 function renderSection(title, sub, reports, dpath) {
+  const showSpecs = dpath !== "data/enjoei";
   const body = reports.length === 0
     ? `<p class="empty">Nenhum run com novidades recentes.</p>`
-    : reports.map((r) => renderCard(r, dpath)).join("\n");
+    : reports.map((r) => renderCard(r, dpath, showSpecs)).join("\n");
   return `<div class="sec">
   <div class="sh"><h2>${e(title)}</h2><small>${e(sub)} &nbsp;·&nbsp; últimos ${reports.length} com novidades</small></div>
   <div class="sb">${body}</div>
 </div>`;
 }
 
-function renderCard(r, dpath) {
+function renderCard(r, dpath, showSpecs) {
   const url = `${BLOB}/${dpath}/${r.file}`;
   const bn = r.newCount > 0 ? `<span class="badge bn">+${r.newCount} novo${r.newCount > 1 ? "s" : ""}</span>` : "";
   const bp = r.priceCount > 0 ? `<span class="badge bp">${r.priceCount} preço${r.priceCount > 1 ? "s" : ""}</span>` : "";
   const rows = [
-    ...r.newItems.map((i) => renderRow(i, false)),
-    ...r.priceItems.map((i) => renderRow(i, true)),
+    ...r.newItems.map((i) => renderRow(i, false, showSpecs)),
+    ...r.priceItems.map((i) => renderRow(i, true, showSpecs)),
   ].join("\n");
   return `<div class="card">
   <div class="ch">
@@ -373,8 +374,8 @@ function renderCard(r, dpath) {
 </div>`;
 }
 
-function renderRow(item, isPrice) {
-  if (item.machine) return renderMachineRow(item, isPrice);
+function renderRow(item, isPrice, showSpecs) {
+  if (showSpecs && item.machine) return renderMachineRow(item, isPrice);
   const titleHtml = item.url
     ? `<a href="${e(item.url)}" target="_blank">${e(item.title)}</a>`
     : e(item.title);
