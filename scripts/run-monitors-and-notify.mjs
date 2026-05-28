@@ -66,23 +66,23 @@ async function main() {
 
   console.log(`\nNovos — OLX: ${olxNew} | Enjoei tênis: ${enjoeiNew} | Enjoei NB: ${enjoeiNbNew}`);
 
-  if (totalNew === 0 && errors.length === 0) {
-    if (!forceEmail) { console.log("Nenhum item novo. Email não enviado."); return; }
-    console.log("Nenhum item novo, mas --force-email ativo.");
-  }
-
   const subject     = buildSubject(olxNew, enjoeiNew, enjoeiNbNew, errors);
   const body        = buildBody(olxReport, enjoeiReport, enjoeiNbReport, olxNew, enjoeiNew, enjoeiNbNew, errors);
   const whatsappMsg = buildWhatsAppMessage(olxReport, enjoeiReport, enjoeiNbReport, olxNew, enjoeiNew, enjoeiNbNew, errors);
 
+  // WhatsApp sempre (heartbeat de execução).
+  // Email só quando há novidades ou erros (evita caixa cheia com confirmações vazias).
+  const sendingEmail = totalNew > 0 || errors.length > 0 || forceEmail;
+
   const [emailResult, waResult] = await Promise.allSettled([
-    sendEmail(subject, body),
+    sendingEmail ? sendEmail(subject, body) : Promise.resolve(null),
     sendWhatsApp(whatsappMsg),
   ]);
 
-  if (emailResult.status === "fulfilled") console.log(`Email enviado para ${NOTIFY_TO}.`);
-  else console.warn(`Email não enviado: ${emailResult.reason.message}`);
-
+  if (sendingEmail) {
+    if (emailResult.status === "fulfilled") console.log(`Email enviado para ${NOTIFY_TO}.`);
+    else console.warn(`Email não enviado: ${emailResult.reason.message}`);
+  }
   if (waResult.status === "fulfilled") console.log("WhatsApp enviado.");
   else console.warn(`WhatsApp não enviado: ${waResult.reason.message}`);
 }
@@ -145,7 +145,7 @@ function buildSubject(olxNew, enjoeiNew, enjoeiNbNew, errors) {
   if (enjoeiNew > 0)   parts.push(`${enjoeiNew} novo(s) Enjoei tênis`);
   if (enjoeiNbNew > 0) parts.push(`${enjoeiNbNew} novo(s) Enjoei NB`);
   if (errors.length)   parts.push("erros");
-  if (!parts.length)   parts.push("TESTE — sem itens novos");
+  if (!parts.length)   parts.push("sem itens novos");
   return `[Monitor] ${parts.join(" | ")} — ${new Date().toLocaleDateString("pt-BR")}`;
 }
 
@@ -166,12 +166,7 @@ function buildWhatsAppMessage(olxReport, enjoeiReport, enjoeiNbReport, olxNew, e
   if (errors.length) lines.push(`Erros: ${errors.join(", ")}`);
 
   if (olxNew === 0 && enjoeiNew === 0 && enjoeiNbNew === 0) {
-    if (errors.length === 0) {
-      lines.push("Teste - sem itens novos");
-      lines.push("(email e whatsapp funcionando)");
-    } else {
-      lines.push("Sem novos itens nesta rodada.");
-    }
+    lines.push("Sem novos itens.");
     return lines.join("\n");
   }
 
@@ -211,7 +206,7 @@ async function sendEmail(subject, body) {
     host: "smtp.gmail.com", port: 587, secure: false,
     auth: { user: GMAIL_USER, pass: GMAIL_APP_PASSWORD },
   });
-  await transporter.sendMail({ from: `Monitor Notebooks/Tênis <${GMAIL_USER}>`, to: NOTIFY_TO, subject, text: body });
+  await transporter.sendMail({ from: `Monitor <${GMAIL_USER}>`, to: NOTIFY_TO, subject, text: body });
 }
 
 async function sendWhatsApp(message) {

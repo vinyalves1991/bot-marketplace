@@ -308,7 +308,7 @@ function buildHtml({ olx, premium, enjoeiNb, enjoeiNbPremium, enjoei, now }) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Monitor Notebooks &amp; Tênis</title>
+<title>Monitor</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;padding:28px 24px;max-width:1680px;margin:0 auto}
@@ -353,7 +353,7 @@ h1{font-size:1.3rem;color:#f0f6fc;margin-bottom:5px}
 </style>
 </head>
 <body>
-<h1>Monitor Notebooks &amp; Tênis</h1>
+<h1>Monitor</h1>
 <p class="meta">Atualizado: ${e(now)} (BRT) &nbsp;·&nbsp; <a href="https://github.com/${REPO}" target="_blank">ver repositório ↗</a></p>
 <div class="grid">
 ${renderSection("OLX Notebooks", "R$ 2.000 – R$ 4.000", olx, "data/olx")}

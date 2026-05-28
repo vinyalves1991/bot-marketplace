@@ -1,7 +1,7 @@
-name: Monitor Notebooks e Tenis
+name: Monitor
 
 on:
-  workflow_dispatch:        # disparado pelo cron-job.org via API (07:00, 12:00, 20:00 BRT)
+  workflow_dispatch:        # disparado pelo cron-job.org via API (07:00, 16:00 BRT — Enjoei only; OLX roda local)
 
 permissions:
   contents: write
