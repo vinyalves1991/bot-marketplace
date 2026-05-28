@@ -5,9 +5,8 @@ param(
 $ErrorActionPreference = "Stop"
 
 $root = Resolve-Path (Join-Path $PSScriptRoot "..")
-$taskName = "Monitor-Notebooks-Tenis"
-$nodeExe = (Get-Command node -ErrorAction Stop).Source
-$scriptPath = Join-Path $root "scripts\run-monitors-and-notify.mjs"
+$taskName = "Monitor-OLX-Local-Publish"
+$scriptPath = Join-Path $root "scripts\run-local-olx-and-publish.ps1"
 
 if ($Remove) {
   Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
@@ -16,8 +15,8 @@ if ($Remove) {
 }
 
 $action = New-ScheduledTaskAction `
-  -Execute $nodeExe `
-  -Argument $scriptPath `
+  -Execute "powershell.exe" `
+  -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"" `
   -WorkingDirectory $root
 
 $triggers = @(

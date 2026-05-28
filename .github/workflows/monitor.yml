@@ -33,6 +33,7 @@ jobs:
           NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
           CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
           CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          SKIP_OLX: "1"
           OLX_DATA_DIR: ${{ github.workspace }}/data/olx
           ENJOEI_DATA_DIR: ${{ github.workspace }}/data/enjoei
           ENJOEI_NOTEBOOKS_DATA_DIR: ${{ github.workspace }}/data/enjoei-notebooks

@@ -19,6 +19,10 @@ const CALLMEBOT_PHONE    = process.env.CALLMEBOT_PHONE ?? "554196968789";
 const CALLMEBOT_APIKEY   = process.env.CALLMEBOT_APIKEY ?? "2696242";
 const forceEmail         = process.argv.includes("--force-email");
 const skipMonitors       = process.argv.includes("--skip-monitors");
+const onlyOlx            = process.argv.includes("--only-olx");
+const skipOlx            = process.argv.includes("--skip-olx") || process.env.SKIP_OLX === "1";
+const skipEnjoei         = process.argv.includes("--skip-enjoei") || process.env.SKIP_ENJOEI === "1";
+const olxMaxPerCpu       = getArgValue("--olx-max-per-cpu") ?? process.env.OLX_MAX_PER_CPU ?? "12";
 
 main().catch((err) => { console.error(`Falha geral: ${err.message}`); process.exitCode = 1; });
 
@@ -30,20 +34,29 @@ async function main() {
     console.log("--skip-monitors ativo: usando relatórios existentes.");
   } else {
     console.log("Rodando monitores em paralelo...");
-    const [olxR, enjoeiR, enjoeiNbR] = await Promise.allSettled([
-      runScript("monitor-olx-notebooks-por-cpu.mjs", ["--headless"]),
-      runScript("monitor-enjoei-tenis.mjs", []),
-      runScript("monitor-enjoei-notebooks.mjs", []),
-    ]);
-    if (olxR.status      === "rejected") { console.error(`OLX falhou: ${olxR.reason.message}`);            errors.push(`OLX: ${olxR.reason.message}`); }
-    if (enjoeiR.status   === "rejected") { console.error(`Enjoei tênis falhou: ${enjoeiR.reason.message}`); errors.push(`Enjoei tênis: ${enjoeiR.reason.message}`); }
-    if (enjoeiNbR.status === "rejected") { console.error(`Enjoei NB falhou: ${enjoeiNbR.reason.message}`);  errors.push(`Enjoei NB: ${enjoeiNbR.reason.message}`); }
+    const jobs = [];
+    if (!skipOlx) jobs.push(["olx", runOlxMonitor()]);
+    else console.log("OLX pulado nesta rodada.");
+    if (!onlyOlx && !skipEnjoei) {
+      jobs.push(["enjoei-tenis", runScript("monitor-enjoei-tenis.mjs", [])]);
+      jobs.push(["enjoei-notebooks", runScript("monitor-enjoei-notebooks.mjs", [])]);
+    }
+
+    const results = await Promise.allSettled(jobs.map(([, promise]) => promise));
+    for (let i = 0; i < jobs.length; i += 1) {
+      const [name] = jobs[i];
+      const result = results[i];
+      if (result.status !== "rejected") continue;
+      if (name === "olx") { console.error(`OLX falhou: ${result.reason.message}`); errors.push(`OLX: ${result.reason.message}`); }
+      if (name === "enjoei-tenis") { console.error(`Enjoei tênis falhou: ${result.reason.message}`); errors.push(`Enjoei tênis: ${result.reason.message}`); }
+      if (name === "enjoei-notebooks") { console.error(`Enjoei NB falhou: ${result.reason.message}`); errors.push(`Enjoei NB: ${result.reason.message}`); }
+    }
   }
 
   const [olxReport, enjoeiReport, enjoeiNbReport] = await Promise.all([
-    readLatestReport(OLX_DIR).catch(() => null),
-    readLatestReport(ENJOEI_DIR).catch(() => null),
-    readLatestReport(ENJOEI_NOTEBOOKS_DIR).catch(() => null),
+    skipOlx ? null : readLatestReport(OLX_DIR).catch(() => null),
+    onlyOlx || skipEnjoei ? null : readLatestReport(ENJOEI_DIR).catch(() => null),
+    onlyOlx || skipEnjoei ? null : readLatestReport(ENJOEI_NOTEBOOKS_DIR).catch(() => null),
   ]);
 
   const olxNew      = extractNewCount(olxReport,      /Novos anúncios válidos[^:]*:\s*\*\*(\d+)\*\*/);
@@ -78,11 +91,35 @@ async function main() {
 
 function runScript(scriptName, extraArgs) {
   const scriptPath = path.join(workspaceRoot, "scripts", scriptName);
+  return runCommand(process.execPath, [scriptPath, ...extraArgs]);
+}
+
+function runOlxMonitor() {
+  if (process.platform === "win32" && process.env.GITHUB_ACTIONS !== "true") {
+    return runCommand("powershell.exe", [
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      path.join(workspaceRoot, "scripts", "run-olx-monitor.ps1"),
+      "-MaxPerCpu",
+      olxMaxPerCpu,
+    ]);
+  }
+  return runScript("monitor-olx-notebooks-por-cpu.mjs", ["--headless", "--max-per-cpu", olxMaxPerCpu]);
+}
+
+function runCommand(command, args) {
   return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [scriptPath, ...extraArgs], { stdio: "inherit", cwd: workspaceRoot });
+    const child = spawn(command, args, { stdio: "inherit", cwd: workspaceRoot });
     child.on("close", (code) => (code === 0 ? resolve() : reject(new Error(`Saiu com código ${code}`))));
     child.on("error", reject);
   });
+}
+
+function getArgValue(name) {
+  const index = process.argv.indexOf(name);
+  return index >= 0 ? process.argv[index + 1] : null;
 }
 
 async function readLatestReport(dir) {
