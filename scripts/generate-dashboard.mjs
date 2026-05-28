@@ -20,9 +20,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 export { parseReport, formatRunLabelFromFile, summarizeMachine };
 
 async function main() {
+  const olxDetails = await latestSnapshotDetails(OLX_DIR);
   const [olx, premium, enjoeiNb, enjoeiNbPremium, enjoei] = await Promise.all([
-    gather(OLX_DIR, "report-", "report-premium-"),
-    gather(OLX_DIR, "report-premium-", null),
+    gather(OLX_DIR, "report-", "report-premium-", olxDetails),
+    gather(OLX_DIR, "report-premium-", null, olxDetails),
     gather(ENJOEI_NOTEBOOKS_DIR, "report-", "report-premium-"),
     gather(ENJOEI_NOTEBOOKS_DIR, "report-premium-", null),
     gather(ENJOEI_DIR, "report-", null),
@@ -38,7 +39,21 @@ async function main() {
 
 // ── coleta ──────────────────────────────────────────────────────────────────
 
-async function gather(dir, prefix, excludePrefix) {
+async function latestSnapshotDetails(dir) {
+  const all = await fs.readdir(dir).catch(() => []);
+  const file = all.filter((n) => n.startsWith("snapshot-") && n.endsWith(".json")).sort().reverse()[0];
+  if (!file) return new Map();
+  const raw = await fs.readFile(path.join(dir, file), "utf8").catch(() => null);
+  if (!raw) return new Map();
+  try {
+    const snapshot = JSON.parse(raw);
+    return new Map((snapshot.items ?? []).filter((item) => item.url).map((item) => [item.url, item]));
+  } catch {
+    return new Map();
+  }
+}
+
+async function gather(dir, prefix, excludePrefix, detailsByUrl = new Map()) {
   const all = await fs.readdir(dir).catch(() => []);
   const files = all
     .filter((n) => n.startsWith(prefix) && (!excludePrefix || !n.startsWith(excludePrefix)) && n.endsWith(".md"))
@@ -49,7 +64,7 @@ async function gather(dir, prefix, excludePrefix) {
     if (out.length >= MAX) break;
     const txt = await fs.readFile(path.join(dir, file), "utf8").catch(() => null);
     if (!txt) continue;
-    const p = parseReport(txt);
+    const p = parseReport(txt, detailsByUrl);
     if (p.newCount > 0 || p.priceCount > 0) out.push({ file, ...p, runLabel: formatRunLabelFromFile(file, p.date) });
   }
   return out;
@@ -57,7 +72,7 @@ async function gather(dir, prefix, excludePrefix) {
 
 // ── parser ───────────────────────────────────────────────────────────────────
 
-function parseReport(txt) {
+function parseReport(txt, detailsByUrl = new Map()) {
   const num = (patterns) => {
     for (const r of patterns) { const m = txt.match(r); if (m) return +m[1]; }
     return 0;
@@ -74,12 +89,12 @@ function parseReport(txt) {
   ]);
   const dateM = txt.match(/[—\-]\s*(\d{4}-\d{2}-\d{2})/);
   const date = dateM ? dateM[1] : null;
-  const newItems = extractItems(txt, /^## Novos (an[úu]ncios|produtos|notebooks)/m);
-  const priceItems = extractItems(txt, /^## Mudan[cç]as? de pre[cç]o/m);
+  const newItems = extractItems(txt, /^## Novos (an[úu]ncios|produtos|notebooks)/m, detailsByUrl);
+  const priceItems = extractItems(txt, /^## Mudan[cç]as? de pre[cç]o/m, detailsByUrl);
   return { newCount, priceCount, date, newItems, priceItems };
 }
 
-function extractItems(txt, sectionRe) {
+function extractItems(txt, sectionRe, detailsByUrl = new Map()) {
   const m = txt.match(sectionRe);
   if (!m) return [];
   const rest = txt.slice(m.index);
@@ -89,10 +104,10 @@ function extractItems(txt, sectionRe) {
     .split("\n")
     .filter((l) => l.startsWith("- ") && !/Nenhum|Observa[cç]|CPUs? exclu/i.test(l))
     .slice(0, MAX)
-    .map(parseLine);
+    .map((line) => parseLine(line, detailsByUrl));
 }
 
-function parseLine(line) {
+function parseLine(line, detailsByUrl = new Map()) {
   const raw = line.slice(2).trim();
   const urlM = raw.match(/https?:\/\/\S+/);
   const url = urlM ? urlM[0].replace(/[.,)]+$/, "") : null;
@@ -108,21 +123,31 @@ function parseLine(line) {
   title = title.replace(/^\s*[—–\-,\s]+/, "").replace(/[—–\-,\s]+$/, "");
   const fullTitle = title || "—";
   const shortTitle = fullTitle.length > 72 ? fullTitle.slice(0, 72) + "…" : fullTitle;
-  return { title: shortTitle, fullTitle, price, url, priceFrom, priceTo, machine: summarizeMachine(fullTitle) };
+  return { title: shortTitle, fullTitle, price, url, priceFrom, priceTo, machine: summarizeMachine(fullTitle, url ? detailsByUrl.get(url) : null) };
 }
 
-function summarizeMachine(text) {
+function summarizeMachine(text, details = null) {
   const [rawTitle, ...metaParts] = (text ?? "").split(/\s+[—–]\s+/).map((part) => part.trim()).filter(Boolean);
   const title = rawTitle || text || "";
   const meta = metaParts.join(" — ");
-  const all = `${title} ${meta}`;
+  const detailMeta = details ? formatSnapshotSpecs(details) : "";
+  const all = `${title} ${meta} ${detailMeta}`;
   const brand = extractBrand(title);
-  const cpu = extractCpu(title) ?? extractCpu(meta) ?? extractCpuFromMeta(meta);
+  const cpu = extractCpu(title) ?? extractCpu(meta) ?? extractCpu(detailMeta) ?? extractCpuFromMeta(meta);
   const ram = extractRam(all);
   const ssd = extractSsd(all);
-  const gpu = extractGpu(title) ?? extractGpu(meta);
+  const gpu = extractGpu(title) ?? extractGpu(meta) ?? extractGpu(detailMeta);
   const model = cleanModel(title, brand, cpu, gpu, ram, ssd);
   return { brand, model, cpu, ram, ssd, gpu };
+}
+
+function formatSnapshotSpecs(item) {
+  return [
+    item.cpu_term ? `cpu: ${item.cpu_term}` : "",
+    item.ram_gb ? `${item.ram_gb} GB RAM` : "",
+    item.storage_gb ? `${item.storage_gb} GB SSD` : "",
+    item.gpu ? `GPU ${item.gpu}` : "",
+  ].filter(Boolean).join(" / ");
 }
 
 function extractBrand(text) {
