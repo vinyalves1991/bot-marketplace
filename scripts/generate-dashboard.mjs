@@ -176,6 +176,9 @@ function extractCpu(text) {
   const patterns = [
     /\b(?:intel\s+)?core\s+ultra\s+i?([579])[\s-]*(\d{3})(h|hx)?\b/i,
     /\bultra\s+i?([579])[\s-]*(\d{3})(h|hx)?\b/i,
+    /\bryzen\s+ai\s+([3579])[\s-]*(\d{3})\b/i,
+    /\bai\s*([3579])[\s-]*(\d{3})\b/i,
+    /\bai([3579])(\d{3})\b/i,
     /\b(?:intel\s+)?core\s+([3579])[\s-]*(\d{4,5})([a-z]{0,2})\b/i,
     /\b(?:intel\s+)?(?:core\s+)?(i[3579])[\s-]*(\d{4,5})([a-z]{0,2})\b/i,
     /\bryzen\s+(?:ai\s+)?([3579])[\s-]*(\d{4})([a-z]{1,3})\b/i,
@@ -186,6 +189,7 @@ function extractCpu(text) {
     if (!m) continue;
     if (/hx\s*370/i.test(m[0])) return "HX 370";
     if (/ultra/i.test(m[0])) return `Ultra ${m[1]} ${m[2]}${(m[3] ?? "h").toUpperCase()}`;
+    if (/\b(?:ryzen\s+)?ai/i.test(m[0])) return `Ryzen AI ${m[1]} ${m[2]}`;
     if (/\bcore\s+[3579]\b/i.test(m[0])) return `Core ${m[1]} ${m[2]}${(m[3] ?? "").toUpperCase()}`;
     if (/ryzen/i.test(m[0])) return `Ryzen ${m[1]} ${m[2]}${(m[3] ?? "").toUpperCase()}`;
     return `${m[1].toUpperCase()}-${m[2]}${(m[3] ?? "").toUpperCase()}`;
@@ -233,6 +237,7 @@ function cleanModel(text, brand, cpu, gpu, ram, ssd) {
   s = s
     .replace(/\bnotebook\b|\blaptop\b|\bgamer\b|\bpremium\b|\btop de linha\b|\btop\b|\bautentico\b|\bnovo em folha\b|\bnovinho em folha\b|\bnovo\b|\bfolha\b|\bpouco uso\b|\bbrindes?\b|\blacrado\b|\bbarato\b|\bestado de novo\b|\bcaixa original\b|\boriginal\b/gi, " ")
     .replace(/\bryzen\s+[3579]\b/gi, " ")
+    .replace(/\bryzen\s+ai\s+[3579]\s*\d{3}\b|\bai\s*[3579]\s*\d{3}\b|\bai[3579]\d{3}\b/gi, " ")
     .replace(/\b(?:core\s+)?ultra\s+i?[579]\s*-?\s*\d{3}(?:h|hx)?\b/gi, " ")
     .replace(/\bintel\b|\bcore\b|\bultra\b|\bamd\b|\bryzen\b/gi, " ")
     .replace(/\b(i[3579])[\s-]*(\d{4,5})([a-z]{0,2})\b/gi, " ")

@@ -93,6 +93,20 @@ describe("summarizeMachine", () => {
 
 // ── extractRamGb ──────────────────────────────────────────────────────────────
 
+test("summarizeMachine identifica Ryzen AI 7 350 sem deixar CPU no modelo", () => {
+  assert.deepEqual(
+    summarizeMachine("ASUS Zenbook 14 OLED - 32GB RAM - Touch - Ryzen AI 7 350 (ai7350) — 32 GB RAM / 1024 GB / GPU n/d"),
+    {
+      brand: "Asus",
+      model: "Zenbook 14 Touch",
+      cpu: "Ryzen AI 7 350",
+      ram: "32 GB",
+      ssd: "1.024 GB",
+      gpu: null,
+    },
+  );
+});
+
 test("summarizeMachine identifica Core Ultra i7 no titulo e Intel Arc no detalhe", () => {
   assert.deepEqual(
     summarizeMachine(
