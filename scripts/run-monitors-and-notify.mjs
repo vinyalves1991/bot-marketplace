@@ -19,6 +19,7 @@ const CALLMEBOT_PHONE    = process.env.CALLMEBOT_PHONE ?? "554196968789";
 const CALLMEBOT_APIKEY   = process.env.CALLMEBOT_APIKEY ?? "2696242";
 const forceEmail         = process.argv.includes("--force-email");
 const skipMonitors       = process.argv.includes("--skip-monitors");
+const dryRun             = process.argv.includes("--dry-run"); // imprime mensagens e NÃO envia nada
 const onlyOlx            = process.argv.includes("--only-olx");
 const skipOlx            = process.argv.includes("--skip-olx") || process.env.SKIP_OLX === "1";
 const skipEnjoei         = process.argv.includes("--skip-enjoei") || process.env.SKIP_ENJOEI === "1";
@@ -53,26 +54,53 @@ async function main() {
     }
   }
 
-  const [olxReport, enjoeiReport, enjoeiNbReport] = await Promise.all([
-    skipOlx ? null : readLatestReport(OLX_DIR).catch(() => null),
-    onlyOlx || skipEnjoei ? null : readLatestReport(ENJOEI_DIR).catch(() => null),
-    onlyOlx || skipEnjoei ? null : readLatestReport(ENJOEI_NOTEBOOKS_DIR).catch(() => null),
+  const enjoeiOn = !onlyOlx && !skipEnjoei;
+  const [olxStd, olxPrem, enjoeiReport, enjoeiNbStd, enjoeiNbPrem] = await Promise.all([
+    skipOlx   ? null : readLatestReport(OLX_DIR).catch(() => null),
+    skipOlx   ? null : readLatestPremiumReport(OLX_DIR).catch(() => null),
+    enjoeiOn  ? readLatestReport(ENJOEI_DIR).catch(() => null) : null,
+    enjoeiOn  ? readLatestReport(ENJOEI_NOTEBOOKS_DIR).catch(() => null) : null,
+    enjoeiOn  ? readLatestPremiumReport(ENJOEI_NOTEBOOKS_DIR).catch(() => null) : null,
   ]);
 
-  const olxNew      = extractNewCount(olxReport,      /Novos anúncios válidos[^:]*:\s*\*\*(\d+)\*\*/);
-  const enjoeiNew   = extractNewCount(enjoeiReport,    /Novos produtos:\s*\*\*(\d+)\*\*/);
-  const enjoeiNbNew = extractNewCount(enjoeiNbReport,  /Novos notebooks[^:]*:\s*\*\*(\d+)\*\*/);
-  const totalNew    = olxNew + enjoeiNew + enjoeiNbNew;
+  // Cada fonte conta itens NOVOS e ALTERAÇÕES DE PREÇO (antes só contava novos do range padrão).
+  const sources = [
+    { label: "OLX Notebooks",     report: olxStd,       newRe: /Novos an[úu]ncios v[aá]lidos[^:]*:\s*\*\*(\d+)\*\*/, newSec: "## Novos anúncios", priceSec: "## Mudanças de preço" },
+    { label: "OLX Premium",       report: olxPrem,      newRe: /Novos an[úu]ncios:\s*\*\*(\d+)\*\*/,                 newSec: "## Novos anúncios", priceSec: "## Mudanças de preço" },
+    { label: "Enjoei Notebooks",  report: enjoeiNbStd,  newRe: /Novos notebooks[^:]*:\s*\*\*(\d+)\*\*/,              newSec: "## Novos notebooks", priceSec: "## Mudanças de preço" },
+    { label: "Enjoei NB Premium", report: enjoeiNbPrem, newRe: /Novos notebooks:\s*\*\*(\d+)\*\*/,                   newSec: "## Novos notebooks", priceSec: "## Mudanças de preço" },
+    { label: "Enjoei Tênis",      report: enjoeiReport, newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,                    newSec: "## Novos produtos",  priceSec: "## Mudancas de preco" },
+  ].map((s) => ({
+    ...s,
+    newCount:   extractNewCount(s.report, s.newRe),
+    priceCount: extractNewCount(s.report, PRICE_CHANGE_RE),
+  }));
 
-  console.log(`\nNovos — OLX: ${olxNew} | Enjoei tênis: ${enjoeiNew} | Enjoei NB: ${enjoeiNbNew}`);
+  const totalNew   = sources.reduce((sum, s) => sum + s.newCount, 0);
+  const totalPrice = sources.reduce((sum, s) => sum + s.priceCount, 0);
 
-  const subject     = buildSubject(olxNew, enjoeiNew, enjoeiNbNew, errors);
-  const body        = buildBody(olxReport, enjoeiReport, enjoeiNbReport, olxNew, enjoeiNew, enjoeiNbNew, errors);
-  const whatsappMsg = buildWhatsAppMessage(olxReport, enjoeiReport, enjoeiNbReport, olxNew, enjoeiNew, enjoeiNbNew, errors);
+  console.log("\nResumo desta rodada:");
+  for (const s of sources) {
+    if (!s.report) continue;
+    console.log(`  ${s.label}: ${s.newCount} novo(s), ${s.priceCount} preço(s)`);
+  }
+
+  const subject     = buildSubject(sources, errors);
+  const body        = buildBody(sources, errors);
+  const whatsappMsg = buildWhatsAppMessage(sources, errors);
 
   // WhatsApp sempre (heartbeat de execução).
-  // Email só quando há novidades ou erros (evita caixa cheia com confirmações vazias).
-  const sendingEmail = totalNew > 0 || errors.length > 0 || forceEmail;
+  // Email quando há novos itens, alterações de preço ou erros (evita caixa cheia com confirmações vazias).
+  const sendingEmail = totalNew > 0 || totalPrice > 0 || errors.length > 0 || forceEmail;
+
+  if (dryRun) {
+    console.log("\n── DRY-RUN (nada enviado) ──");
+    console.log(`Enviaria email? ${sendingEmail ? "sim" : "não"}`);
+    console.log(`\nSUBJECT: ${subject}`);
+    console.log(`\nWHATSAPP:\n${whatsappMsg}`);
+    console.log(`\nEMAIL BODY:\n${body || "(vazio)"}`);
+    return;
+  }
 
   const [emailResult, waResult] = await Promise.allSettled([
     sendingEmail ? sendEmail(subject, body) : Promise.resolve(null),
@@ -131,6 +159,18 @@ async function readLatestReport(dir) {
   return fs.readFile(path.join(dir, reports[0]), "utf8");
 }
 
+async function readLatestPremiumReport(dir) {
+  const entries = await fs.readdir(dir).catch(() => []);
+  const reports = entries
+    .filter((n) => n.startsWith("report-premium-") && n.endsWith(".md"))
+    .sort().reverse();
+  if (!reports.length) return null;
+  return fs.readFile(path.join(dir, reports[0]), "utf8");
+}
+
+// Aceita acento/sem acento: "Alterações de preço detectadas: **4**" e "Alteracoes de preco: **0**".
+const PRICE_CHANGE_RE = /Altera[cç][oõ]es de pre[cç]o[^:]*:\s*\*\*(\d+)\*\*/;
+
 function extractNewCount(report, regex) {
   if (!report) return 0;
   const m = report.match(regex);
@@ -139,48 +179,49 @@ function extractNewCount(report, regex) {
 
 // ── mensagens ─────────────────────────────────────────────────────────────────
 
-function buildSubject(olxNew, enjoeiNew, enjoeiNbNew, errors) {
+function buildSubject(sources, errors) {
+  const totalNew   = sources.reduce((sum, s) => sum + s.newCount, 0);
+  const totalPrice = sources.reduce((sum, s) => sum + s.priceCount, 0);
   const parts = [];
-  if (olxNew > 0)      parts.push(`${olxNew} novo(s) OLX`);
-  if (enjoeiNew > 0)   parts.push(`${enjoeiNew} novo(s) Enjoei tênis`);
-  if (enjoeiNbNew > 0) parts.push(`${enjoeiNbNew} novo(s) Enjoei NB`);
-  if (errors.length)   parts.push("erros");
-  if (!parts.length)   parts.push("sem itens novos");
+  if (totalNew > 0)   parts.push(`${totalNew} novo(s)`);
+  if (totalPrice > 0) parts.push(`${totalPrice} alteração(ões) de preço`);
+  if (errors.length)  parts.push("erros");
+  if (!parts.length)  parts.push("sem novidades");
   return `[Monitor] ${parts.join(" | ")} — ${new Date().toLocaleDateString("pt-BR")}`;
 }
 
-function buildBody(olxReport, enjoeiReport, enjoeiNbReport, olxNew, enjoeiNew, enjoeiNbNew, errors) {
+function buildBody(sources, errors) {
   const sections = [];
-  if (errors.length)    sections.push("## Erros nesta rodada\n" + errors.map((e) => `- ${e}`).join("\n"));
-  if (olxNew > 0 && olxReport)           sections.push(olxReport);
-  if (enjoeiNew > 0 && enjoeiReport)     sections.push(enjoeiReport);
-  if (enjoeiNbNew > 0 && enjoeiNbReport) sections.push(enjoeiNbReport);
+  if (errors.length) sections.push("## Erros nesta rodada\n" + errors.map((e) => `- ${e}`).join("\n"));
+  for (const s of sources) {
+    if ((s.newCount > 0 || s.priceCount > 0) && s.report) sections.push(s.report);
+  }
   return sections.join("\n\n---\n\n");
 }
 
-function buildWhatsAppMessage(olxReport, enjoeiReport, enjoeiNbReport, olxNew, enjoeiNew, enjoeiNbNew, errors) {
+function buildWhatsAppMessage(sources, errors) {
   const date = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
   const time = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
   const lines = [`Monitor ${date} ${time}`];
 
   if (errors.length) lines.push(`Erros: ${errors.join(", ")}`);
 
-  if (olxNew === 0 && enjoeiNew === 0 && enjoeiNbNew === 0) {
-    lines.push("Sem novos itens.");
+  const totalNew   = sources.reduce((sum, s) => sum + s.newCount, 0);
+  const totalPrice = sources.reduce((sum, s) => sum + s.priceCount, 0);
+
+  if (totalNew === 0 && totalPrice === 0) {
+    lines.push("Sem novos itens nem alterações de preço.");
     return lines.join("\n");
   }
 
-  if (olxNew > 0) {
-    lines.push(`\nOLX: ${olxNew} novo(s)`);
-    lines.push(...extractNewItems(olxReport, "## Novos anúncios").slice(0, 3));
-  }
-  if (enjoeiNbNew > 0) {
-    lines.push(`\nEnjoei Notebooks: ${enjoeiNbNew} novo(s)`);
-    lines.push(...extractNewItems(enjoeiNbReport, "## Novos notebooks").slice(0, 3));
-  }
-  if (enjoeiNew > 0) {
-    lines.push(`\nEnjoei Tênis: ${enjoeiNew} novo(s)`);
-    lines.push(...extractNewItems(enjoeiReport, "## Novos produtos").slice(0, 3));
+  for (const s of sources) {
+    if (s.newCount === 0 && s.priceCount === 0) continue;
+    const tags = [];
+    if (s.newCount > 0)   tags.push(`${s.newCount} novo(s)`);
+    if (s.priceCount > 0) tags.push(`${s.priceCount} preço(s)`);
+    lines.push(`\n${s.label}: ${tags.join(", ")}`);
+    if (s.newCount > 0)   lines.push(...extractNewItems(s.report, s.newSec).slice(0, 2));
+    if (s.priceCount > 0) lines.push(...extractNewItems(s.report, s.priceSec).slice(0, 2));
   }
 
   lines.push("\nDetalhes completos por email.");
