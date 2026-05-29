@@ -78,14 +78,23 @@ try {
     exit 0
   }
 
+  # As operacoes git abaixo emitem avisos benignos em stderr — "LF will be
+  # replaced by CRLF" ao indexar index.html, e o progresso do push. Sob
+  # ErrorActionPreference='Stop' com a saida redirecionada, esse stderr vira erro
+  # terminante e aborta ANTES do commit/push. O que importa e o exit code: rodamos
+  # com 'Continue' e verificamos commit/push explicitamente.
+  $ErrorActionPreference = 'Continue'
   git add data/olx index.html
   if (-not (git diff --staged --quiet)) {
     $stamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm")
     git commit -m "snapshots olx local $stamp"
+    if ($LASTEXITCODE -ne 0) { $ErrorActionPreference = $prevEAP; throw "git commit falhou (exit $LASTEXITCODE)." }
     git push origin main
+    if ($LASTEXITCODE -ne 0) { $ErrorActionPreference = $prevEAP; throw "git push falhou (exit $LASTEXITCODE)." }
   } else {
     Write-Host "Sem mudancas OLX para publicar."
   }
+  $ErrorActionPreference = $prevEAP
 
   $success = $true
 } finally {
