@@ -72,6 +72,7 @@ async function main() {
 
   const collected = await collectProducts(previousSnapshot);
   const snapshot = mergeWithPreviousSnapshot({ runDate, collected, previousSnapshot });
+  backfillSpecsFromTitle(snapshot);
 
   await fs.mkdir(automationRoot, { recursive: true });
 
@@ -289,6 +290,24 @@ async function fetchProductDetails(item) {
     storage_gb: extractStorageGb(text),
     gpu: extractGpuLabel(text),
   };
+}
+
+// Reaproveita melhorias dos parsers em itens carregados de snapshots antigos.
+// Itens "not_seen" sao copiados verbatim do snapshot anterior (lib/snapshot.mjs)
+// e nao passam por normalizeProduct/enriquecimento, entao ficam com campos
+// defasados — ex.: sem o campo cpu, que so foi adicionado depois, ou sem ram/ssd
+// que um parser melhorado agora consegue extrair. Preenchemos a partir do TITULO
+// apenas (puro, sem rede) e nunca sobrescrevemos dado ja existente. O que so
+// existe na descricao (3 dos itens sem cpu) nao e recuperavel aqui de proposito:
+// nao refazemos fetch de anuncios que sairam dos resultados.
+function backfillSpecsFromTitle(snapshot) {
+  for (const item of snapshot.items ?? []) {
+    const title = item.title ?? "";
+    if (item.cpu == null) { const v = extractCpuLabel(title); if (v != null) item.cpu = v; }
+    if (item.ram_gb == null) { const v = extractRamGb(title); if (v != null) item.ram_gb = v; }
+    if (item.storage_gb == null) { const v = extractStorageGb(title); if (v != null) item.storage_gb = v; }
+    if (item.gpu == null) { const v = extractGpuLabel(title); if (v != null) item.gpu = v; }
+  }
 }
 
 function mergeWithPreviousSnapshot({ runDate, collected, previousSnapshot }) {
