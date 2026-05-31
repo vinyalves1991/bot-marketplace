@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { extractGpuLabel } from "./lib/parsers.mjs";
+import { extractGpuLabel, parseBrlPrice } from "./lib/parsers.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -375,6 +375,9 @@ h1{font-size:1.3rem;color:#f0f6fc;margin-bottom:5px}
 .ip{color:#58a6ff;font-weight:700;white-space:nowrap;font-size:.78rem}
 .pf{color:#8b949e;text-decoration:line-through;font-size:.75rem}
 .pt{color:#e3b341;font-weight:700;font-size:.75rem}
+.arr{font-size:.7rem;font-weight:700;line-height:1}
+.arr.up{color:#f85149}
+.arr.down{color:#3fb950}
 </style>
 </head>
 <body>
@@ -424,13 +427,25 @@ function renderCard(r, dpath, showSpecs) {
 </div>`;
 }
 
+// Seta de direcao do preco (perspectiva de comprador): subiu = vermelha pra
+// cima (ruim), desceu = verde pra baixo (bom). Retorna "" se nao der pra
+// comparar ou se o valor nao mudou.
+function priceArrow(priceFrom, priceTo) {
+  const from = parseBrlPrice(priceFrom);
+  const to = parseBrlPrice(priceTo);
+  if (from == null || to == null || from === to) return "";
+  return to > from
+    ? ` <span class="arr up" title="subiu">▲</span>`
+    : ` <span class="arr down" title="desceu">▼</span>`;
+}
+
 function renderRow(item, isPrice, showSpecs) {
   if (showSpecs && item.machine) return renderMachineRow(item, isPrice);
   const titleHtml = item.url
     ? `<a href="${e(item.url)}" target="_blank">${e(item.title)}</a>`
     : e(item.title);
   if (isPrice && item.priceFrom && item.priceTo) {
-    return `<div class="item"><span class="it">${titleHtml}</span><span><span class="pf">${e(item.priceFrom)}</span> → <span class="pt">${e(item.priceTo)}</span></span></div>`;
+    return `<div class="item"><span class="it">${titleHtml}</span><span><span class="pf">${e(item.priceFrom)}</span> → <span class="pt">${e(item.priceTo)}</span>${priceArrow(item.priceFrom, item.priceTo)}</span></div>`;
   }
   return `<div class="item"><span class="it">${titleHtml}</span>${item.price ? `<span class="ip">${e(item.price)}</span>` : ""}</div>`;
 }
@@ -443,7 +458,7 @@ function renderMachineRow(item, isPrice) {
     : e(title);
   const gpu = m.gpu ?? "integrada/n/d";
   const priceHtml = isPrice && item.priceFrom && item.priceTo
-    ? `<span><span class="pf">${e(item.priceFrom)}</span> → <span class="pt">${e(item.priceTo)}</span></span>`
+    ? `<span><span class="pf">${e(item.priceFrom)}</span> → <span class="pt">${e(item.priceTo)}</span>${priceArrow(item.priceFrom, item.priceTo)}</span>`
     : item.price ? `<span class="ip">${e(item.price)}</span>` : "";
   return `<div class="item">
   <div class="machine-head"><span class="machine-title">${titleHtml}</span>${priceHtml}</div>
