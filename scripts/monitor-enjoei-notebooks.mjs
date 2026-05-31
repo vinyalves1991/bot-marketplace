@@ -31,7 +31,7 @@ const shippingRange = getOptionValue(args, "--shipping-range") ?? "same_country"
 const state = getOptionValue(args, "--state") ?? "pr";
 const city = getOptionValue(args, "--city") ?? "curitiba";
 const first = Number(getOptionValue(args, "--first") ?? 30);
-const detailMax = Number(getOptionValue(args, "--detail-max") ?? process.env.ENJOEI_DETAIL_MAX ?? 30);
+const detailMax = Number(getOptionValue(args, "--detail-max") ?? process.env.ENJOEI_DETAIL_MAX ?? 50);
 const maxPriceBrl = Number(getOptionValue(args, "--max-price") ?? PRICE_MAX_BRL);
 const minPriceBrl = Number(getOptionValue(args, "--min-price") ?? PRICE_MIN_BRL);
 const premiumMaxPriceBrl = Number(getOptionValue(args, "--premium-max-price") ?? PRICE_PREMIUM_MAX_BRL);
@@ -235,6 +235,11 @@ function isLikelyNotebookSearchHit(item) {
 
 // ── snapshot ─────────────────────────────────────────────────────────────────
 
+function titleConfirmsAnyTerm(item) {
+  const text = `${item.title ?? ""} ${item.brand ?? ""}`;
+  return (item.cpu_terms ?? []).some((t) => textContainsCpuTerm(text, t));
+}
+
 async function enrichMissingDetails(items, previousSnapshot) {
   const previousById = new Map((previousSnapshot?.items ?? []).map((item) => [item.id ?? item.url, item]));
   let opened = 0;
@@ -243,19 +248,48 @@ async function enrichMissingDetails(items, previousSnapshot) {
   for (const item of items) {
     const previous = previousById.get(item.id ?? item.url);
     let merged = mergeCachedDetails(item, previous);
-    if (needsProductDetails(merged) && opened < detailMax) {
+    // Texto-evidência usado para confirmar o CPU de fato. Começa com título+marca
+    // e ganha a descrição quando buscamos os detalhes.
+    let evidence = `${merged.title ?? ""} ${merged.brand ?? ""}`;
+    // Buscamos os detalhes quando faltam specs OU quando o título sozinho não
+    // confirma nenhum termo — nesse caso precisamos da descrição para verificar
+    // o CPU e não aceitar cegamente qualquer notebook que a busca difusa do
+    // Enjoei devolveu (ex.: i5-12450HX retornado para o termo 13450hx).
+    if ((needsProductDetails(merged) || !titleConfirmsAnyTerm(merged)) && opened < detailMax) {
       const details = await fetchProductDetails(merged).catch((error) => {
         console.warn(`  Aviso: não consegui enriquecer "${merged.title}" — ${error.message}`);
         return null;
       });
       opened += 1;
-      if (details) merged = mergeCachedDetails(merged, details);
+      if (details) {
+        merged = mergeCachedDetails(merged, details);
+        if (details.text) evidence += ` ${details.text}`;
+      }
     }
+    merged.__evidence = evidence;
     out.push(merged);
   }
-
   if (opened > 0) console.log(`Detalhes Enjoei abertos: ${opened}`);
-  return out;
+
+  // Verificação de precisão: mantém só os termos de CPU realmente presentes no
+  // título/descrição e descarta itens que não confirmam nenhum (falsos
+  // positivos da busca difusa). Isso elimina casos como "i5-13420H" marcado
+  // como 13620h ou "Ultra 7 255H" marcado como 255hx.
+  let dropped = 0;
+  const verified = [];
+  for (const item of out) {
+    const evidence = item.__evidence ?? `${item.title ?? ""} ${item.brand ?? ""}`;
+    delete item.__evidence;
+    const terms = (item.cpu_terms ?? []).filter((t) => textContainsCpuTerm(evidence, t));
+    if (terms.length === 0) {
+      dropped += 1;
+      console.log(`  Descartado (CPU não confere): "${item.title}" [buscado: ${(item.cpu_terms ?? []).join(", ")}]`);
+      continue;
+    }
+    verified.push({ ...item, cpu_terms: terms });
+  }
+  if (dropped > 0) console.log(`Itens descartados por CPU não confirmado: ${dropped}`);
+  return verified;
 }
 
 function mergeCachedDetails(item, details) {
@@ -290,6 +324,7 @@ async function fetchProductDetails(item) {
     ram_gb: extractRamGb(text),
     storage_gb: extractStorageGb(text),
     gpu: extractGpuLabel(text),
+    text, // texto-evidência (título + descrição) para verificar o CPU de fato
   };
 }
 

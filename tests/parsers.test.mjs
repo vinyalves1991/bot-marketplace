@@ -214,6 +214,17 @@ describe("textContainsCpuTerm", () => {
     assert.equal(textContainsCpuTerm("AMD Ryzen 9 7945HX3D notebook", "7945hx"), false));
   test("7945hx sem sufixo deve casar com termo 7945hx", () =>
     assert.equal(textContainsCpuTerm("Asus ROG 7945HX 32GB gaming", "7945hx"), true));
+  // regressões de falso positivo do Enjoei (CPU próxima, mas diferente)
+  test("13420H NÃO deve casar com termo 13620h", () =>
+    assert.equal(textContainsCpuTerm("notebook lenovo ideapad slim 3 i5-13420h 16gb", "13620h"), false));
+  test("12450HX NÃO deve casar com termo 13450hx", () =>
+    assert.equal(textContainsCpuTerm("notebook acer loq i5-12450hx rtx 3050", "13450hx"), false));
+  test("255H NÃO deve casar com termo 255hx", () =>
+    assert.equal(textContainsCpuTerm("notebook ultra 7 255h 32gb 1tb", "255hx"), false));
+  test("12500H NÃO deve casar com termo 12700h", () =>
+    assert.equal(textContainsCpuTerm("notebook dell g15 i5 12500h rtx 3050", "12700h"), false));
+  test("275HX NÃO deve casar com termo 255hx", () =>
+    assert.equal(textContainsCpuTerm("rog strix scar 16 ultra 9-275hx 32gb", "255hx"), false));
 });
 
 // ── has32GbRam ────────────────────────────────────────────────────────────────
