@@ -27,9 +27,7 @@ const DEFAULT_CDP_URL = "http://127.0.0.1:9222";
 const BASE_URL = "https://www.olx.com.br/brasil/informatica/notebooks";
 
 const PRICE_MIN_BRL = 2000;
-const PRICE_MAX_BRL = 4000;
-const PRICE_PREMIUM_MAX_BRL = 8000;
-const EXCEPTION_32GB_MAX_PRICE_BRL = 4500;
+const PRICE_MAX_BRL = 8000;
 const NAVIGATION_TIMEOUT_MS = 30_000;
 const DETAIL_TIMEOUT_MS = 25_000;
 const RAW_SCROLL_DELAY_MS = Number(process.env.OLX_SCROLL_DELAY_MS ?? 350);
@@ -143,14 +141,8 @@ async function main() {
     const reportPath = path.join(automationRoot, `report-${runId}.md`);
     await fs.writeFile(reportPath, report, "utf8");
 
-    const cheapCpuTerms = getCheapCpuTerms(snapshot);
-    const premiumReport = buildPremiumReport({ runDate, snapshot, previousSnapshot, cheapCpuTerms });
-    const premiumReportPath = path.join(automationRoot, `report-premium-${runId}.md`);
-    await fs.writeFile(premiumReportPath, premiumReport, "utf8");
-
     console.log(`Snapshot salvo: ${snapshotPath}`);
     console.log(`Relatório salvo: ${reportPath}`);
-    console.log(`Relatório premium salvo: ${premiumReportPath}`);
   } finally {
     await close();
   }
@@ -196,14 +188,8 @@ async function runWithRawCdp({ cdpUrl, runDate, runTimestamp, previousSnapshot }
   const reportPath = path.join(automationRoot, `report-${runId}.md`);
   await fs.writeFile(reportPath, report, "utf8");
 
-  const cheapCpuTerms = getCheapCpuTerms(snapshot);
-  const premiumReport = buildPremiumReport({ runDate, snapshot, previousSnapshot, cheapCpuTerms });
-  const premiumReportPath = path.join(automationRoot, `report-premium-${runId}.md`);
-  await fs.writeFile(premiumReportPath, premiumReport, "utf8");
-
   console.log(`Snapshot salvo: ${snapshotPath}`);
   console.log(`Relatório salvo: ${reportPath}`);
-  console.log(`Relatório premium salvo: ${premiumReportPath}`);
 }
 
 async function launchDedicatedChromeProfile(headlessMode) {
@@ -929,7 +915,6 @@ function extractConditionFromText(text) {
 function buildReport({ runDate, snapshot, previousSnapshot, priceMin, priceMax }) {
   const currentItems = snapshot.items.filter((x) => x.status === "active");
   const inRange = currentItems.filter((x) => x.price_brl != null && x.price_brl >= priceMin && x.price_brl <= priceMax);
-  const aboveRange = currentItems.filter((x) => x.price_brl != null && x.price_brl > priceMax);
 
   const previousById = new Map((previousSnapshot?.items ?? []).map((x) => [x.id ?? x.url, x]));
   const currentById = new Map(currentItems.map((x) => [x.id ?? x.url, x]));
@@ -950,11 +935,6 @@ function buildReport({ runDate, snapshot, previousSnapshot, priceMin, priceMax }
       priceChanges.push({ item, from: prev.price_brl, to: item.price_brl });
     }
   }
-
-  const topAbove = aboveRange
-    .slice()
-    .sort((a, b) => (a.price_brl ?? 0) - (b.price_brl ?? 0))
-    .slice(0, 3);
 
   const lines = [];
   lines.push(`# Monitor OLX notebooks por CPU — ${runDate}`);
@@ -1003,14 +983,6 @@ function buildReport({ runDate, snapshot, previousSnapshot, priceMin, priceMax }
     lines.push("");
   }
 
-  if (topAbove.length > 0) {
-    lines.push("## Opcional — 3 válidos mais baratos acima de R$ " + priceMax.toLocaleString("pt-BR"));
-    for (const item of topAbove) {
-      lines.push(formatItemLine(item));
-    }
-    lines.push("");
-  }
-
   return lines.join("\n");
 }
 
@@ -1040,7 +1012,7 @@ function mergeWithPreviousSnapshot({ runDate, collected, previousSnapshot }) {
   });
 }
 
-export { mergeWithPreviousSnapshot, getCheapCpuTerms, getReusablePreviousEnrichedItem, needsDetailEnrichment };
+export { mergeWithPreviousSnapshot, getReusablePreviousEnrichedItem, needsDetailEnrichment };
 
 function hasExcludedKeyword(text) {
   const normalized = (text ?? "").toString().toLowerCase();
@@ -1048,112 +1020,6 @@ function hasExcludedKeyword(text) {
 }
 
 
-function getCheapCpuTerms(snapshot) {
-  const terms = new Set();
-  for (const item of snapshot.items) {
-    if (
-      item.status === "active" &&
-      item.cpu_term &&
-      item.price_brl != null &&
-      item.price_brl >= PRICE_MIN_BRL &&
-      item.price_brl <= PRICE_MAX_BRL
-    ) {
-      terms.add(item.cpu_term);
-    }
-  }
-  return terms;
-}
-
-function buildPremiumReport({ runDate, snapshot, previousSnapshot, cheapCpuTerms }) {
-  const priceMin = PRICE_MAX_BRL;
-  const priceMax = PRICE_PREMIUM_MAX_BRL;
-  const exceptionMaxPrice = EXCEPTION_32GB_MAX_PRICE_BRL;
-
-  const currentItems = snapshot.items.filter((x) => x.status === "active");
-  const previousById = new Map((previousSnapshot?.items ?? []).map((x) => [x.id ?? x.url, x]));
-  const currentById = new Map(currentItems.map((x) => [x.id ?? x.url, x]));
-
-  const inRange = currentItems.filter((x) => {
-    if (x.price_brl == null || x.price_brl <= priceMin || x.price_brl > priceMax) return false;
-    if (cheapCpuTerms.has(x.cpu_term)) {
-      return has32GbRam(x) && x.price_brl <= exceptionMaxPrice;
-    }
-    return true;
-  });
-
-  const previousPremiumItems = (previousSnapshot?.items ?? []).filter(
-    (x) => x.price_brl != null && x.price_brl > priceMin && x.price_brl <= priceMax
-  );
-  const previousPremiumById = new Map(previousPremiumItems.map((x) => [x.id ?? x.url, x]));
-
-  const newItems = inRange.filter((x) => !previousById.has(x.id ?? x.url));
-  const stillActive = inRange.filter((x) => previousById.has(x.id ?? x.url));
-  const notSeenThisRun = previousPremiumItems
-    .filter((x) => x.status === "active")
-    .filter((x) => !currentById.has(x.id ?? x.url));
-
-  const priceChanges = [];
-  for (const item of inRange) {
-    const prev = previousPremiumById.get(item.id ?? item.url);
-    if (!prev) continue;
-    if (prev.price_brl != null && item.price_brl != null && prev.price_brl !== item.price_brl) {
-      priceChanges.push({ item, from: prev.price_brl, to: item.price_brl });
-    }
-  }
-
-  const lines = [];
-  lines.push(`# Monitor OLX notebooks PREMIUM (R$ ${(priceMin + 1).toLocaleString("pt-BR")}–R$ ${priceMax.toLocaleString("pt-BR")}) — ${runDate}`);
-  lines.push("");
-  lines.push("## Resumo executivo");
-  lines.push(`- Novos anúncios: **${newItems.length}**`);
-  lines.push(`- Já vistos: **${stillActive.length}**`);
-  lines.push(`- Não vistos nesta rodada: **${notSeenThisRun.length}**`);
-  lines.push(`- Alterações de preço: **${priceChanges.length}**`);
-  if (cheapCpuTerms.size > 0) {
-    lines.push(`- CPUs excluídos (disponíveis em R$ ${PRICE_MIN_BRL.toLocaleString("pt-BR")}–R$ ${priceMin.toLocaleString("pt-BR")}): ${[...cheapCpuTerms].join(", ")}`);
-    lines.push(`- Exceção: CPU excluído com 32 GB RAM aceito até R$ ${exceptionMaxPrice.toLocaleString("pt-BR")}`);
-  }
-  lines.push("");
-
-  lines.push("## Novos anúncios");
-  if (newItems.length === 0) {
-    lines.push("- Nenhum.");
-  } else {
-    for (const item of newItems.sort((a, b) => (a.price_brl ?? 0) - (b.price_brl ?? 0))) {
-      lines.push(formatItemLine(item));
-    }
-  }
-  lines.push("");
-
-  if (priceChanges.length > 0) {
-    lines.push("## Mudanças de preço");
-    for (const change of priceChanges.sort((a, b) => (a.to ?? 0) - (b.to ?? 0))) {
-      lines.push(formatPriceChangeLine(change));
-    }
-    lines.push("");
-  }
-
-  lines.push("## Anúncios já vistos");
-  if (stillActive.length === 0) {
-    lines.push("- Nenhum.");
-  } else {
-    for (const item of stillActive.sort((a, b) => (a.price_brl ?? 0) - (b.price_brl ?? 0))) {
-      lines.push(formatItemLine(item));
-    }
-  }
-  lines.push("");
-
-  if (notSeenThisRun.length > 0) {
-    lines.push("## Não vistos nesta rodada");
-    lines.push("- Observação: ausência não garante que o anúncio foi removido da OLX.");
-    for (const item of notSeenThisRun.sort((a, b) => (a.price_brl ?? 0) - (b.price_brl ?? 0))) {
-      lines.push(`- ${item.title} (${item.cpu_term}) — ${item.url}`);
-    }
-    lines.push("");
-  }
-
-  return lines.join("\n");
-}
 
 async function getLatestSnapshotPath(root) {
   try {

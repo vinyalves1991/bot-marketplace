@@ -60,21 +60,17 @@ async function main() {
   }
 
   const enjoeiOn = !onlyOlx && !skipEnjoei;
-  const [olxStd, olxPrem, enjoeiReport, enjoeiNbStd, enjoeiNbPrem] = await Promise.all([
+  const [olxStd, enjoeiReport, enjoeiNbStd] = await Promise.all([
     skipOlx   ? null : readLatestReport(OLX_DIR).catch(() => null),
-    skipOlx   ? null : readLatestPremiumReport(OLX_DIR).catch(() => null),
     enjoeiOn  ? readLatestReport(ENJOEI_DIR).catch(() => null) : null,
     enjoeiOn  ? readLatestReport(ENJOEI_NOTEBOOKS_DIR).catch(() => null) : null,
-    enjoeiOn  ? readLatestPremiumReport(ENJOEI_NOTEBOOKS_DIR).catch(() => null) : null,
   ]);
 
   // Cada fonte conta itens NOVOS e ALTERAÇÕES DE PREÇO (antes só contava novos do range padrão).
   const sources = [
-    { label: "OLX Notebooks",     report: olxStd,       newRe: /Novos an[úu]ncios v[aá]lidos[^:]*:\s*\*\*(\d+)\*\*/, newSec: "## Novos anúncios", priceSec: "## Mudanças de preço" },
-    { label: "OLX Premium",       report: olxPrem,      newRe: /Novos an[úu]ncios:\s*\*\*(\d+)\*\*/,                 newSec: "## Novos anúncios", priceSec: "## Mudanças de preço" },
-    { label: "Enjoei Notebooks",  report: enjoeiNbStd,  newRe: /Novos notebooks[^:]*:\s*\*\*(\d+)\*\*/,              newSec: "## Novos notebooks", priceSec: "## Mudanças de preço" },
-    { label: "Enjoei NB Premium", report: enjoeiNbPrem, newRe: /Novos notebooks:\s*\*\*(\d+)\*\*/,                   newSec: "## Novos notebooks", priceSec: "## Mudanças de preço" },
-    { label: "Enjoei Tênis",      report: enjoeiReport, newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,                    newSec: "## Novos produtos",  priceSec: "## Mudancas de preco" },
+    { label: "OLX Notebooks",    report: olxStd,      newRe: /Novos an[úu]ncios v[aá]lidos[^:]*:\s*\*\*(\d+)\*\*/, newSec: "## Novos anúncios", priceSec: "## Mudanças de preço" },
+    { label: "Enjoei Notebooks", report: enjoeiNbStd, newRe: /Novos notebooks[^:]*:\s*\*\*(\d+)\*\*/,              newSec: "## Novos notebooks", priceSec: "## Mudanças de preço" },
+    { label: "Enjoei Tênis",     report: enjoeiReport, newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,                    newSec: "## Novos produtos",  priceSec: "## Mudancas de preco" },
   ].map((s) => ({
     ...s,
     newCount:   extractNewCount(s.report, s.newRe),

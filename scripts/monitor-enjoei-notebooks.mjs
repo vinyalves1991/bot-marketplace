@@ -23,8 +23,7 @@ const EXCLUDE_PATTERNS = [
 ];
 
 const PRICE_MIN_BRL = 1500;
-const PRICE_MAX_BRL = 4000;
-const PRICE_PREMIUM_MAX_BRL = 8000;
+const PRICE_MAX_BRL = 8000;
 
 const args = process.argv.slice(2);
 const shippingRange = getOptionValue(args, "--shipping-range") ?? "same_country";
@@ -34,8 +33,6 @@ const first = Number(getOptionValue(args, "--first") ?? 30);
 const detailMax = Number(getOptionValue(args, "--detail-max") ?? process.env.ENJOEI_DETAIL_MAX ?? 50);
 const maxPriceBrl = Number(getOptionValue(args, "--max-price") ?? PRICE_MAX_BRL);
 const minPriceBrl = Number(getOptionValue(args, "--min-price") ?? PRICE_MIN_BRL);
-const premiumMaxPriceBrl = Number(getOptionValue(args, "--premium-max-price") ?? PRICE_PREMIUM_MAX_BRL);
-const collectionMaxPriceBrl = Math.max(maxPriceBrl, premiumMaxPriceBrl);
 const cpuArg = getOptionValue(args, "--cpu");
 const terms = cpuArg
   ? cpuArg.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean)
@@ -84,13 +81,8 @@ async function main() {
   const reportPath = path.join(automationRoot, `report-${runId}.md`);
   await fs.writeFile(reportPath, report, "utf8");
 
-  const premiumReport = buildPremiumReport({ runDate, snapshot, previousSnapshot });
-  const premiumReportPath = path.join(automationRoot, `report-premium-${runId}.md`);
-  await fs.writeFile(premiumReportPath, premiumReport, "utf8");
-
   console.log(`Coletados: ${collected.length} | Snapshot: ${snapshotPath}`);
   console.log(`Relatório: ${reportPath}`);
-  console.log(`Relatório premium: ${premiumReportPath}`);
 }
 
 // ── coleta ───────────────────────────────────────────────────────────────────
@@ -123,7 +115,7 @@ async function collectProducts(previousSnapshot) {
       for (const edge of products.edges ?? []) {
         const item = normalizeProduct(edge.node, term);
         if (!item) continue;
-        if (item.price_brl == null || item.price_brl < minPriceBrl || item.price_brl > collectionMaxPriceBrl) continue;
+        if (item.price_brl == null || item.price_brl < minPriceBrl || item.price_brl > maxPriceBrl) continue;
         if (!itemMatchesCpuTerm(item, term)) continue;
         if (hasExcludedKeyword(item.title)) continue;
 
@@ -372,14 +364,14 @@ function verifyCarriedItems(snapshot) {
 
 function mergeWithPreviousSnapshot({ runDate, collected, previousSnapshot }) {
   const previousItems = (previousSnapshot?.items ?? []).filter(
-    (i) => i.price_brl != null && i.price_brl >= minPriceBrl && i.price_brl <= collectionMaxPriceBrl
+    (i) => i.price_brl != null && i.price_brl >= minPriceBrl && i.price_brl <= maxPriceBrl
   );
   return mergeItems({
     runDate,
     collected,
     previousSnapshot: previousSnapshot ? { ...previousSnapshot, items: previousItems } : null,
     priceMin: minPriceBrl,
-    priceMax: collectionMaxPriceBrl,
+    priceMax: maxPriceBrl,
   });
 }
 
@@ -400,10 +392,6 @@ function buildReport({ runDate, snapshot, previousSnapshot }) {
   const notSeen = previousItems
     .filter((i) => i.status === "active")
     .filter((i) => !currentById.has(i.id ?? i.url));
-  const aboveRange = snapshot.items
-    .filter((i) => i.status === "active" && i.price_brl != null && i.price_brl > maxPriceBrl && i.price_brl <= premiumMaxPriceBrl)
-    .sort((a, b) => (a.price_brl ?? Infinity) - (b.price_brl ?? Infinity))
-    .slice(0, 5);
 
   const priceChanges = [];
   for (const item of currentItems) {
@@ -425,84 +413,6 @@ function buildReport({ runDate, snapshot, previousSnapshot }) {
   lines.push("");
 
   lines.push(`## Novos notebooks`);
-  if (!newItems.length) {
-    lines.push("- Nenhum.");
-  } else {
-    for (const item of sortByPrice(newItems)) lines.push(formatLine(item));
-  }
-  lines.push("");
-
-  if (priceChanges.length) {
-    lines.push("## Mudanças de preço");
-    for (const c of priceChanges.sort((a, b) => a.to - b.to)) {
-      lines.push(`- R$ ${fmtBrl(c.from)} → R$ ${fmtBrl(c.to)} — ${c.item.title} — ${c.item.url}`);
-    }
-    lines.push("");
-  }
-
-  lines.push("## Já vistos e ativos");
-  if (!stillActive.length) {
-    lines.push("- Nenhum.");
-  } else {
-    for (const item of sortByPrice(stillActive)) lines.push(formatLine(item));
-  }
-  lines.push("");
-
-  if (notSeen.length) {
-    lines.push("## Não vistos nesta rodada");
-    lines.push("- Observação: ausência não garante remoção do anúncio.");
-    for (const item of sortByPrice(notSeen)) lines.push(`- ${item.title} — ${item.url}`);
-    lines.push("");
-  }
-
-  if (aboveRange.length) {
-    lines.push(`## Opcional — válidos mais baratos acima de R$ ${fmtBrl(maxPriceBrl)}`);
-    lines.push("- Observação: esses itens ficam no relatório premium e não contam como novos na faixa principal.");
-    for (const item of aboveRange) lines.push(formatLine(item));
-    lines.push("");
-  }
-
-  return lines.join("\n");
-}
-
-function buildPremiumReport({ runDate, snapshot, previousSnapshot }) {
-  const priceMin = maxPriceBrl;
-  const priceMax = premiumMaxPriceBrl;
-  const currentItems = snapshot.items.filter(
-    (i) => i.status === "active" && i.price_brl != null && i.price_brl > priceMin && i.price_brl <= priceMax
-  );
-  const previousItems = (previousSnapshot?.items ?? []).filter(
-    (i) => i.price_brl != null && i.price_brl > priceMin && i.price_brl <= priceMax
-  );
-  const previousById = new Map(previousItems.map((i) => [i.id ?? i.url, i]));
-  const currentById = new Map(currentItems.map((i) => [i.id ?? i.url, i]));
-
-  const newItems = currentItems.filter((i) => !previousById.has(i.id ?? i.url));
-  const stillActive = currentItems.filter((i) => previousById.has(i.id ?? i.url));
-  const notSeen = previousItems
-    .filter((i) => i.status === "active")
-    .filter((i) => !currentById.has(i.id ?? i.url));
-
-  const priceChanges = [];
-  for (const item of currentItems) {
-    const prev = previousById.get(item.id ?? item.url);
-    if (prev?.price_brl != null && item.price_brl != null && prev.price_brl !== item.price_brl) {
-      priceChanges.push({ item, from: prev.price_brl, to: item.price_brl });
-    }
-  }
-
-  const lines = [];
-  lines.push(`# Monitor Enjoei notebooks PREMIUM (R$ ${fmtBrl(priceMin + 1)}–R$ ${fmtBrl(priceMax)}) — ${runDate}`);
-  lines.push("");
-  lines.push("## Resumo executivo");
-  lines.push(`- Novos notebooks: **${newItems.length}**`);
-  lines.push(`- Já vistos e ativos: **${stillActive.length}**`);
-  lines.push(`- Não vistos nesta rodada: **${notSeen.length}**`);
-  lines.push(`- Alterações de preço: **${priceChanges.length}**`);
-  lines.push(`- Termos: ${terms.join(", ")}`);
-  lines.push("");
-
-  lines.push("## Novos notebooks");
   if (!newItems.length) {
     lines.push("- Nenhum.");
   } else {
