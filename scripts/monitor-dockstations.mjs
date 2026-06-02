@@ -1,5 +1,5 @@
 // Monitor de dockstations (OLX + Enjoei) até um teto de preço.
-// Busca modelos específicos (ex.: SD25TB4, WD22TB4, UTD21B) e alerta quando
+// Busca modelos específicos (ex.: SD25TB4, WD22TB4, 40AY0090BR) e alerta quando
 // aparecem por menos que o preço máximo. OLX é coletado via Playwright (mesma
 // estratégia anti-Cloudflare do monitor de notebooks); Enjoei via API GraphQL.
 import fs from "node:fs/promises";
@@ -303,11 +303,20 @@ function textMatchesModel(text, model) {
   return normalizeCode(text).includes(normalizeCode(model));
 }
 
+// Um item do snapshot anterior só continua relevante se ainda casa com algum
+// modelo da busca atual — seja pelo campo `model` registrado, seja pelo título.
+// Assim, ao remover um modelo da lista, seus itens saem do histórico em vez de
+// ficarem presos como "não vistos" para sempre.
+function itemMatchesAnyModel(item) {
+  if (item.model && models.some((m) => normalizeCode(m) === normalizeCode(item.model))) return true;
+  return models.some((m) => textMatchesModel(item.title ?? "", m));
+}
+
 // ── snapshot + relatório ───────────────────────────────────────────────────────
 
 function mergeWithPreviousSnapshot({ runDate, collected, previousSnapshot }) {
   const previousItems = (previousSnapshot?.items ?? []).filter(
-    (i) => i.price_brl == null || i.price_brl <= maxPriceBrl
+    (i) => (i.price_brl == null || i.price_brl <= maxPriceBrl) && itemMatchesAnyModel(i)
   );
   return mergeItems({
     runDate,
@@ -321,7 +330,7 @@ function mergeWithPreviousSnapshot({ runDate, collected, previousSnapshot }) {
 function buildReport({ runDate, snapshot, previousSnapshot, errors }) {
   const currentItems = snapshot.items.filter((i) => i.status === "active");
   const previousItems = (previousSnapshot?.items ?? []).filter(
-    (i) => i.price_brl == null || i.price_brl <= maxPriceBrl
+    (i) => (i.price_brl == null || i.price_brl <= maxPriceBrl) && itemMatchesAnyModel(i)
   );
   const previousById = new Map(previousItems.map((i) => [i.id ?? i.url, i]));
   const currentById = new Map(currentItems.map((i) => [i.id ?? i.url, i]));
