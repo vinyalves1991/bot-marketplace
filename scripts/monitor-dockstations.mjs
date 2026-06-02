@@ -15,7 +15,7 @@ const automationRoot =
   process.env.DOCKSTATIONS_DATA_DIR ??
   path.join(process.env.USERPROFILE ?? process.env.HOME ?? "", ".codex", "automations", "monitor-dockstations");
 
-const DEFAULT_MODELS = ["SD25TB4", "WD22TB4", "UTD21B"];
+const DEFAULT_MODELS = ["SD25TB4", "WD22TB4", "40AY0090BR"];
 const PRICE_MAX_BRL = 500;
 
 // Perfil de Chrome próprio para não conflitar (lock de userDataDir) com o
