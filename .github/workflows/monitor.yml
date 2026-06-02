@@ -37,6 +37,7 @@ jobs:
           OLX_DATA_DIR: ${{ github.workspace }}/data/olx
           ENJOEI_DATA_DIR: ${{ github.workspace }}/data/enjoei
           ENJOEI_NOTEBOOKS_DATA_DIR: ${{ github.workspace }}/data/enjoei-notebooks
+          DOCKSTATIONS_DATA_DIR: ${{ github.workspace }}/data/dockstations
         run: node scripts/run-monitors-and-notify.mjs
 
       - name: Gerar dashboard HTML
@@ -44,6 +45,7 @@ jobs:
           OLX_DATA_DIR: ${{ github.workspace }}/data/olx
           ENJOEI_DATA_DIR: ${{ github.workspace }}/data/enjoei
           ENJOEI_NOTEBOOKS_DATA_DIR: ${{ github.workspace }}/data/enjoei-notebooks
+          DOCKSTATIONS_DATA_DIR: ${{ github.workspace }}/data/dockstations
         run: node scripts/generate-dashboard.mjs
 
       - name: Salvar snapshots no repositorio

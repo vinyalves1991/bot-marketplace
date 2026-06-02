@@ -8,6 +8,7 @@ const ROOT = path.resolve(__dirname, "..");
 const OLX_DIR              = process.env.OLX_DATA_DIR              ?? path.join(ROOT, "data", "olx");
 const ENJOEI_DIR           = process.env.ENJOEI_DATA_DIR           ?? path.join(ROOT, "data", "enjoei");
 const ENJOEI_NOTEBOOKS_DIR = process.env.ENJOEI_NOTEBOOKS_DATA_DIR ?? path.join(ROOT, "data", "enjoei-notebooks");
+const DOCKSTATIONS_DIR     = process.env.DOCKSTATIONS_DATA_DIR     ?? path.join(ROOT, "data", "dockstations");
 const OUTPUT = path.join(ROOT, "index.html");
 const REPO = "almeida3339/olx-daily";
 const BLOB = `https://github.com/${REPO}/blob/main`;
@@ -22,21 +23,21 @@ export { parseReport, formatRunLabelFromFile, summarizeMachine };
 async function main() {
   const olxDetails = await latestSnapshotDetails(OLX_DIR);
   const enjoeiNbDetails = await latestSnapshotDetails(ENJOEI_NOTEBOOKS_DIR);
-  const [olx, premium, enjoeiNb, enjoeiNbPremium, enjoei] = await Promise.all([
+  const [olx, enjoeiNb, enjoei, dock] = await Promise.all([
     gather(OLX_DIR, "report-", "report-premium-", olxDetails),
-    gather(OLX_DIR, "report-premium-", null, olxDetails),
     gather(ENJOEI_NOTEBOOKS_DIR, "report-", "report-premium-", enjoeiNbDetails),
-    gather(ENJOEI_NOTEBOOKS_DIR, "report-premium-", null, enjoeiNbDetails),
     gather(ENJOEI_DIR, "report-", null),
+    gather(DOCKSTATIONS_DIR, "report-", null),
   ]);
-  const [olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated] = await Promise.all([
+  const [olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated] = await Promise.all([
     latestRunLabel(OLX_DIR),
     latestRunLabel(ENJOEI_NOTEBOOKS_DIR),
     latestRunLabel(ENJOEI_DIR),
+    latestRunLabel(DOCKSTATIONS_DIR),
   ]);
   await fs.writeFile(
     OUTPUT,
-    buildHtml({ olx, premium, enjoeiNb, enjoeiNbPremium, enjoei, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated }),
+    buildHtml({ olx, enjoeiNb, enjoei, dock, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated }),
     "utf8"
   );
   console.log(`Dashboard gerado: ${OUTPUT}`);
@@ -325,7 +326,7 @@ function e(s) {
   return (s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function buildHtml({ olx, premium, enjoeiNb, enjoeiNbPremium, enjoei, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated }) {
+function buildHtml({ olx, enjoeiNb, enjoei, dock, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated }) {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -389,20 +390,20 @@ h1{font-size:1.3rem;color:#f0f6fc;margin-bottom:5px}
 <span class="u"><b>OLX</b> <time>${e(olxUpdated ?? "—")}</time></span>
 <span class="u"><b>Enjoei Notebooks</b> <time>${e(enjoeiNbUpdated ?? "—")}</time></span>
 <span class="u"><b>Enjoei Tênis</b> <time>${e(enjoeiTenisUpdated ?? "—")}</time></span>
+<span class="u"><b>Dockstations</b> <time>${e(dockUpdated ?? "—")}</time></span>
 </div>
 <div class="grid">
-${renderSection("OLX Notebooks", "R$ 2.000 – R$ 4.000", olx, "data/olx")}
-${renderSection("OLX Premium", "R$ 4.001 – R$ 8.000", premium, "data/olx")}
-${renderSection("Enjoei Notebooks", "R$ 1.500 – R$ 4.000", enjoeiNb, "data/enjoei-notebooks")}
-${renderSection("Enjoei NB Premium", "R$ 4.001 – R$ 8.000", enjoeiNbPremium, "data/enjoei-notebooks")}
+${renderSection("OLX Notebooks", "R$ 2.000 – R$ 8.000", olx, "data/olx")}
+${renderSection("Enjoei Notebooks", "R$ 1.500 – R$ 8.000", enjoeiNb, "data/enjoei-notebooks")}
 ${renderSection("Enjoei Tênis 42", "até R$ 500,00", enjoei, "data/enjoei")}
+${renderSection("Dockstations", "OLX + Enjoei · até R$ 500,00", dock, "data/dockstations")}
 </div>
 </body>
 </html>`;
 }
 
 function renderSection(title, sub, reports, dpath) {
-  const showSpecs = dpath !== "data/enjoei";
+  const showSpecs = dpath !== "data/enjoei" && dpath !== "data/dockstations";
   const body = reports.length === 0
     ? `<p class="empty">Nenhum run com novidades recentes.</p>`
     : reports.map((r) => renderCard(r, dpath, showSpecs)).join("\n");

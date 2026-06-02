@@ -9,6 +9,7 @@
     "monitor:olx-notebooks-por-cpu": "node scripts/monitor-olx-notebooks-por-cpu.mjs",
     "monitor:enjoei-tenis": "node scripts/monitor-enjoei-tenis.mjs",
     "monitor:enjoei-notebooks": "node scripts/monitor-enjoei-notebooks.mjs",
+    "monitor:dockstations": "node scripts/monitor-dockstations.mjs",
     "monitor:todos": "node scripts/run-monitors-and-notify.mjs",
     "monitor:todos:forcar-email": "node scripts/run-monitors-and-notify.mjs --force-email",
     "dashboard": "node scripts/generate-dashboard.mjs"
