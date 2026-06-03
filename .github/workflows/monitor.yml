@@ -41,34 +41,62 @@ jobs:
           FITBIT_DATA_DIR: ${{ github.workspace }}/data/fitbit
         run: node scripts/run-monitors-and-notify.mjs
 
-      - name: Gerar dashboard HTML
+      # O dashboard NAO e gerado aqui: ele depende de TODOS os dados (OLX do
+      # commit local + Enjoei deste run) e e regenerado no passo de publicacao,
+      # ja sincronizado com origin. Gerar antes produziria um index.html defasado
+      # que, no rebase, sobrescreveria o do outro lado (corrida CI x local).
+      - name: Salvar snapshots e publicar dashboard
         env:
           OLX_DATA_DIR: ${{ github.workspace }}/data/olx
           ENJOEI_DATA_DIR: ${{ github.workspace }}/data/enjoei
           ENJOEI_NOTEBOOKS_DATA_DIR: ${{ github.workspace }}/data/enjoei-notebooks
           DOCKSTATIONS_DATA_DIR: ${{ github.workspace }}/data/dockstations
           FITBIT_DATA_DIR: ${{ github.workspace }}/data/fitbit
-        run: node scripts/generate-dashboard.mjs
-
-      - name: Salvar snapshots no repositorio
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main || true
-          git add data/ index.html || true
-          if git diff --staged --quiet; then
-            echo "Sem mudancas para commitar."
-            exit 0
+
+          # (1) Commita apenas os dados coletados (pastas data/* nao conflitam
+          # entre CI e local). O dashboard entra depois, ja sincronizado.
+          git add data/
+          local_commit=0
+          if ! git diff --staged --quiet; then
+            git commit -m "snapshots $(date -u +%Y-%m-%dT%H:%M)"
+            local_commit=1
           fi
-          git commit -m "snapshots $(date -u +%Y-%m-%dT%H:%M)"
-          for i in 1 2 3; do
+
+          # (2) Publica. A cada tentativa: sincroniza com origin usando -X theirs
+          # (resolve o index.html sem travar em conflito — era a causa da falha do
+          # push das 16h), regenera o dashboard com TUDO e empurra.
+          for i in 1 2 3 4; do
+            git fetch origin
+            if ! git -c core.editor=true rebase -X theirs origin/main; then
+              git rebase --abort || true
+              echo "Rebase falhou (tentativa $i); nova tentativa."
+              sleep $((i * 5)); continue
+            fi
+
+            node scripts/generate-dashboard.mjs
+            git add index.html
+            if ! git diff --staged --quiet; then
+              if [ "$local_commit" -eq 1 ]; then
+                git commit --amend --no-edit
+              else
+                git commit -m "dashboard $(date -u +%Y-%m-%dT%H:%M)"
+                local_commit=1
+              fi
+            fi
+
+            if [ "$(git rev-list --count origin/main..HEAD)" -eq 0 ]; then
+              echo "Nada novo a publicar."
+              exit 0
+            fi
             if git push; then
               echo "Push ok (tentativa $i)."
               exit 0
             fi
-            echo "Tentativa $i falhou, aguardando $((i * 10))s..."
-            git pull --rebase origin main || true
-            sleep $((i * 10))
+            echo "Push rejeitado (tentativa $i) - re-sincronizando."
+            sleep $((i * 5))
           done
-          echo "Falha ao fazer push apos 3 tentativas."
+          echo "Falha ao publicar apos 4 tentativas."
           exit 1
