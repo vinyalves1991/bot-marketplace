@@ -100,15 +100,13 @@ try {
     throw "Monitor OLX local falhou com exit code $monitorExit."
   }
 
-  & node (Join-Path $PSScriptRoot "generate-dashboard.mjs")
-  $dashExit = $LASTEXITCODE
-  $ErrorActionPreference = $prevEAP
-  if ($dashExit -ne 0) {
-    throw "Geracao do dashboard falhou com exit code $dashExit."
-  }
-
   if ($NoPush) {
-    Write-Host "NoPush ativo: nao vou commitar nem publicar."
+    # Sem publicar: regenera o dashboard localmente apenas para inspecao.
+    & node (Join-Path $PSScriptRoot "generate-dashboard.mjs")
+    $dashExit = $LASTEXITCODE
+    $ErrorActionPreference = $prevEAP
+    if ($dashExit -ne 0) { throw "Geracao do dashboard falhou com exit code $dashExit." }
+    Write-Host "NoPush ativo: dashboard regenerado, nada commitado/publicado."
     $success = $true
     exit 0
   }
@@ -119,37 +117,60 @@ try {
   # terminante e aborta ANTES do commit/push. O que importa e o exit code: rodamos
   # com 'Continue' e verificamos commit/push explicitamente.
   $ErrorActionPreference = 'Continue'
-  git add data/olx data/dockstations data/fitbit index.html
+
+  # (1) Commita os dados coletados localmente (OLX/dockstations/fitbit). O
+  # dashboard NAO entra aqui — ele e gerado adiante, ja sincronizado com o CI.
+  git add data/olx data/dockstations data/fitbit
+  $stamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm")
+  $localCommitExists = $false
   if (-not (git diff --staged --quiet)) {
-    $stamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm")
     git commit -m "snapshots olx local $stamp"
     if ($LASTEXITCODE -ne 0) { $ErrorActionPreference = $prevEAP; throw "git commit falhou (exit $LASTEXITCODE)." }
-
-    # O push compete com o CI do Enjoei, que tambem publica em main. A coleta +
-    # dashboard leva minutos; o rebase de inicio de rodada ja fica defasado e, se o
-    # CI empurrar nesse meio-tempo, nosso push e rejeitado (non-fast-forward) e os
-    # dados do OLX ficam presos localmente. Foi exatamente o que aconteceu em
-    # 30/05 (run 10:52 coletou 161 itens, push rejeitado, exit 1). Por isso
-    # re-sincronizamos (fetch + rebase -X theirs) IMEDIATAMENTE antes de cada nova
-    # tentativa de push, ate 4 vezes.
-    $pushed = $false
-    for ($attempt = 1; $attempt -le 4 -and -not $pushed; $attempt++) {
-      git push origin main
-      if ($LASTEXITCODE -eq 0) { $pushed = $true; break }
-      Write-Host "Push rejeitado (tentativa $attempt/4) - re-sincronizando com origin/main."
-      git fetch origin
-      if ($LASTEXITCODE -ne 0) { Write-Host "fetch falhou; nova tentativa."; Start-Sleep -Seconds 3; continue }
-      git -c core.editor=true rebase -X theirs origin/main
-      if ($LASTEXITCODE -ne 0) {
-        git rebase --abort 2>$null
-        $ErrorActionPreference = $prevEAP
-        throw "Rebase pre-push falhou; estado limpo. Rodada abortada (a proxima tentara de novo)."
-      }
-    }
-    if (-not $pushed) { $ErrorActionPreference = $prevEAP; throw "git push falhou apos 4 tentativas." }
-  } else {
-    Write-Host "Sem mudancas OLX para publicar."
+    $localCommitExists = $true
   }
+
+  # (2) Publica. O dashboard e regenerado DENTRO do loop, sempre DEPOIS de
+  # sincronizar com origin, para refletir tambem o que o CI (Enjoei) publicou
+  # durante a nossa coleta. Antes, o dashboard era gerado com dados defasados e o
+  # -X theirs fazia o index.html local sobrescrever o do CI — escondendo, p.ex., a
+  # queda de preco de um tenis ja coletada pelo CI (incidente 03/06 16h). O push
+  # tambem compete com o CI por main, entao re-sincronizamos a cada tentativa.
+  $pushed = $false
+  for ($attempt = 1; $attempt -le 4 -and -not $pushed; $attempt++) {
+    git fetch origin
+    if ($LASTEXITCODE -ne 0) { Write-Host "fetch falhou (tentativa $attempt/4); nova tentativa."; Start-Sleep -Seconds 3; continue }
+
+    git -c core.editor=true rebase -X theirs origin/main
+    if ($LASTEXITCODE -ne 0) {
+      git rebase --abort 2>$null
+      $ErrorActionPreference = $prevEAP
+      throw "Rebase pre-push falhou; estado limpo. Rodada abortada (a proxima tentara de novo)."
+    }
+
+    # Regenera o dashboard com OLX local (ja commitado) + dados do CI recem-trazidos.
+    & node (Join-Path $PSScriptRoot "generate-dashboard.mjs")
+    if ($LASTEXITCODE -ne 0) { $ErrorActionPreference = $prevEAP; throw "Geracao do dashboard falhou (exit $LASTEXITCODE)." }
+    git add index.html
+    if (-not (git diff --staged --quiet)) {
+      if ($localCommitExists) {
+        git commit --amend --no-edit
+      } else {
+        git commit -m "dashboard local $stamp"
+        $localCommitExists = $true
+      }
+      if ($LASTEXITCODE -ne 0) { $ErrorActionPreference = $prevEAP; throw "git commit (dashboard) falhou (exit $LASTEXITCODE)." }
+    }
+
+    # Nada a publicar (sem dados OLX novos e dashboard identico ao do origin).
+    $ahead = [int](git rev-list --count "origin/main..HEAD")
+    if ($ahead -eq 0) { Write-Host "Nada novo a publicar."; $pushed = $true; break }
+
+    git push origin main
+    if ($LASTEXITCODE -eq 0) { $pushed = $true; break }
+    Write-Host "Push rejeitado (tentativa $attempt/4) - re-sincronizando com origin/main."
+  }
+  if (-not $pushed) { $ErrorActionPreference = $prevEAP; throw "git push falhou apos 4 tentativas." }
+
   $ErrorActionPreference = $prevEAP
 
   $success = $true
