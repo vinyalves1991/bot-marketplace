@@ -378,6 +378,9 @@ describe("parseReport", () => {
 ## Novos notebooks
 - R$ 2.000 — Notebook Acer i7-13620H — 16 GB RAM / 512 GB — https://www.enjoei.com.br/p/notebook-acer-1
 - R$ 3.000 — Notebook Asus Ryzen 7840HS — 32 GB RAM / 1 TB — https://www.enjoei.com.br/p/notebook-asus-2
+
+## Mudanças de preço
+- R$ 3.200,00 → R$ 3.000,00 — Notebook Asus Ryzen 7840HS — https://www.enjoei.com.br/p/notebook-asus-2
 `.trim();
 
   test("newCount — OLX report", () => assert.equal(parseReport(olxReport).newCount, 3));
@@ -411,5 +414,33 @@ describe("parseReport", () => {
     assert.equal(priceItems.length, 2);
     assert.ok(priceItems[0].priceFrom != null);
     assert.ok(priceItems[0].priceTo != null);
+  });
+
+  const olxReportAcima10k = `
+# Monitor OLX notebooks por CPU — 2026-06-02
+
+## Resumo executivo
+- Novos anúncios válidos (R$ 2.000–R$ 8.000): **1**
+- Alterações de preço detectadas: **3**
+
+## Novos anúncios (R$ 2.000–R$ 8.000)
+- R$ 7.500 — Notebook Asus i9-13980HX — 32 GB RAM / 1 TB — https://sp.olx.com.br/notebooks/asus-ok
+
+## Mudanças de preço
+- R$ 8.000 → R$ 8.499 — Asus ROG Strix G16 (13980hx) — https://sp.olx.com.br/notebooks/asus-8499
+- R$ 10.899 → R$ 11.999 — Acer Predator Helios (275hx) — https://sp.olx.com.br/notebooks/acer-12k
+- R$ 17.450 → R$ 17.300 — Kit Razer Blade 18 (13950hx) — https://sp.olx.com.br/notebooks/razer-17k
+`.trim();
+
+  test("itens acima de R$ 10 mil são filtrados (mudanças de preço)", () => {
+    const { priceItems, priceCount } = parseReport(olxReportAcima10k);
+    assert.equal(priceCount, 1);
+    assert.equal(priceItems.length, 1);
+    assert.equal(priceItems[0].priceTo, "R$ 8.499");
+  });
+  test("itens até R$ 10 mil são mantidos (novos)", () => {
+    const { newItems, newCount } = parseReport(olxReportAcima10k);
+    assert.equal(newCount, 1);
+    assert.equal(newItems[0].price, "R$ 7.500");
   });
 });

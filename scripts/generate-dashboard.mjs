@@ -14,6 +14,11 @@ const OUTPUT = path.join(ROOT, "index.html");
 const REPO = "almeida3339/olx-daily";
 const BLOB = `https://github.com/${REPO}/blob/main`;
 const MAX = 5;
+// Teto de preço para itens exibidos (espelha o filtro de mudanças de preço do
+// monitor OLX). Aplicado aqui também para valer retroativamente em relatórios
+// antigos, que foram gerados antes do filtro existir. Itens acima disso (ex.:
+// notebooks > R$ 10 mil) não aparecem no dashboard.
+const PRICE_CAP_BRL = 10000;
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main().catch((e) => { console.error(e.message); process.exitCode = 1; });
@@ -95,25 +100,26 @@ async function latestRunLabel(dir) {
 // ── parser ───────────────────────────────────────────────────────────────────
 
 function parseReport(txt, detailsByUrl = new Map()) {
-  const num = (patterns) => {
-    for (const r of patterns) { const m = txt.match(r); if (m) return +m[1]; }
-    return 0;
-  };
-  const newCount = num([
-    /Novos an[úu]ncios v[aá]lidos[^:]*:\s*\*\*(\d+)\*\*/,
-    /Novos an[úu]ncios:\s*\*\*(\d+)\*\*/,
-    /Novos produtos:\s*\*\*(\d+)\*\*/,
-    /Novos notebooks[^:]*:\s*\*\*(\d+)\*\*/,
-  ]);
-  const priceCount = num([
-    /Altera[cç][oõ]es de pre[cç]o[^:]*:\s*\*\*(\d+)\*\*/,
-    /Altera[cç]oes de preco:\s*\*\*(\d+)\*\*/,
-  ]);
   const dateM = txt.match(/[—\-]\s*(\d{4}-\d{2}-\d{2})/);
   const date = dateM ? dateM[1] : null;
-  const newItems = extractItems(txt, /^## Novos (an[úu]ncios|produtos|notebooks)/m, detailsByUrl);
-  const priceItems = extractItems(txt, /^## Mudan[cç]as? de pre[cç]o/m, detailsByUrl);
-  return { newCount, priceCount, date, newItems, priceItems };
+
+  // Contagem e itens derivam das próprias seções (já filtradas pelo teto de
+  // preço), em vez do resumo. Assim o badge bate com as linhas exibidas e
+  // relatórios cujos únicos itens estão acima do teto somem do dashboard.
+  const withinCap = (item) => {
+    const p = parseBrlPrice(item.priceTo ?? item.price);
+    return p == null || p <= PRICE_CAP_BRL;
+  };
+  const newItems = extractItems(txt, /^## Novos (an[úu]ncios|produtos|notebooks)/m, detailsByUrl).filter(withinCap);
+  const priceItems = extractItems(txt, /^## Mudan[cç]as? de pre[cç]o/m, detailsByUrl).filter(withinCap);
+
+  return {
+    newCount: newItems.length,
+    priceCount: priceItems.length,
+    date,
+    newItems: newItems.slice(0, MAX),
+    priceItems: priceItems.slice(0, MAX),
+  };
 }
 
 function extractItems(txt, sectionRe, detailsByUrl = new Map()) {
@@ -125,7 +131,6 @@ function extractItems(txt, sectionRe, detailsByUrl = new Map()) {
   return block
     .split("\n")
     .filter((l) => l.startsWith("- ") && !/Nenhum|Observa[cç]|CPUs? exclu/i.test(l))
-    .slice(0, MAX)
     .map((line) => parseLine(line, detailsByUrl));
 }
 
