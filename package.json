@@ -12,6 +12,7 @@
     "monitor:dockstations": "node scripts/monitor-dockstations.mjs",
     "monitor:fitbit": "node scripts/monitor-fitbit.mjs",
     "monitor:lifefactory": "node scripts/monitor-lifefactory.mjs",
+    "monitor:tela-galaxybook3": "node scripts/monitor-tela-galaxybook3.mjs",
     "monitor:todos": "node scripts/run-monitors-and-notify.mjs",
     "monitor:todos:forcar-email": "node scripts/run-monitors-and-notify.mjs --force-email",
     "dashboard": "node scripts/generate-dashboard.mjs"
