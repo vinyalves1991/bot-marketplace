@@ -16,6 +16,7 @@ runWatchlistMonitor({
   maxPrice: 75,
   minSizeMl: 500,
   maxSizeMl: 1000,
+  excludeTerms: ["mamadeira"],
 }).catch((error) => {
   console.error(`\nFalha: ${error.stack || error.message}`);
   process.exitCode = 1;

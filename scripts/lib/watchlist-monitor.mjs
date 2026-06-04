@@ -26,6 +26,7 @@ const NAVIGATION_TIMEOUT_MS = 30_000;
  * @param {number} config.maxPrice     Preço máximo (inclusivo).
  * @param {number} [config.minSizeMl]  Capacidade mínima em ml (opcional).
  * @param {number} [config.maxSizeMl]  Capacidade máxima em ml (opcional).
+ * @param {string[]} [config.excludeTerms] Termos que, se presentes no título, descartam o item.
  */
 export async function runWatchlistMonitor(config) {
   const args = process.argv.slice(2);
@@ -62,6 +63,14 @@ export async function runWatchlistMonitor(config) {
     if (maxSizeMl != null && ml > maxSizeMl) return false;
     return true;
   };
+  // Descarta itens cujo título contém algum termo de exclusão (ex.: "mamadeira"
+  // numa busca por garrafas). Comparação tolerante a acentos e caixa.
+  const excludeTerms = (config.excludeTerms ?? []).map((t) => normalizeText(t));
+  const notExcluded = (text) => {
+    if (excludeTerms.length === 0) return true;
+    const n = normalizeText(text);
+    return !excludeTerms.some((t) => n.includes(t));
+  };
   const matchesAnyTerm = (item) => {
     const recorded = item.term ?? item.model;
     if (recorded && terms.some((t) => normalizeCode(t) === normalizeCode(recorded))) return true;
@@ -87,7 +96,7 @@ export async function runWatchlistMonitor(config) {
 
   if (!skipEnjoei) {
     try {
-      collected.push(...(await collectEnjoei({ terms, slug, inRange, sizeOk })));
+      collected.push(...(await collectEnjoei({ terms, slug, inRange, sizeOk, notExcluded })));
     } catch (error) {
       console.warn(`Aviso: coleta Enjoei falhou — ${error.message}`);
       errors.push(`Enjoei: ${error.message}`);
@@ -96,7 +105,7 @@ export async function runWatchlistMonitor(config) {
 
   if (!skipOlx) {
     try {
-      collected.push(...(await collectOlx({ terms, userDataDir, headless, inRange, sizeOk })));
+      collected.push(...(await collectOlx({ terms, userDataDir, headless, inRange, sizeOk, notExcluded })));
     } catch (error) {
       console.warn(`Aviso: coleta OLX falhou — ${error.message}`);
       errors.push(`OLX: ${error.message}`);
@@ -112,7 +121,7 @@ export async function runWatchlistMonitor(config) {
   const deduped = [...byKey.values()];
 
   const previousItemsInScope = (previousSnapshot?.items ?? []).filter(
-    (i) => (i.price_brl == null || inRange(i.price_brl)) && matchesAnyTerm(i) && sizeOk(i.title ?? "")
+    (i) => (i.price_brl == null || inRange(i.price_brl)) && matchesAnyTerm(i) && sizeOk(i.title ?? "") && notExcluded(i.title ?? "")
   );
   const snapshot = mergeItems({
     runDate,
@@ -137,7 +146,7 @@ export async function runWatchlistMonitor(config) {
 
 // ── Enjoei (API GraphQL) ───────────────────────────────────────────────────────
 
-async function collectEnjoei({ terms, slug, inRange, sizeOk }) {
+async function collectEnjoei({ terms, slug, inRange, sizeOk, notExcluded }) {
   const out = [];
   for (let i = 0; i < terms.length; i += 1) {
     const term = terms[i];
@@ -166,6 +175,7 @@ async function collectEnjoei({ terms, slug, inRange, sizeOk }) {
       if (!Number.isFinite(price) || !inRange(price)) continue;
       if (!textMatchesTerm(`${title} ${brand}`, term)) continue;
       if (!sizeOk(`${title} ${brand}`)) continue;
+      if (!notExcluded(`${title} ${brand}`)) continue;
       out.push({
         id: `enjoei-${node.id}`,
         url: `${ENJOEI_SITE_ORIGIN}/p/${node.path}`,
@@ -200,7 +210,7 @@ function buildEnjoeiApiUrl(term, slug) {
 
 // ── OLX (Playwright) ───────────────────────────────────────────────────────────
 
-async function collectOlx({ terms, userDataDir, headless, inRange, sizeOk }) {
+async function collectOlx({ terms, userDataDir, headless, inRange, sizeOk, notExcluded }) {
   const isCI = Boolean(process.env.CI);
   const launchOptions = {
     headless: headless || isCI,
@@ -248,6 +258,7 @@ async function collectOlx({ terms, userDataDir, headless, inRange, sizeOk }) {
           if (!inRange(card.price_brl)) continue;
           if (!textMatchesTerm(card.title, term)) continue;
           if (!sizeOk(card.title)) continue;
+          if (!notExcluded(card.title)) continue;
           out.push({
             id: extractOlxId(card.url) ?? card.url,
             url: card.url,
@@ -338,6 +349,16 @@ function normalizeCode(text) {
 
 function textMatchesTerm(text, term) {
   return normalizeCode(text).includes(normalizeCode(term));
+}
+
+// Normaliza preservando espaços (lowercase, sem acentos) — para casar termos de
+// exclusão por palavra, ex.: "mamadeira" em "mamadeira de vidro".
+function normalizeText(text) {
+  return (text ?? "")
+    .toString()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase();
 }
 
 // Extrai a capacidade declarada no texto em ml. Aceita "500ml", "500 ml",
