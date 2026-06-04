@@ -10,6 +10,7 @@ const ENJOEI_DIR           = process.env.ENJOEI_DATA_DIR           ?? path.join(
 const ENJOEI_NOTEBOOKS_DIR = process.env.ENJOEI_NOTEBOOKS_DATA_DIR ?? path.join(ROOT, "data", "enjoei-notebooks");
 const DOCKSTATIONS_DIR     = process.env.DOCKSTATIONS_DATA_DIR     ?? path.join(ROOT, "data", "dockstations");
 const FITBIT_DIR           = process.env.FITBIT_DATA_DIR           ?? path.join(ROOT, "data", "fitbit");
+const LIFEFACTORY_DIR      = process.env.LIFEFACTORY_DATA_DIR      ?? path.join(ROOT, "data", "lifefactory");
 const OUTPUT = path.join(ROOT, "index.html");
 const REPO = "almeida3339/olx-daily";
 const BLOB = `https://github.com/${REPO}/blob/main`;
@@ -29,23 +30,25 @@ export { parseReport, formatRunLabelFromFile, summarizeMachine };
 async function main() {
   const olxDetails = await latestSnapshotDetails(OLX_DIR);
   const enjoeiNbDetails = await latestSnapshotDetails(ENJOEI_NOTEBOOKS_DIR);
-  const [olx, enjoeiNb, enjoei, dock, fitbit] = await Promise.all([
+  const [olx, enjoeiNb, enjoei, dock, fitbit, lifefactory] = await Promise.all([
     gather(OLX_DIR, "report-", "report-premium-", olxDetails),
     gather(ENJOEI_NOTEBOOKS_DIR, "report-", "report-premium-", enjoeiNbDetails),
     gather(ENJOEI_DIR, "report-", null),
     gather(DOCKSTATIONS_DIR, "report-", null),
     gather(FITBIT_DIR, "report-", null),
+    gather(LIFEFACTORY_DIR, "report-", null),
   ]);
-  const [olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated] = await Promise.all([
+  const [olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated] = await Promise.all([
     latestRunLabel(OLX_DIR),
     latestRunLabel(ENJOEI_NOTEBOOKS_DIR),
     latestRunLabel(ENJOEI_DIR),
     latestRunLabel(DOCKSTATIONS_DIR),
     latestRunLabel(FITBIT_DIR),
+    latestRunLabel(LIFEFACTORY_DIR),
   ]);
   await fs.writeFile(
     OUTPUT,
-    buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated }),
+    buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated }),
     "utf8"
   );
   console.log(`Dashboard gerado: ${OUTPUT}`);
@@ -334,7 +337,7 @@ function e(s) {
   return (s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated }) {
+function buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated }) {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -401,6 +404,7 @@ h1{font-size:1.3rem;color:#f0f6fc;margin-bottom:5px}
 <span class="u"><b>Enjoei Tênis</b> <time>${e(enjoeiTenisUpdated ?? "—")}</time></span>
 <span class="u"><b>Dockstations</b> <time>${e(dockUpdated ?? "—")}</time></span>
 <span class="u"><b>Fitbit Air</b> <time>${e(fitbitUpdated ?? "—")}</time></span>
+<span class="u"><b>Lifefactory</b> <time>${e(lifefactoryUpdated ?? "—")}</time></span>
 </div>
 <div class="grid">
 ${renderSection("OLX Notebooks", "R$ 2.000 – R$ 8.000", olx, "data/olx")}
@@ -408,13 +412,14 @@ ${renderSection("Enjoei Notebooks", "R$ 1.500 – R$ 8.000", enjoeiNb, "data/enj
 ${renderSection("Enjoei Tênis 42", "até R$ 500,00", enjoei, "data/enjoei")}
 ${renderSection("Dockstations", "OLX + Enjoei · até R$ 500,00", dock, "data/dockstations")}
 ${renderSection("Fitbit Air", "OLX + Enjoei · R$ 300 – R$ 600", fitbit, "data/fitbit")}
+${renderSection("Lifefactory", "OLX + Enjoei · 500ml–1L · R$ 25 – R$ 75", lifefactory, "data/lifefactory")}
 </div>
 </body>
 </html>`;
 }
 
 function renderSection(title, sub, reports, dpath) {
-  const showSpecs = dpath !== "data/enjoei" && dpath !== "data/dockstations" && dpath !== "data/fitbit";
+  const showSpecs = dpath !== "data/enjoei" && dpath !== "data/dockstations" && dpath !== "data/fitbit" && dpath !== "data/lifefactory";
   const body = reports.length === 0
     ? `<p class="empty">Nenhum run com novidades recentes.</p>`
     : reports.map((r) => renderCard(r, dpath, showSpecs)).join("\n");

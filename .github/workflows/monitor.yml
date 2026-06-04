@@ -39,6 +39,7 @@ jobs:
           ENJOEI_NOTEBOOKS_DATA_DIR: ${{ github.workspace }}/data/enjoei-notebooks
           DOCKSTATIONS_DATA_DIR: ${{ github.workspace }}/data/dockstations
           FITBIT_DATA_DIR: ${{ github.workspace }}/data/fitbit
+          LIFEFACTORY_DATA_DIR: ${{ github.workspace }}/data/lifefactory
         run: node scripts/run-monitors-and-notify.mjs
 
       # O dashboard NAO e gerado aqui: ele depende de TODOS os dados (OLX do
@@ -52,6 +53,7 @@ jobs:
           ENJOEI_NOTEBOOKS_DATA_DIR: ${{ github.workspace }}/data/enjoei-notebooks
           DOCKSTATIONS_DATA_DIR: ${{ github.workspace }}/data/dockstations
           FITBIT_DATA_DIR: ${{ github.workspace }}/data/fitbit
+          LIFEFACTORY_DATA_DIR: ${{ github.workspace }}/data/lifefactory
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

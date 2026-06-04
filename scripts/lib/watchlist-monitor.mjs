@@ -24,6 +24,8 @@ const NAVIGATION_TIMEOUT_MS = 30_000;
  * @param {string[]} config.terms      Termos/modelos a buscar.
  * @param {number} [config.minPrice=0] Preço mínimo (inclusivo).
  * @param {number} config.maxPrice     Preço máximo (inclusivo).
+ * @param {number} [config.minSizeMl]  Capacidade mínima em ml (opcional).
+ * @param {number} [config.maxSizeMl]  Capacidade máxima em ml (opcional).
  */
 export async function runWatchlistMonitor(config) {
   const args = process.argv.slice(2);
@@ -45,7 +47,21 @@ export async function runWatchlistMonitor(config) {
     ? termsArg.split(",").map((s) => s.trim()).filter(Boolean)
     : config.terms;
 
+  const minSizeMl = config.minSizeMl ?? null;
+  const maxSizeMl = config.maxSizeMl ?? null;
+
   const inRange = (price) => price != null && price >= minPrice && price <= maxPrice;
+  // Filtro de capacidade (opcional): exclui apenas itens cujo título declara um
+  // tamanho FORA da faixa. Itens sem capacidade detectável são mantidos — melhor
+  // mostrar e deixar o usuário avaliar do que descartar por falta de info.
+  const sizeOk = (text) => {
+    if (minSizeMl == null && maxSizeMl == null) return true;
+    const ml = extractCapacityMl(text);
+    if (ml == null) return true;
+    if (minSizeMl != null && ml < minSizeMl) return false;
+    if (maxSizeMl != null && ml > maxSizeMl) return false;
+    return true;
+  };
   const matchesAnyTerm = (item) => {
     const recorded = item.term ?? item.model;
     if (recorded && terms.some((t) => normalizeCode(t) === normalizeCode(recorded))) return true;
@@ -59,8 +75,11 @@ export async function runWatchlistMonitor(config) {
   const previousSnapshotPath = await getLatestSnapshotPath(dataDir);
   const previousSnapshot = previousSnapshotPath ? await readJsonSafe(previousSnapshotPath) : null;
 
+  const sizeLabel = (minSizeMl != null || maxSizeMl != null)
+    ? ` | ${minSizeMl ?? 0}–${maxSizeMl ?? "∞"} ml`
+    : "";
   console.log(`Execução ${label}: ${now.toISOString()}`);
-  console.log(`Termos: ${terms.join(", ")} | R$ ${minPrice}–R$ ${maxPrice}`);
+  console.log(`Termos: ${terms.join(", ")} | R$ ${minPrice}–R$ ${maxPrice}${sizeLabel}`);
   console.log(`Snapshot anterior: ${previousSnapshotPath ?? "(nenhum)"}\n`);
 
   const collected = [];
@@ -68,7 +87,7 @@ export async function runWatchlistMonitor(config) {
 
   if (!skipEnjoei) {
     try {
-      collected.push(...(await collectEnjoei({ terms, slug, inRange })));
+      collected.push(...(await collectEnjoei({ terms, slug, inRange, sizeOk })));
     } catch (error) {
       console.warn(`Aviso: coleta Enjoei falhou — ${error.message}`);
       errors.push(`Enjoei: ${error.message}`);
@@ -77,7 +96,7 @@ export async function runWatchlistMonitor(config) {
 
   if (!skipOlx) {
     try {
-      collected.push(...(await collectOlx({ terms, userDataDir, headless, inRange })));
+      collected.push(...(await collectOlx({ terms, userDataDir, headless, inRange, sizeOk })));
     } catch (error) {
       console.warn(`Aviso: coleta OLX falhou — ${error.message}`);
       errors.push(`OLX: ${error.message}`);
@@ -93,7 +112,7 @@ export async function runWatchlistMonitor(config) {
   const deduped = [...byKey.values()];
 
   const previousItemsInScope = (previousSnapshot?.items ?? []).filter(
-    (i) => (i.price_brl == null || inRange(i.price_brl)) && matchesAnyTerm(i)
+    (i) => (i.price_brl == null || inRange(i.price_brl)) && matchesAnyTerm(i) && sizeOk(i.title ?? "")
   );
   const snapshot = mergeItems({
     runDate,
@@ -118,7 +137,7 @@ export async function runWatchlistMonitor(config) {
 
 // ── Enjoei (API GraphQL) ───────────────────────────────────────────────────────
 
-async function collectEnjoei({ terms, slug, inRange }) {
+async function collectEnjoei({ terms, slug, inRange, sizeOk }) {
   const out = [];
   for (let i = 0; i < terms.length; i += 1) {
     const term = terms[i];
@@ -146,6 +165,7 @@ async function collectEnjoei({ terms, slug, inRange }) {
       const brand = node.brand?.displayable_name ?? "";
       if (!Number.isFinite(price) || !inRange(price)) continue;
       if (!textMatchesTerm(`${title} ${brand}`, term)) continue;
+      if (!sizeOk(`${title} ${brand}`)) continue;
       out.push({
         id: `enjoei-${node.id}`,
         url: `${ENJOEI_SITE_ORIGIN}/p/${node.path}`,
@@ -180,7 +200,7 @@ function buildEnjoeiApiUrl(term, slug) {
 
 // ── OLX (Playwright) ───────────────────────────────────────────────────────────
 
-async function collectOlx({ terms, userDataDir, headless, inRange }) {
+async function collectOlx({ terms, userDataDir, headless, inRange, sizeOk }) {
   const isCI = Boolean(process.env.CI);
   const launchOptions = {
     headless: headless || isCI,
@@ -227,6 +247,7 @@ async function collectOlx({ terms, userDataDir, headless, inRange }) {
         for (const card of cards) {
           if (!inRange(card.price_brl)) continue;
           if (!textMatchesTerm(card.title, term)) continue;
+          if (!sizeOk(card.title)) continue;
           out.push({
             id: extractOlxId(card.url) ?? card.url,
             url: card.url,
@@ -317,6 +338,20 @@ function normalizeCode(text) {
 
 function textMatchesTerm(text, term) {
   return normalizeCode(text).includes(normalizeCode(term));
+}
+
+// Extrai a capacidade declarada no texto em ml. Aceita "500ml", "500 ml",
+// "1l", "1,5 litros", "0,5L". Retorna null quando não há indicação.
+export function extractCapacityMl(text) {
+  const t = (text ?? "").toString().toLowerCase();
+  const ml = t.match(/(\d{2,4})\s*ml\b/);
+  if (ml) return Number(ml[1]);
+  const lit = t.match(/(\d+(?:[.,]\d+)?)\s*(?:l\b|lt\b|litros?\b)/);
+  if (lit) {
+    const v = Number(lit[1].replace(",", "."));
+    if (Number.isFinite(v)) return Math.round(v * 1000);
+  }
+  return null;
 }
 
 // ── relatório ───────────────────────────────────────────────────────────────────
