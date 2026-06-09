@@ -1,0 +1,11 @@
+{
+  "run": {
+    "date": "2026-06-09",
+    "timezone": "America/Sao_Paulo"
+  },
+  "items": [],
+  "price_range_brl": {
+    "min": 300,
+    "max": 600
+  }
+}
