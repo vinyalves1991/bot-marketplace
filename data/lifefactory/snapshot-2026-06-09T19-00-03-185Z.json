@@ -1,0 +1,24 @@
+{
+  "run": {
+    "date": "2026-06-09",
+    "timezone": "America/Sao_Paulo"
+  },
+  "items": [
+    {
+      "id": "enjoei-143172452",
+      "url": "https://www.enjoei.com.br/p/garrafa-life-factory-pink-500-ml-143172452",
+      "title": "garrafa life factory pink 500 ml",
+      "source": "Enjoei",
+      "term": "lifefactory",
+      "price_brl": 70,
+      "store_name": "Melissa",
+      "status": "active",
+      "first_seen": "2026-06-04",
+      "last_seen": "2026-06-09"
+    }
+  ],
+  "price_range_brl": {
+    "min": 25,
+    "max": 75
+  }
+}
