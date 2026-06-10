@@ -15,7 +15,9 @@ runWatchlistMonitor({
   terms: ["melanger"],
   minPrice: 1000,
   maxPrice: 5000,
+  // Exclui 220V puro, mas mantém bivolt e qualquer menção a 110V/127V.
   excludeTerms: ["220v", "220 v", "220volts", "220 volts"],
+  keepTerms: ["110v", "110 v", "110volts", "110 volts", "127v", "127 v", "bivolt", "bi-volt", "bi volt", "110/220", "110 / 220"],
   olxCategoryUrls: [
     "https://www.olx.com.br/eletro/eletroportateis-para-cozinha-e-limpeza",
     "https://www.olx.com.br/comercio-e-escritorio/gastronomia",

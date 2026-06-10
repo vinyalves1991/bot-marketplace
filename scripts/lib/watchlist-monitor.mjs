@@ -27,6 +27,8 @@ const NAVIGATION_TIMEOUT_MS = 30_000;
  * @param {number} [config.minSizeMl]  Capacidade mínima em ml (opcional).
  * @param {number} [config.maxSizeMl]  Capacidade máxima em ml (opcional).
  * @param {string[]} [config.excludeTerms] Termos que, se presentes no título, descartam o item.
+ * @param {string[]} [config.keepTerms] Override: se algum aparecer, o item é mantido mesmo
+ *        que case um excludeTerm (ex.: manter "bivolt"/"110v" apesar de conter "220v").
  * @param {string[]} [config.olxCategoryUrls] URLs de categoria do OLX onde buscar
  *        (cada uma recebe `?q=<termo>`). Default: a busca geral em /brasil.
  */
@@ -68,9 +70,13 @@ export async function runWatchlistMonitor(config) {
   // Descarta itens cujo título contém algum termo de exclusão (ex.: "mamadeira"
   // numa busca por garrafas). Comparação tolerante a acentos e caixa.
   const excludeTerms = (config.excludeTerms ?? []).map((t) => normalizeText(t));
+  const keepTerms = (config.keepTerms ?? []).map((t) => normalizeText(t));
   const notExcluded = (text) => {
     if (excludeTerms.length === 0) return true;
     const n = normalizeText(text);
+    // keepTerms vencem a exclusão: ex.: "110/220V bivolt" contém "220v" mas
+    // serve em 110V, então é mantido.
+    if (keepTerms.some((k) => n.includes(k))) return true;
     return !excludeTerms.some((t) => n.includes(t));
   };
   const matchesAnyTerm = (item) => {
