@@ -15,6 +15,7 @@ const DOCKSTATIONS_DIR     = def("DOCKSTATIONS_DATA_DIR",     "monitor-dockstati
 const FITBIT_DIR           = def("FITBIT_DATA_DIR",           "monitor-fitbit");
 const LIFEFACTORY_DIR      = def("LIFEFACTORY_DATA_DIR",      "monitor-lifefactory");
 const TELA_BOOK3_DIR       = def("TELA_GALAXYBOOK3_DATA_DIR", "monitor-tela-galaxybook3");
+const MELANGER_DIR         = def("MELANGER_DATA_DIR",         "monitor-melanger");
 
 const GMAIL_USER         = process.env.GMAIL_USER ?? "docrash@gmail.com";
 // App passwords do Gmail são 16 caracteres sem espaços. O Google exibe a senha
@@ -36,6 +37,7 @@ const skipDockstations   = process.argv.includes("--skip-dockstations") || proce
 const skipFitbit         = process.argv.includes("--skip-fitbit") || process.env.SKIP_FITBIT === "1";
 const skipLifefactory    = process.argv.includes("--skip-lifefactory") || process.env.SKIP_LIFEFACTORY === "1";
 const skipTelaBook3      = process.argv.includes("--skip-tela-book3") || process.env.SKIP_TELA_BOOK3 === "1";
+const skipMelanger       = process.argv.includes("--skip-melanger") || process.env.SKIP_MELANGER === "1";
 const olxMaxPerCpu       = getArgValue("--olx-max-per-cpu") ?? process.env.OLX_MAX_PER_CPU ?? "12";
 
 main().catch((err) => { console.error(`Falha geral: ${err.message}`); process.exitCode = 1; });
@@ -62,6 +64,7 @@ async function main() {
     if (!skipFitbit) jobs.push(["fitbit", runScript("monitor-fitbit.mjs", [])]);
     if (!skipLifefactory) jobs.push(["lifefactory", runScript("monitor-lifefactory.mjs", [])]);
     if (!skipTelaBook3) jobs.push(["tela-book3", runScript("monitor-tela-galaxybook3.mjs", [])]);
+    if (!skipMelanger) jobs.push(["melanger", runScript("monitor-melanger.mjs", [])]);
 
     const results = await Promise.allSettled(jobs.map(([, promise]) => promise));
     for (let i = 0; i < jobs.length; i += 1) {
@@ -75,11 +78,12 @@ async function main() {
       if (name === "fitbit") { console.error(`Fitbit falhou: ${result.reason.message}`); errors.push(`Fitbit: ${result.reason.message}`); }
       if (name === "lifefactory") { console.error(`Lifefactory falhou: ${result.reason.message}`); errors.push(`Lifefactory: ${result.reason.message}`); }
       if (name === "tela-book3") { console.error(`Tela Book3 falhou: ${result.reason.message}`); errors.push(`Tela Book3: ${result.reason.message}`); }
+      if (name === "melanger") { console.error(`Melanger falhou: ${result.reason.message}`); errors.push(`Melanger: ${result.reason.message}`); }
     }
   }
 
   const enjoeiOn = !onlyOlx && !skipEnjoei;
-  const [olxStd, enjoeiReport, enjoeiNbStd, dockReport, fitbitReport, lifefactoryReport, telaBook3Report] = await Promise.all([
+  const [olxStd, enjoeiReport, enjoeiNbStd, dockReport, fitbitReport, lifefactoryReport, telaBook3Report, melangerReport] = await Promise.all([
     skipOlx          ? null : readLatestReport(OLX_DIR).catch(() => null),
     enjoeiOn         ? readLatestReport(ENJOEI_DIR).catch(() => null) : null,
     enjoeiOn         ? readLatestReport(ENJOEI_NOTEBOOKS_DIR).catch(() => null) : null,
@@ -87,6 +91,7 @@ async function main() {
     skipFitbit       ? null : readLatestReport(FITBIT_DIR).catch(() => null),
     skipLifefactory  ? null : readLatestReport(LIFEFACTORY_DIR).catch(() => null),
     skipTelaBook3    ? null : readLatestReport(TELA_BOOK3_DIR).catch(() => null),
+    skipMelanger     ? null : readLatestReport(MELANGER_DIR).catch(() => null),
   ]);
 
   // Cada fonte conta itens NOVOS e ALTERAÇÕES DE PREÇO (antes só contava novos do range padrão).
@@ -98,6 +103,7 @@ async function main() {
     { label: "Fitbit Air",       report: fitbitReport, newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,                    newSec: "## Novos produtos",  priceSec: "## Mudanças de preço" },
     { label: "Lifefactory",      report: lifefactoryReport, newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,               newSec: "## Novos produtos",  priceSec: "## Mudanças de preço" },
     { label: "Tela Book3",       report: telaBook3Report, newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,                 newSec: "## Novos produtos",  priceSec: "## Mudanças de preço" },
+    { label: "Melanger",         report: melangerReport, newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,                  newSec: "## Novos produtos",  priceSec: "## Mudanças de preço" },
   ].map((s) => ({
     ...s,
     newCount:   extractNewCount(s.report, s.newRe),

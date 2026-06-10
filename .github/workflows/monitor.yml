@@ -41,6 +41,7 @@ jobs:
           FITBIT_DATA_DIR: ${{ github.workspace }}/data/fitbit
           LIFEFACTORY_DATA_DIR: ${{ github.workspace }}/data/lifefactory
           TELA_GALAXYBOOK3_DATA_DIR: ${{ github.workspace }}/data/tela-galaxybook3
+          MELANGER_DATA_DIR: ${{ github.workspace }}/data/melanger
         run: node scripts/run-monitors-and-notify.mjs
 
       # O dashboard NAO e gerado aqui: ele depende de TODOS os dados (OLX do
@@ -56,6 +57,7 @@ jobs:
           FITBIT_DATA_DIR: ${{ github.workspace }}/data/fitbit
           LIFEFACTORY_DATA_DIR: ${{ github.workspace }}/data/lifefactory
           TELA_GALAXYBOOK3_DATA_DIR: ${{ github.workspace }}/data/tela-galaxybook3
+          MELANGER_DATA_DIR: ${{ github.workspace }}/data/melanger
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

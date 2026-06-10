@@ -12,6 +12,7 @@ const DOCKSTATIONS_DIR     = process.env.DOCKSTATIONS_DATA_DIR     ?? path.join(
 const FITBIT_DIR           = process.env.FITBIT_DATA_DIR           ?? path.join(ROOT, "data", "fitbit");
 const LIFEFACTORY_DIR      = process.env.LIFEFACTORY_DATA_DIR      ?? path.join(ROOT, "data", "lifefactory");
 const TELA_BOOK3_DIR       = process.env.TELA_GALAXYBOOK3_DATA_DIR ?? path.join(ROOT, "data", "tela-galaxybook3");
+const MELANGER_DIR         = process.env.MELANGER_DATA_DIR         ?? path.join(ROOT, "data", "melanger");
 const OUTPUT = path.join(ROOT, "index.html");
 const REPO = "almeida3339/olx-daily";
 const BLOB = `https://github.com/${REPO}/blob/main`;
@@ -31,7 +32,7 @@ export { parseReport, formatRunLabelFromFile, summarizeMachine };
 async function main() {
   const olxDetails = await latestSnapshotDetails(OLX_DIR);
   const enjoeiNbDetails = await latestSnapshotDetails(ENJOEI_NOTEBOOKS_DIR);
-  const [olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3] = await Promise.all([
+  const [olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3, melanger] = await Promise.all([
     gather(OLX_DIR, "report-", "report-premium-", olxDetails),
     gather(ENJOEI_NOTEBOOKS_DIR, "report-", "report-premium-", enjoeiNbDetails),
     gather(ENJOEI_DIR, "report-", null),
@@ -39,8 +40,9 @@ async function main() {
     gather(FITBIT_DIR, "report-", null),
     gather(LIFEFACTORY_DIR, "report-", null),
     gather(TELA_BOOK3_DIR, "report-", null),
+    gather(MELANGER_DIR, "report-", null),
   ]);
-  const [olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated] = await Promise.all([
+  const [olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated] = await Promise.all([
     latestRunLabel(OLX_DIR),
     latestRunLabel(ENJOEI_NOTEBOOKS_DIR),
     latestRunLabel(ENJOEI_DIR),
@@ -48,10 +50,11 @@ async function main() {
     latestRunLabel(FITBIT_DIR),
     latestRunLabel(LIFEFACTORY_DIR),
     latestRunLabel(TELA_BOOK3_DIR),
+    latestRunLabel(MELANGER_DIR),
   ]);
   await fs.writeFile(
     OUTPUT,
-    buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated }),
+    buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3, melanger, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated }),
     "utf8"
   );
   console.log(`Dashboard gerado: ${OUTPUT}`);
@@ -340,7 +343,7 @@ function e(s) {
   return (s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated }) {
+function buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3, melanger, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated }) {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -409,6 +412,7 @@ h1{font-size:1.3rem;color:#f0f6fc;margin-bottom:5px}
 <span class="u"><b>Fitbit Air</b> <time>${e(fitbitUpdated ?? "—")}</time></span>
 <span class="u"><b>Lifefactory</b> <time>${e(lifefactoryUpdated ?? "—")}</time></span>
 <span class="u"><b>Tela Book3</b> <time>${e(telaBook3Updated ?? "—")}</time></span>
+<span class="u"><b>Melanger</b> <time>${e(melangerUpdated ?? "—")}</time></span>
 </div>
 <div class="grid">
 ${renderSection("OLX Notebooks", "R$ 2.000 – R$ 8.000", olx, "data/olx")}
@@ -418,13 +422,14 @@ ${renderSection("Dockstations", "OLX + Enjoei · até R$ 500,00", dock, "data/do
 ${renderSection("Fitbit Air", "OLX + Enjoei · R$ 300 – R$ 600", fitbit, "data/fitbit")}
 ${renderSection("Lifefactory", "OLX + Enjoei · 500ml–1L · R$ 25 – R$ 75", lifefactory, "data/lifefactory")}
 ${renderSection("Tela Galaxy Book3", "BA96-08462A · OLX + Enjoei · até R$ 1.000", telaBook3, "data/tela-galaxybook3")}
+${renderSection("Melanger", "110V · OLX + Enjoei · R$ 1.000 – R$ 5.000", melanger, "data/melanger")}
 </div>
 </body>
 </html>`;
 }
 
 function renderSection(title, sub, reports, dpath) {
-  const showSpecs = dpath !== "data/enjoei" && dpath !== "data/dockstations" && dpath !== "data/fitbit" && dpath !== "data/lifefactory" && dpath !== "data/tela-galaxybook3";
+  const showSpecs = dpath !== "data/enjoei" && dpath !== "data/dockstations" && dpath !== "data/fitbit" && dpath !== "data/lifefactory" && dpath !== "data/tela-galaxybook3" && dpath !== "data/melanger";
   const body = reports.length === 0
     ? `<p class="empty">Nenhum run com novidades recentes.</p>`
     : reports.map((r) => renderCard(r, dpath, showSpecs)).join("\n");

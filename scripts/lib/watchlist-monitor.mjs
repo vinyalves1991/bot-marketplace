@@ -27,6 +27,8 @@ const NAVIGATION_TIMEOUT_MS = 30_000;
  * @param {number} [config.minSizeMl]  Capacidade mínima em ml (opcional).
  * @param {number} [config.maxSizeMl]  Capacidade máxima em ml (opcional).
  * @param {string[]} [config.excludeTerms] Termos que, se presentes no título, descartam o item.
+ * @param {string[]} [config.olxCategoryUrls] URLs de categoria do OLX onde buscar
+ *        (cada uma recebe `?q=<termo>`). Default: a busca geral em /brasil.
  */
 export async function runWatchlistMonitor(config) {
   const args = process.argv.slice(2);
@@ -105,7 +107,10 @@ export async function runWatchlistMonitor(config) {
 
   if (!skipOlx) {
     try {
-      collected.push(...(await collectOlx({ terms, userDataDir, headless, inRange, sizeOk, notExcluded })));
+      const categoryUrls = (config.olxCategoryUrls && config.olxCategoryUrls.length)
+        ? config.olxCategoryUrls
+        : [OLX_BASE_URL];
+      collected.push(...(await collectOlx({ terms, categoryUrls, userDataDir, headless, inRange, sizeOk, notExcluded })));
     } catch (error) {
       console.warn(`Aviso: coleta OLX falhou — ${error.message}`);
       errors.push(`OLX: ${error.message}`);
@@ -210,7 +215,7 @@ function buildEnjoeiApiUrl(term, slug) {
 
 // ── OLX (Playwright) ───────────────────────────────────────────────────────────
 
-async function collectOlx({ terms, userDataDir, headless, inRange, sizeOk, notExcluded }) {
+async function collectOlx({ terms, categoryUrls, userDataDir, headless, inRange, sizeOk, notExcluded }) {
   const isCI = Boolean(process.env.CI);
   const launchOptions = {
     headless: headless || isCI,
@@ -242,38 +247,40 @@ async function collectOlx({ terms, userDataDir, headless, inRange, sizeOk, notEx
 
   const out = [];
   try {
-    for (const term of terms) {
-      const url = `${OLX_BASE_URL}?q=${encodeURIComponent(term)}`;
-      console.log(`OLX termo: ${term} -> ${url}`);
-      try {
-        await page.goto(url, { waitUntil: "domcontentloaded", timeout: NAVIGATION_TIMEOUT_MS });
-        await waitOutCloudflare(page, headless);
-        const hasCards = await waitForListing(page);
-        if (!hasCards) {
-          console.log("  Nenhum card.");
-          continue;
+    for (const categoryUrl of categoryUrls) {
+      for (const term of terms) {
+        const url = `${categoryUrl}?q=${encodeURIComponent(term)}`;
+        console.log(`OLX termo: ${term} -> ${url}`);
+        try {
+          await page.goto(url, { waitUntil: "domcontentloaded", timeout: NAVIGATION_TIMEOUT_MS });
+          await waitOutCloudflare(page, headless);
+          const hasCards = await waitForListing(page);
+          if (!hasCards) {
+            console.log("  Nenhum card.");
+            continue;
+          }
+          const cards = await collectCards(page);
+          for (const card of cards) {
+            if (!inRange(card.price_brl)) continue;
+            if (!textMatchesTerm(card.title, term)) continue;
+            if (!sizeOk(card.title)) continue;
+            if (!notExcluded(card.title)) continue;
+            out.push({
+              id: extractOlxId(card.url) ?? card.url,
+              url: card.url,
+              title: card.title,
+              source: "OLX",
+              term,
+              price_brl: card.price_brl,
+              location: card.location ?? null,
+              status: "active",
+              first_seen: null,
+              last_seen: null,
+            });
+          }
+        } catch (error) {
+          console.warn(`  Aviso: termo "${term}" em ${categoryUrl} falhou — ${error.message}`);
         }
-        const cards = await collectCards(page);
-        for (const card of cards) {
-          if (!inRange(card.price_brl)) continue;
-          if (!textMatchesTerm(card.title, term)) continue;
-          if (!sizeOk(card.title)) continue;
-          if (!notExcluded(card.title)) continue;
-          out.push({
-            id: extractOlxId(card.url) ?? card.url,
-            url: card.url,
-            title: card.title,
-            source: "OLX",
-            term,
-            price_brl: card.price_brl,
-            location: card.location ?? null,
-            status: "active",
-            first_seen: null,
-            last_seen: null,
-          });
-        }
-      } catch (error) {
-        console.warn(`  Aviso: termo "${term}" falhou — ${error.message}`);
       }
     }
   } finally {
