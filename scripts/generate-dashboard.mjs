@@ -403,7 +403,7 @@ h1{font-size:1.3rem;color:#f0f6fc;margin-bottom:5px}
 </head>
 <body>
 <h1>Monitor</h1>
-<p class="meta">Última atualização por fonte (BRT) &nbsp;·&nbsp; <a href="https://github.com/${REPO}" target="_blank">ver repositório ↗</a></p>
+<p class="meta">Última atualização por fonte (BRT) &nbsp;·&nbsp; <a href="https://github.com/${REPO}" target="_blank" rel="noopener noreferrer">ver repositório ↗</a></p>
 <div class="updates">
 <span class="u"><b>OLX</b> <time>${e(olxUpdated ?? "—")}</time></span>
 <span class="u"><b>Enjoei Notebooks</b> <time>${e(enjoeiNbUpdated ?? "—")}</time></span>
@@ -449,7 +449,7 @@ function renderCard(r, dpath, showSpecs) {
   ].join("\n");
   return `<div class="card">
   <div class="ch">
-    <span class="cd">${e(r.runLabel ?? r.date ?? "—")}<a class="rl" href="${e(url)}" target="_blank">ver completo ↗</a></span>
+    <span class="cd">${e(r.runLabel ?? r.date ?? "—")}<a class="rl" href="${e(url)}" target="_blank" rel="noopener noreferrer">ver completo ↗</a></span>
     <div class="badges">${bn}${bp}</div>
   </div>
   ${rows ? `<div class="ci">${rows}</div>` : ""}
@@ -476,7 +476,7 @@ function priceChangeHtml(item) {
 function renderRow(item, isPrice, showSpecs) {
   if (showSpecs && item.machine) return renderMachineRow(item, isPrice);
   const titleHtml = item.url
-    ? `<a href="${e(item.url)}" target="_blank">${e(item.title)}</a>`
+    ? `<a href="${e(item.url)}" target="_blank" rel="noopener noreferrer">${e(item.title)}</a>`
     : e(item.title);
   if (isPrice && item.priceFrom && item.priceTo) {
     return `<div class="item"><span class="it">${titleHtml}</span>${priceChangeHtml(item)}</div>`;
@@ -488,7 +488,7 @@ function renderMachineRow(item, isPrice) {
   const m = item.machine;
   const title = [m.brand, m.model].filter((x) => x && x !== "n/d").join(" ") || m.model || "n/d";
   const titleHtml = item.url
-    ? `<a href="${e(item.url)}" target="_blank">${e(title)}</a>`
+    ? `<a href="${e(item.url)}" target="_blank" rel="noopener noreferrer">${e(title)}</a>`
     : e(title);
   const gpu = m.gpu ?? "integrada/n/d";
   const priceHtml = isPrice && item.priceFrom && item.priceTo

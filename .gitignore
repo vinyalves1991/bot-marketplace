@@ -5,3 +5,14 @@ node_modules/
 .firefox-controlled-profile/
 .firefox*/
 .chrome*/
+
+# Segredos e artefatos que jamais devem ir ao repositório
+.env
+.env.*
+*.log
+*.har
+*.trace.zip
+trace.zip
+test-results/
+playwright-report/
+storage-state*.json

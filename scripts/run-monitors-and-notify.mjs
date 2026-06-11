@@ -17,7 +17,10 @@ const LIFEFACTORY_DIR      = def("LIFEFACTORY_DATA_DIR",      "monitor-lifefacto
 const TELA_BOOK3_DIR       = def("TELA_GALAXYBOOK3_DATA_DIR", "monitor-tela-galaxybook3");
 const MELANGER_DIR         = def("MELANGER_DATA_DIR",         "monitor-melanger");
 
-const GMAIL_USER         = process.env.GMAIL_USER ?? "docrash@gmail.com";
+// NUNCA usar defaults hardcoded para credenciais: este repositório é público
+// (GitHub Pages) e qualquer valor aqui vaza para o mundo. As variáveis são
+// obrigatórias e validadas no ponto de uso (sendEmail/sendWhatsApp).
+const GMAIL_USER         = process.env.GMAIL_USER;
 // App passwords do Gmail são 16 caracteres sem espaços. O Google exibe a senha
 // no formato "xxxx xxxx xxxx xxxx"; se ela for colada com os espaços, o AUTH do
 // SMTP rejeita com "535-5.7.8 Username and Password not accepted" (a regra de
@@ -25,8 +28,8 @@ const GMAIL_USER         = process.env.GMAIL_USER ?? "docrash@gmail.com";
 // espaço em branco torna a leitura robusta independentemente de como foi salva.
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD?.replace(/\s+/g, "");
 const NOTIFY_TO          = process.env.NOTIFY_EMAIL_TO ?? GMAIL_USER;
-const CALLMEBOT_PHONE    = process.env.CALLMEBOT_PHONE ?? "554196968789";
-const CALLMEBOT_APIKEY   = process.env.CALLMEBOT_APIKEY ?? "2696242";
+const CALLMEBOT_PHONE    = process.env.CALLMEBOT_PHONE;
+const CALLMEBOT_APIKEY   = process.env.CALLMEBOT_APIKEY;
 const forceEmail         = process.argv.includes("--force-email");
 const skipMonitors       = process.argv.includes("--skip-monitors");
 const dryRun             = process.argv.includes("--dry-run"); // imprime mensagens e NÃO envia nada
@@ -278,6 +281,7 @@ function extractNewItems(report, sectionHeader) {
 // ── email / WhatsApp ──────────────────────────────────────────────────────────
 
 async function sendEmail(subject, body) {
+  if (!GMAIL_USER) throw new Error("GMAIL_USER não definida");
   if (!GMAIL_APP_PASSWORD) throw new Error("GMAIL_APP_PASSWORD não definida");
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com", port: 587, secure: false,
@@ -287,6 +291,7 @@ async function sendEmail(subject, body) {
 }
 
 async function sendWhatsApp(message) {
+  if (!CALLMEBOT_PHONE || !CALLMEBOT_APIKEY) throw new Error("CALLMEBOT_PHONE/CALLMEBOT_APIKEY não definidas");
   const url = `https://api.callmebot.com/whatsapp.php?phone=${CALLMEBOT_PHONE}&text=${encodeURIComponent(message)}&apikey=${CALLMEBOT_APIKEY}`;
   const response = await fetch(url);
   if (!response.ok) throw new Error(`CallMeBot HTTP ${response.status}`);
