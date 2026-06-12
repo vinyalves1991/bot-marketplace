@@ -377,11 +377,19 @@ function buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3
     return (b.upd.ts ?? -Infinity) - (a.upd.ts ?? -Infinity);   // depois por recência
   });
 
-  const chipsHtml = sources
-    .map((s) => `<span class="u${s.upd.fresh ? " fresh" : ""}"><b>${e(s.chip)}</b> <time>${e(s.upd.label ?? "—")}</time></span>`)
-    .join("\n");
+  // Topo: apenas dois chips por plataforma (OLX, Enjoei), cada um agregando a
+  // coleta mais recente entre todas as buscas daquela plataforma. As watchlists
+  // combinadas (Dockstations, Fitbit, etc.) contam para as duas. O timestamp de
+  // cada busca específica vai dentro do próprio card (renderSection).
+  const platformChip = (label, platform) => {
+    const members = sources.filter((s) => platformsOf(s.dpath).includes(platform) && s.upd.ts != null);
+    if (!members.length) return `<span class="u"><b>${e(label)}</b> <time>—</time></span>`;
+    const latest = members.reduce((a, b) => (b.upd.ts > a.upd.ts ? b : a));
+    return `<span class="u${latest.upd.fresh ? " fresh" : ""}"><b>${e(label)}</b> <time>${e(latest.upd.label)}</time></span>`;
+  };
+  const chipsHtml = [platformChip("OLX", "olx"), platformChip("Enjoei", "enjoei")].join("\n");
   const cardsHtml = sources
-    .map((s) => renderSection(s.title, s.sub, s.data, s.dpath))
+    .map((s) => renderSection(s.title, s.sub, s.data, s.dpath, s.upd))
     .join("\n");
 
   return `<!DOCTYPE html>
@@ -408,8 +416,11 @@ h1{font-size:1.3rem;color:#f0f6fc;margin-bottom:5px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:18px;align-items:start}
 .sec{background:#161b22;border:1px solid #30363d;border-radius:8px;overflow:hidden}
 .sh{padding:14px 16px 10px;border-bottom:1px solid #21262d}
+.sh .shr{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .sh h2{font-size:.9rem;font-weight:600;color:#f0f6fc}
 .sh small{font-size:.72rem;color:#8b949e}
+.sd{font-size:.72rem;color:#8b949e;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sd.fresh{color:#3fb950}
 .sb{padding:12px 14px}
 .empty{color:#8b949e;font-size:.8rem;padding:4px 0}
 .card{border:1px solid #21262d;border-radius:6px;margin-bottom:10px;overflow:hidden}
@@ -458,13 +469,25 @@ ${cardsHtml}
 </html>`;
 }
 
-function renderSection(title, sub, reports, dpath) {
+// Quais plataformas cada busca usa (para os chips agregados do topo).
+// Combinadas (dockstations/fitbit/lifefactory/tela/melanger) contam para as duas.
+function platformsOf(dpath) {
+  if (dpath === "data/olx") return ["olx"];
+  if (dpath === "data/enjoei" || dpath === "data/enjoei-notebooks") return ["enjoei"];
+  return ["olx", "enjoei"];
+}
+
+function renderSection(title, sub, reports, dpath, upd) {
   const showSpecs = dpath !== "data/enjoei" && dpath !== "data/dockstations" && dpath !== "data/fitbit" && dpath !== "data/lifefactory" && dpath !== "data/tela-galaxybook3" && dpath !== "data/melanger";
   const body = reports.length === 0
     ? `<p class="empty">Nenhum run com novidades recentes.</p>`
     : reports.map((r) => renderCard(r, dpath, showSpecs)).join("\n");
+  // Data/hora da última coleta desta busca, dentro do card (verde se < 24h).
+  const stamp = upd && upd.label
+    ? `<time class="sd${upd.fresh ? " fresh" : ""}">${e(upd.label)}</time>`
+    : "";
   return `<div class="sec">
-  <div class="sh"><h2>${e(title)}</h2><small>${e(sub)} &nbsp;·&nbsp; últimos ${reports.length} com novidades</small></div>
+  <div class="sh"><div class="shr"><h2>${e(title)}</h2>${stamp}</div><small>${e(sub)} &nbsp;·&nbsp; últimos ${reports.length} com novidades</small></div>
   <div class="sb">${body}</div>
 </div>`;
 }
