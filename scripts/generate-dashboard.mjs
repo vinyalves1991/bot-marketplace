@@ -103,11 +103,11 @@ async function latestRunLabel(dir) {
     .filter((n) => n.startsWith("report-") && !n.startsWith("report-premium-") && n.endsWith(".md"))
     .sort()
     .reverse()[0];
-  if (!file) return { label: null, fresh: false };
+  if (!file) return { label: null, fresh: false, ts: null };
   const ts = runTimestampFromFile(file);
   // "fresh" = última coleta há menos de 24h (destaque no dashboard).
   const fresh = ts != null && (Date.now() - ts.getTime()) < 24 * 60 * 60 * 1000;
-  return { label: formatRunLabelFromFile(file, null), fresh };
+  return { label: formatRunLabelFromFile(file, null), fresh, ts: ts ? ts.getTime() : null };
 }
 
 // Extrai o instante (UTC) do nome do arquivo de relatório, ou null se não casar.
@@ -357,6 +357,26 @@ function e(s) {
 }
 
 function buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3, melanger, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated }) {
+  // Fontes ordenadas pela última atualização (mais recente primeiro). Fontes sem
+  // run vão para o fim. Tanto os chips quanto os cards seguem esta ordem.
+  const sources = [
+    { chip: "OLX",              title: "OLX Notebooks",     sub: "R$ 2.000 – R$ 8.000",                          data: olx,         dpath: "data/olx",              upd: olxUpdated },
+    { chip: "Enjoei Notebooks", title: "Enjoei Notebooks",  sub: "R$ 1.500 – R$ 8.000",                          data: enjoeiNb,    dpath: "data/enjoei-notebooks", upd: enjoeiNbUpdated },
+    { chip: "Enjoei Tênis",     title: "Enjoei Tênis 42",   sub: "até R$ 500,00",                                data: enjoei,      dpath: "data/enjoei",           upd: enjoeiTenisUpdated },
+    { chip: "Dockstations",     title: "Dockstations",      sub: "OLX + Enjoei · até R$ 500,00",                 data: dock,        dpath: "data/dockstations",     upd: dockUpdated },
+    { chip: "Fitbit Air",       title: "Fitbit Air",        sub: "OLX + Enjoei · R$ 300 – R$ 600",               data: fitbit,      dpath: "data/fitbit",           upd: fitbitUpdated },
+    { chip: "Lifefactory",      title: "Lifefactory",       sub: "OLX + Enjoei · 500ml–1L · R$ 25 – R$ 75",      data: lifefactory, dpath: "data/lifefactory",      upd: lifefactoryUpdated },
+    { chip: "Tela Book3",       title: "Tela Galaxy Book3", sub: "BA96-08462A · OLX + Enjoei · até R$ 1.000",    data: telaBook3,   dpath: "data/tela-galaxybook3", upd: telaBook3Updated },
+    { chip: "Melanger",         title: "Melanger",          sub: "110V · OLX + Enjoei · R$ 1.000 – R$ 5.000",    data: melanger,    dpath: "data/melanger",         upd: melangerUpdated },
+  ].sort((a, b) => (b.upd.ts ?? -Infinity) - (a.upd.ts ?? -Infinity));
+
+  const chipsHtml = sources
+    .map((s) => `<span class="u${s.upd.fresh ? " fresh" : ""}"><b>${e(s.chip)}</b> <time>${e(s.upd.label ?? "—")}</time></span>`)
+    .join("\n");
+  const cardsHtml = sources
+    .map((s) => renderSection(s.title, s.sub, s.data, s.dpath))
+    .join("\n");
+
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -422,24 +442,10 @@ h1{font-size:1.3rem;color:#f0f6fc;margin-bottom:5px}
 <h1>Monitor</h1>
 <p class="meta">Última atualização por fonte (BRT) &nbsp;·&nbsp; <a href="https://github.com/${REPO}" target="_blank" rel="noopener noreferrer">ver repositório ↗</a></p>
 <div class="updates">
-<span class="u${olxUpdated.fresh ? " fresh" : ""}"><b>OLX</b> <time>${e(olxUpdated.label ?? "—")}</time></span>
-<span class="u${enjoeiNbUpdated.fresh ? " fresh" : ""}"><b>Enjoei Notebooks</b> <time>${e(enjoeiNbUpdated.label ?? "—")}</time></span>
-<span class="u${enjoeiTenisUpdated.fresh ? " fresh" : ""}"><b>Enjoei Tênis</b> <time>${e(enjoeiTenisUpdated.label ?? "—")}</time></span>
-<span class="u${dockUpdated.fresh ? " fresh" : ""}"><b>Dockstations</b> <time>${e(dockUpdated.label ?? "—")}</time></span>
-<span class="u${fitbitUpdated.fresh ? " fresh" : ""}"><b>Fitbit Air</b> <time>${e(fitbitUpdated.label ?? "—")}</time></span>
-<span class="u${lifefactoryUpdated.fresh ? " fresh" : ""}"><b>Lifefactory</b> <time>${e(lifefactoryUpdated.label ?? "—")}</time></span>
-<span class="u${telaBook3Updated.fresh ? " fresh" : ""}"><b>Tela Book3</b> <time>${e(telaBook3Updated.label ?? "—")}</time></span>
-<span class="u${melangerUpdated.fresh ? " fresh" : ""}"><b>Melanger</b> <time>${e(melangerUpdated.label ?? "—")}</time></span>
+${chipsHtml}
 </div>
 <div class="grid">
-${renderSection("OLX Notebooks", "R$ 2.000 – R$ 8.000", olx, "data/olx")}
-${renderSection("Enjoei Notebooks", "R$ 1.500 – R$ 8.000", enjoeiNb, "data/enjoei-notebooks")}
-${renderSection("Enjoei Tênis 42", "até R$ 500,00", enjoei, "data/enjoei")}
-${renderSection("Dockstations", "OLX + Enjoei · até R$ 500,00", dock, "data/dockstations")}
-${renderSection("Fitbit Air", "OLX + Enjoei · R$ 300 – R$ 600", fitbit, "data/fitbit")}
-${renderSection("Lifefactory", "OLX + Enjoei · 500ml–1L · R$ 25 – R$ 75", lifefactory, "data/lifefactory")}
-${renderSection("Tela Galaxy Book3", "BA96-08462A · OLX + Enjoei · até R$ 1.000", telaBook3, "data/tela-galaxybook3")}
-${renderSection("Melanger", "110V · OLX + Enjoei · R$ 1.000 – R$ 5.000", melanger, "data/melanger")}
+${cardsHtml}
 </div>
 </body>
 </html>`;
