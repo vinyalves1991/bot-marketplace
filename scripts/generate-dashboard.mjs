@@ -357,8 +357,10 @@ function e(s) {
 }
 
 function buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3, melanger, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated }) {
-  // Fontes ordenadas pela última atualização (mais recente primeiro). Fontes sem
-  // run vão para o fim. Tanto os chips quanto os cards seguem esta ordem.
+  // Ordenação em dois níveis: primeiro as fontes COM achados recentes (cards com
+  // conteúdo), depois as vazias ("Nenhum run com novidades") — sempre no fundo,
+  // mesmo que tenham rodado há pouco. Dentro de cada grupo, mais recente primeiro.
+  // Tanto os chips quanto os cards seguem esta ordem.
   const sources = [
     { chip: "OLX",              title: "OLX Notebooks",     sub: "R$ 2.000 – R$ 8.000",                          data: olx,         dpath: "data/olx",              upd: olxUpdated },
     { chip: "Enjoei Notebooks", title: "Enjoei Notebooks",  sub: "R$ 1.500 – R$ 8.000",                          data: enjoeiNb,    dpath: "data/enjoei-notebooks", upd: enjoeiNbUpdated },
@@ -368,7 +370,12 @@ function buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3
     { chip: "Lifefactory",      title: "Lifefactory",       sub: "OLX + Enjoei · 500ml–1L · R$ 25 – R$ 75",      data: lifefactory, dpath: "data/lifefactory",      upd: lifefactoryUpdated },
     { chip: "Tela Book3",       title: "Tela Galaxy Book3", sub: "BA96-08462A · OLX + Enjoei · até R$ 1.000",    data: telaBook3,   dpath: "data/tela-galaxybook3", upd: telaBook3Updated },
     { chip: "Melanger",         title: "Melanger",          sub: "110V · OLX + Enjoei · R$ 1.000 – R$ 5.000",    data: melanger,    dpath: "data/melanger",         upd: melangerUpdated },
-  ].sort((a, b) => (b.upd.ts ?? -Infinity) - (a.upd.ts ?? -Infinity));
+  ].sort((a, b) => {
+    const aHas = a.data.length > 0 ? 1 : 0;
+    const bHas = b.data.length > 0 ? 1 : 0;
+    if (aHas !== bHas) return bHas - aHas;                       // com achados primeiro
+    return (b.upd.ts ?? -Infinity) - (a.upd.ts ?? -Infinity);   // depois por recência
+  });
 
   const chipsHtml = sources
     .map((s) => `<span class="u${s.upd.fresh ? " fresh" : ""}"><b>${e(s.chip)}</b> <time>${e(s.upd.label ?? "—")}</time></span>`)
