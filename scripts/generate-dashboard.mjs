@@ -370,11 +370,23 @@ function buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3
     { chip: "Lifefactory",      title: "Lifefactory",       sub: "OLX + Enjoei · 500ml–1L · R$ 25 – R$ 75",      data: lifefactory, dpath: "data/lifefactory",      upd: lifefactoryUpdated },
     { chip: "Tela Book3",       title: "Tela Galaxy Book3", sub: "BA96-08462A · OLX + Enjoei · até R$ 1.000",    data: telaBook3,   dpath: "data/tela-galaxybook3", upd: telaBook3Updated },
     { chip: "Melanger",         title: "Melanger",          sub: "110V · OLX + Enjoei · R$ 1.000 – R$ 5.000",    data: melanger,    dpath: "data/melanger",         upd: melangerUpdated },
-  ].sort((a, b) => {
-    const aHas = a.data.length > 0 ? 1 : 0;
-    const bHas = b.data.length > 0 ? 1 : 0;
-    if (aHas !== bHas) return bHas - aHas;                       // com achados primeiro
-    return (b.upd.ts ?? -Infinity) - (a.upd.ts ?? -Infinity);   // depois por recência
+  ];
+
+  // Ordenação e data do card vêm do ÚLTIMO ACHADO (report com novidade), não da
+  // última coleta. data[0] é o achado mais recente (gather ordena desc). Fontes
+  // sem achado vão para o fim, com a última coleta apenas como desempate.
+  const DAY = 24 * 60 * 60 * 1000;
+  for (const s of sources) {
+    const top = s.data[0];
+    const findTs = top ? (runTimestampFromFile(top.file)?.getTime() ?? null) : null;
+    s.hasFind = top != null;
+    s.sortTs = findTs ?? s.upd.ts ?? null;
+    s.stampLabel = top ? (top.runLabel ?? top.date) : s.upd.label;
+    s.stampFresh = s.sortTs != null && (Date.now() - s.sortTs) < DAY;
+  }
+  sources.sort((a, b) => {
+    if (a.hasFind !== b.hasFind) return (b.hasFind ? 1 : 0) - (a.hasFind ? 1 : 0);  // com achados primeiro
+    return (b.sortTs ?? -Infinity) - (a.sortTs ?? -Infinity);                       // depois pelo último achado
   });
 
   // Topo: apenas dois chips por plataforma (OLX, Enjoei), cada um agregando a
@@ -389,7 +401,7 @@ function buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3
   };
   const chipsHtml = [platformChip("OLX", "olx"), platformChip("Enjoei", "enjoei")].join("\n");
   const cardsHtml = sources
-    .map((s) => renderSection(s.title, s.sub, s.data, s.dpath, s.upd))
+    .map((s) => renderSection(s.title, s.sub, s.data, s.dpath, { label: s.stampLabel, fresh: s.stampFresh }))
     .join("\n");
 
   return `<!DOCTYPE html>
@@ -477,14 +489,14 @@ function platformsOf(dpath) {
   return ["olx", "enjoei"];
 }
 
-function renderSection(title, sub, reports, dpath, upd) {
+function renderSection(title, sub, reports, dpath, stampInfo) {
   const showSpecs = dpath !== "data/enjoei" && dpath !== "data/dockstations" && dpath !== "data/fitbit" && dpath !== "data/lifefactory" && dpath !== "data/tela-galaxybook3" && dpath !== "data/melanger";
   const body = reports.length === 0
     ? `<p class="empty">Nenhum run com novidades recentes.</p>`
     : reports.map((r) => renderCard(r, dpath, showSpecs)).join("\n");
-  // Data/hora da última coleta desta busca, dentro do card (verde se < 24h).
-  const stamp = upd && upd.label
-    ? `<time class="sd${upd.fresh ? " fresh" : ""}">${e(upd.label)}</time>`
+  // Data/hora do último achado desta busca, dentro do card (verde se < 24h).
+  const stamp = stampInfo && stampInfo.label
+    ? `<time class="sd${stampInfo.fresh ? " fresh" : ""}">${e(stampInfo.label)}</time>`
     : "";
   return `<div class="sec">
   <div class="sh"><div class="shr"><h2>${e(title)}</h2>${stamp}</div><small>${e(sub)} &nbsp;·&nbsp; últimos ${reports.length} com novidades</small></div>
