@@ -1,0 +1,11 @@
+{
+  "run": {
+    "date": "2026-06-12",
+    "timezone": "UTC"
+  },
+  "items": [],
+  "price_range_brl": {
+    "min": 0,
+    "max": 1000
+  }
+}

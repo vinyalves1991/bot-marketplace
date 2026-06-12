@@ -1,0 +1,151 @@
+{
+  "run": {
+    "date": "2026-06-12",
+    "timezone": "UTC"
+  },
+  "search": {
+    "terms": [
+      "barefoot",
+      "feet of tomorrow",
+      "fot",
+      "vita",
+      "vivobarefoot",
+      "xero",
+      "vibram",
+      "merrell",
+      "lems"
+    ],
+    "department": "masculino",
+    "shoe_size": "42",
+    "shipping_range": "same_country",
+    "max_price_brl": 500,
+    "source_urls": [
+      "https://www.enjoei.com.br/barefoot/s?ref=products_search&q=barefoot&d=masculino&st%5Bss%5D=42&sr=same_country",
+      "https://www.enjoei.com.br/feet%20of%20tomorrow/s?ref=products_search&q=feet+of+tomorrow&d=masculino&st%5Bss%5D=42&sr=same_country",
+      "https://www.enjoei.com.br/fot/s?ref=products_search&q=fot&d=masculino&st%5Bss%5D=42&sr=same_country",
+      "https://www.enjoei.com.br/vita/s?ref=products_search&q=vita&d=masculino&st%5Bss%5D=42&sr=same_country",
+      "https://www.enjoei.com.br/vivobarefoot/s?ref=products_search&q=vivobarefoot&d=masculino&st%5Bss%5D=42&sr=same_country",
+      "https://www.enjoei.com.br/xero/s?ref=products_search&q=xero&d=masculino&st%5Bss%5D=42&sr=same_country",
+      "https://www.enjoei.com.br/vibram/s?ref=products_search&q=vibram&d=masculino&st%5Bss%5D=42&sr=same_country",
+      "https://www.enjoei.com.br/merrell/s?ref=products_search&q=merrell&d=masculino&st%5Bss%5D=42&sr=same_country",
+      "https://www.enjoei.com.br/lems/s?ref=products_search&q=lems&d=masculino&st%5Bss%5D=42&sr=same_country"
+    ]
+  },
+  "items": [
+    {
+      "id": "121147815",
+      "url": "https://www.enjoei.com.br/p/tenis-mvp-barefoot-preto-crossfit-121147815",
+      "title": "tênis mvp barefoot - preto crossfit",
+      "brand": "mvp",
+      "price_brl": 105,
+      "original_price_brl": 150,
+      "size": "42",
+      "used": true,
+      "shipping_free": false,
+      "store_name": "lucas",
+      "store_path": "https://www.enjoei.com.br/@lucas-56a55e-33576ef6-04f4-47d0-b5a7-d0e0368306b4",
+      "search_terms": [
+        "barefoot"
+      ],
+      "status": "active",
+      "first_seen": "2026-05-20",
+      "last_seen": "2026-06-12"
+    },
+    {
+      "id": "134490205",
+      "url": "https://www.enjoei.com.br/p/tenis-feet-of-tomorrow-fot-walka-off-white-134490205",
+      "title": "tênis feet of tomorrow fot walka off white",
+      "brand": "feet of tomorrow",
+      "price_brl": 400,
+      "original_price_brl": 400,
+      "size": "42",
+      "used": true,
+      "shipping_free": false,
+      "store_name": "",
+      "store_path": "https://www.enjoei.com.br/@",
+      "search_terms": [
+        "feet of tomorrow",
+        "fot"
+      ],
+      "status": "active",
+      "first_seen": "2026-05-20",
+      "last_seen": "2026-06-12"
+    },
+    {
+      "id": "144425316",
+      "url": "https://www.enjoei.com.br/p/tenis-vibram-fivefingers-azul-42-144425316",
+      "title": "tênis vibram fivefingers azul 42",
+      "brand": "vibram",
+      "price_brl": 300,
+      "original_price_brl": 300,
+      "size": "42",
+      "used": true,
+      "shipping_free": false,
+      "store_name": "Joao",
+      "store_path": "https://www.enjoei.com.br/@joao-b0d89b",
+      "search_terms": [
+        "vibram"
+      ],
+      "status": "active",
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-12"
+    },
+    {
+      "id": "144425107",
+      "url": "https://www.enjoei.com.br/p/tenis-vibram-fivefingers-vermelho-42-144425107",
+      "title": "tênis vibram fivefingers vermelho 42",
+      "brand": "vibram",
+      "price_brl": 300,
+      "original_price_brl": 300,
+      "size": "42",
+      "used": true,
+      "shipping_free": false,
+      "store_name": "Joao",
+      "store_path": "https://www.enjoei.com.br/@joao-b0d89b",
+      "search_terms": [
+        "vibram"
+      ],
+      "status": "active",
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-12"
+    },
+    {
+      "id": "132844531",
+      "url": "https://www.enjoei.com.br/p/sandalia-merrell-hydro-moc-132844531",
+      "title": "sandalia merrell hydro moc",
+      "brand": "merrell",
+      "price_brl": 330,
+      "original_price_brl": 330,
+      "size": "42",
+      "used": true,
+      "shipping_free": false,
+      "store_name": "",
+      "store_path": "https://www.enjoei.com.br/@",
+      "search_terms": [
+        "merrell"
+      ],
+      "status": "active",
+      "first_seen": "2026-05-20",
+      "last_seen": "2026-06-12"
+    },
+    {
+      "id": "137508659",
+      "url": "https://www.enjoei.com.br/p/tenis-lems-numero-42-drop-zero-137508659",
+      "title": "tênis lems - número 42 - drop zero",
+      "brand": "lems",
+      "price_brl": 385,
+      "original_price_brl": 550,
+      "size": "42",
+      "used": true,
+      "shipping_free": false,
+      "store_name": "",
+      "store_path": "https://www.enjoei.com.br/@",
+      "search_terms": [
+        "lems"
+      ],
+      "status": "active",
+      "first_seen": "2026-05-20",
+      "last_seen": "2026-06-12"
+    }
+  ]
+}
