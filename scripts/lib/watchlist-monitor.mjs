@@ -101,13 +101,19 @@ export async function runWatchlistMonitor(config) {
 
   const collected = [];
   const errors = [];
+  // "source:term" que falharam nesta rodada (cobertura incompleta). Usado para
+  // NÃO rebaixar a not_seen os itens correspondentes do snapshot anterior.
+  const failedSourceTerms = new Set();
 
   if (!skipEnjoei) {
     try {
-      collected.push(...(await collectEnjoei({ terms, slug, inRange, sizeOk, notExcluded })));
+      const { items, failedTerms } = await collectEnjoei({ terms, slug, inRange, sizeOk, notExcluded });
+      collected.push(...items);
+      for (const t of failedTerms) { failedSourceTerms.add(`Enjoei:${t}`); errors.push(`Enjoei termo "${t}" falhou`); }
     } catch (error) {
       console.warn(`Aviso: coleta Enjoei falhou — ${error.message}`);
       errors.push(`Enjoei: ${error.message}`);
+      for (const t of terms) failedSourceTerms.add(`Enjoei:${t}`); // coleta inteira falhou
     }
   }
 
@@ -116,10 +122,13 @@ export async function runWatchlistMonitor(config) {
       const categoryUrls = (config.olxCategoryUrls && config.olxCategoryUrls.length)
         ? config.olxCategoryUrls
         : [OLX_BASE_URL];
-      collected.push(...(await collectOlx({ terms, categoryUrls, userDataDir, headless, inRange, sizeOk, notExcluded })));
+      const { items, failedTerms } = await collectOlx({ terms, categoryUrls, userDataDir, headless, inRange, sizeOk, notExcluded });
+      collected.push(...items);
+      for (const t of failedTerms) { failedSourceTerms.add(`OLX:${t}`); errors.push(`OLX termo "${t}" falhou`); }
     } catch (error) {
       console.warn(`Aviso: coleta OLX falhou — ${error.message}`);
       errors.push(`OLX: ${error.message}`);
+      for (const t of terms) failedSourceTerms.add(`OLX:${t}`); // coleta inteira falhou
     }
   }
 
@@ -134,12 +143,20 @@ export async function runWatchlistMonitor(config) {
   const previousItemsInScope = (previousSnapshot?.items ?? []).filter(
     (i) => (i.price_brl == null || inRange(i.price_brl)) && matchesAnyTerm(i) && sizeOk(i.title ?? "") && notExcluded(i.title ?? "")
   );
+  // Itens do snapshot anterior cuja fonte/termo falhou nesta rodada: protegidos
+  // de virar not_seen (a ausência pode ser falha de coleta, não desaparecimento).
+  const failedKeys = new Set(
+    previousItemsInScope
+      .filter((i) => failedSourceTerms.has(`${i.source}:${i.term}`))
+      .map((i) => i.id ?? i.url)
+  );
   const snapshot = mergeItems({
     runDate,
     collected: deduped,
     previousSnapshot: previousSnapshot ? { ...previousSnapshot, items: previousItemsInScope } : null,
     priceMin: minPrice,
     priceMax: maxPrice,
+    failedKeys,
   });
 
   await fs.mkdir(dataDir, { recursive: true });
@@ -159,49 +176,57 @@ export async function runWatchlistMonitor(config) {
 
 async function collectEnjoei({ terms, slug, inRange, sizeOk, notExcluded }) {
   const out = [];
+  const failedTerms = new Set();
   for (let i = 0; i < terms.length; i += 1) {
     const term = terms[i];
     if (i > 0) await sleep(400);
     console.log(`Enjoei termo: ${term}`);
-    const response = await fetchWithRetry(buildEnjoeiApiUrl(term, slug), {
-      headers: {
-        accept: "application/json",
-        origin: ENJOEI_SITE_ORIGIN,
-        referer: `${ENJOEI_SITE_ORIGIN}/${encodeURIComponent(term)}/s?q=${encodeURIComponent(term)}`,
-        "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
-      },
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const payload = await response.json();
-    const products = payload?.data?.search?.products;
-    if (!products) throw new Error("Resposta sem data.search.products");
-
-    for (const edge of products.edges ?? []) {
-      const node = edge.node;
-      if (!node?.id || !node?.path) continue;
-      const price = Number(node.price?.current);
-      const title = node.title?.name ?? "";
-      const brand = node.brand?.displayable_name ?? "";
-      if (!Number.isFinite(price) || !inRange(price)) continue;
-      if (!textMatchesTerm(`${title} ${brand}`, term)) continue;
-      if (!sizeOk(`${title} ${brand}`)) continue;
-      if (!notExcluded(`${title} ${brand}`)) continue;
-      out.push({
-        id: `enjoei-${node.id}`,
-        url: `${ENJOEI_SITE_ORIGIN}/p/${node.path}`,
-        title,
-        source: "Enjoei",
-        term,
-        price_brl: price,
-        store_name: node.store?.displayable?.name ?? null,
-        status: "active",
-        first_seen: null,
-        last_seen: null,
+    // try/catch por termo: a falha de um termo não pode abortar os demais nem
+    // (via merge) marcar como "not_seen" itens que apenas não foram coletados.
+    try {
+      const response = await fetchWithRetry(buildEnjoeiApiUrl(term, slug), {
+        headers: {
+          accept: "application/json",
+          origin: ENJOEI_SITE_ORIGIN,
+          referer: `${ENJOEI_SITE_ORIGIN}/${encodeURIComponent(term)}/s?q=${encodeURIComponent(term)}`,
+          "user-agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+        },
       });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const payload = await response.json();
+      const products = payload?.data?.search?.products;
+      if (!products) throw new Error("Resposta sem data.search.products");
+
+      for (const edge of products.edges ?? []) {
+        const node = edge.node;
+        if (!node?.id || !node?.path) continue;
+        const price = Number(node.price?.current);
+        const title = node.title?.name ?? "";
+        const brand = node.brand?.displayable_name ?? "";
+        if (!Number.isFinite(price) || !inRange(price)) continue;
+        if (!textMatchesTerm(`${title} ${brand}`, term)) continue;
+        if (!sizeOk(`${title} ${brand}`)) continue;
+        if (!notExcluded(`${title} ${brand}`)) continue;
+        out.push({
+          id: `enjoei-${node.id}`,
+          url: `${ENJOEI_SITE_ORIGIN}/p/${node.path}`,
+          title,
+          source: "Enjoei",
+          term,
+          price_brl: price,
+          store_name: node.store?.displayable?.name ?? null,
+          status: "active",
+          first_seen: null,
+          last_seen: null,
+        });
+      }
+    } catch (error) {
+      console.warn(`  Aviso: termo Enjoei "${term}" falhou — ${error.message}`);
+      failedTerms.add(term);
     }
   }
-  return out;
+  return { items: out, failedTerms };
 }
 
 function buildEnjoeiApiUrl(term, slug) {
@@ -252,6 +277,7 @@ async function collectOlx({ terms, categoryUrls, userDataDir, headless, inRange,
   page.setDefaultNavigationTimeout(60_000);
 
   const out = [];
+  const failedTerms = new Set();
   try {
     for (const categoryUrl of categoryUrls) {
       for (const term of terms) {
@@ -286,13 +312,14 @@ async function collectOlx({ terms, categoryUrls, userDataDir, headless, inRange,
           }
         } catch (error) {
           console.warn(`  Aviso: termo "${term}" em ${categoryUrl} falhou — ${error.message}`);
+          failedTerms.add(term);
         }
       }
     }
   } finally {
     await context.close().catch(() => {});
   }
-  return out;
+  return { items: out, failedTerms };
 }
 
 async function waitOutCloudflare(page, headless) {

@@ -306,7 +306,7 @@ describe("mergeWithPreviousSnapshot", () => {
     assert.equal(items[0].status, "active");
   });
 
-  test("item ausente nesta rodada — status = not_seen", () => {
+  test("item ausente nesta rodada — status = not_seen, last_seen preservado", () => {
     const prev = { ...base, first_seen: "2026-05-20", last_seen: "2026-05-24" };
     const { items } = mergeWithPreviousSnapshot({
       runDate: "2026-05-25",
@@ -314,7 +314,20 @@ describe("mergeWithPreviousSnapshot", () => {
       previousSnapshot: { items: [prev] },
     });
     assert.equal(items[0].status, "not_seen");
-    assert.equal(items[0].last_seen, "2026-05-25");
+    // last_seen NÃO é sobrescrito: continua sendo a última vez REALMENTE visto.
+    assert.equal(items[0].last_seen, "2026-05-24");
+  });
+
+  test("item ausente mas com fonte/termo que falhou — carregado intacto (não not_seen)", () => {
+    const prev = { ...base, term: "fitbit air", source: "OLX", first_seen: "2026-05-20", last_seen: "2026-05-24", status: "active" };
+    const { items } = mergeWithPreviousSnapshot({
+      runDate: "2026-05-25",
+      collected: [],
+      previousSnapshot: { items: [prev] },
+      failedKeys: new Set([prev.id]),
+    });
+    assert.equal(items[0].status, "active");        // não rebaixado
+    assert.equal(items[0].last_seen, "2026-05-24"); // intacto
   });
 
   test("dois itens: um novo, um não visto", () => {

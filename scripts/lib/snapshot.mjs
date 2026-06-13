@@ -6,6 +6,11 @@
  * Items that were in the previous snapshot but absent from `collected`
  * are carried forward with status "not_seen".
  *
+ * `failedKeys` (Set of item keys): itens cuja fonte/termo FALHOU nesta rodada.
+ * Como a ausência pode ser só uma falha de coleta (não desaparecimento real),
+ * eles são carregados adiante intactos — sem virar "not_seen" nem mexer no
+ * last_seen.
+ *
  * Keys are item.id ?? item.url.
  */
 export function mergeWithPreviousSnapshot({
@@ -14,6 +19,7 @@ export function mergeWithPreviousSnapshot({
   previousSnapshot,
   priceMin,
   priceMax,
+  failedKeys = new Set(),
 }) {
   const previousItems = previousSnapshot?.items ?? [];
   const previousById = new Map(previousItems.map((x) => [x.id ?? x.url, x]));
@@ -32,11 +38,18 @@ export function mergeWithPreviousSnapshot({
   const currentKeys = new Set(items.map((x) => x.id ?? x.url));
   for (const prev of previousItems) {
     const key = prev.id ?? prev.url;
-    if (!currentKeys.has(key)) {
+    if (currentKeys.has(key)) continue;
+    if (failedKeys.has(key)) {
+      // Cobertura incompleta nesta rodada (a fonte/termo deste item falhou):
+      // não sabemos se sumiu, então carregamos adiante sem alterar nada.
+      items.push({ ...prev });
+    } else {
+      // Realmente ausente: marca not_seen, mas PRESERVA o last_seen original
+      // (quando foi visto pela última vez de fato), em vez de sobrescrever.
       items.push({
         ...prev,
         status: "not_seen",
-        last_seen: runDate,
+        last_seen: prev.last_seen ?? runDate,
       });
     }
   }

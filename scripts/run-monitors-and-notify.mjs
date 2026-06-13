@@ -48,6 +48,7 @@ const olxMaxPerCpu       = getArgValue("--olx-max-per-cpu") ?? process.env.OLX_M
 main().catch((err) => { console.error(`Falha geral: ${err.message}`); process.exitCode = 1; });
 
 async function main() {
+  const runStart = Date.now();
   console.log(`Iniciando rodada: ${new Date().toISOString()}`);
   const errors = [];
 
@@ -89,17 +90,22 @@ async function main() {
     }
   }
 
+  // Só apresentamos relatórios DESTA rodada. Se um monitor falhou e não escreveu
+  // relatório novo, readLatestReport(dir, minTime) devolve null em vez do relatório
+  // antigo — evita reapresentar/realertar achados de rodadas anteriores. No modo
+  // --skip-monitors (reuso de relatórios para teste), não aplicamos o corte.
+  const reportMinTime = skipMonitors ? null : runStart;
   const enjoeiOn = !onlyOlx && !skipEnjoei;
   const [olxStd, enjoeiReport, enjoeiNbStd, dockReport, fitbitReport, lifefactoryReport, telaBook3Report, melangerReport, buds4ProReport] = await Promise.all([
-    skipOlx          ? null : readLatestReport(OLX_DIR).catch(() => null),
-    enjoeiOn         ? readLatestReport(ENJOEI_DIR).catch(() => null) : null,
-    enjoeiOn         ? readLatestReport(ENJOEI_NOTEBOOKS_DIR).catch(() => null) : null,
-    skipDockstations ? null : readLatestReport(DOCKSTATIONS_DIR).catch(() => null),
-    skipFitbit       ? null : readLatestReport(FITBIT_DIR).catch(() => null),
-    skipLifefactory  ? null : readLatestReport(LIFEFACTORY_DIR).catch(() => null),
-    skipTelaBook3    ? null : readLatestReport(TELA_BOOK3_DIR).catch(() => null),
-    skipMelanger     ? null : readLatestReport(MELANGER_DIR).catch(() => null),
-    skipBuds4Pro     ? null : readLatestReport(BUDS4PRO_DIR).catch(() => null),
+    skipOlx          ? null : readLatestReport(OLX_DIR, reportMinTime).catch(() => null),
+    enjoeiOn         ? readLatestReport(ENJOEI_DIR, reportMinTime).catch(() => null) : null,
+    enjoeiOn         ? readLatestReport(ENJOEI_NOTEBOOKS_DIR, reportMinTime).catch(() => null) : null,
+    skipDockstations ? null : readLatestReport(DOCKSTATIONS_DIR, reportMinTime).catch(() => null),
+    skipFitbit       ? null : readLatestReport(FITBIT_DIR, reportMinTime).catch(() => null),
+    skipLifefactory  ? null : readLatestReport(LIFEFACTORY_DIR, reportMinTime).catch(() => null),
+    skipTelaBook3    ? null : readLatestReport(TELA_BOOK3_DIR, reportMinTime).catch(() => null),
+    skipMelanger     ? null : readLatestReport(MELANGER_DIR, reportMinTime).catch(() => null),
+    skipBuds4Pro     ? null : readLatestReport(BUDS4PRO_DIR, reportMinTime).catch(() => null),
   ]);
 
   // Cada fonte conta itens NOVOS e ALTERAÇÕES DE PREÇO (antes só contava novos do range padrão).
@@ -193,13 +199,28 @@ function getArgValue(name) {
   return index >= 0 ? process.argv[index + 1] : null;
 }
 
-async function readLatestReport(dir) {
+async function readLatestReport(dir, minTime = null) {
   const entries = await fs.readdir(dir).catch(() => []);
   const reports = entries
     .filter((n) => n.startsWith("report-") && !n.startsWith("report-premium-") && n.endsWith(".md"))
     .sort().reverse();
   if (!reports.length) return null;
+  // Se o relatório mais recente é de antes desta rodada, a fonte não produziu
+  // nada agora (falhou) — não o apresentamos como resultado atual.
+  if (minTime != null) {
+    const ts = reportFileTime(reports[0]);
+    if (ts != null && ts < minTime) return null;
+  }
   return fs.readFile(path.join(dir, reports[0]), "utf8");
+}
+
+// Instante (epoch ms) embutido no nome do arquivo de relatório, ou null.
+function reportFileTime(file) {
+  const m = file.match(/report-(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})-(\d{3})Z\.md$/);
+  if (!m) return null;
+  const [, y, mo, d, h, mi, s, ms] = m;
+  const t = Date.parse(`${y}-${mo}-${d}T${h}:${mi}:${s}.${ms}Z`);
+  return Number.isNaN(t) ? null : t;
 }
 
 async function readLatestPremiumReport(dir) {
