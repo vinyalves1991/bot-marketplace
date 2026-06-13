@@ -291,7 +291,21 @@ function buildWhatsAppMessage(sources, errors) {
   }
 
   lines.push("\nDetalhes completos por email.");
-  return lines.join("\n").slice(0, 1500);
+  return capByWholeLines(lines, 1500);
+}
+
+// Limita o tamanho da mensagem sem cortar uma linha (e sua URL) no meio: vai
+// somando linhas inteiras até o orçamento e descarta o excedente como um todo.
+function capByWholeLines(lines, max) {
+  const out = [];
+  let used = 0;
+  for (const line of lines) {
+    const add = (out.length ? 1 : 0) + line.length; // +1 do "\n"
+    if (used + add > max) break;
+    out.push(line);
+    used += add;
+  }
+  return out.join("\n");
 }
 
 function extractNewItems(report, sectionHeader) {
@@ -302,7 +316,18 @@ function extractNewItems(report, sectionHeader) {
   const section = end === -1 ? report.slice(start) : report.slice(start, end);
   return section.split("\n")
     .filter((l) => l.startsWith("- ") && !l.includes("Nenhum"))
-    .map((l) => l.slice(0, 120));
+    .map(shortenKeepingUrl);
+}
+
+// Encurta a linha sem mutilar o link: trunca só o trecho ANTES da URL (preço +
+// título) e mantém a URL inteira, que é a parte clicável do alerta de WhatsApp.
+function shortenKeepingUrl(line, maxPrefix = 150) {
+  const idx = line.search(/https?:\/\//);
+  if (idx === -1) return line.length > maxPrefix ? line.slice(0, maxPrefix - 1) + "…" : line;
+  const prefix = line.slice(0, idx);
+  const url = line.slice(idx).trim();
+  const head = prefix.length > maxPrefix ? prefix.slice(0, maxPrefix - 1) + "… " : prefix;
+  return head + url;
 }
 
 // ── email / WhatsApp ──────────────────────────────────────────────────────────
