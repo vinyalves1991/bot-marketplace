@@ -49,6 +49,7 @@ $env:FITBIT_DATA_DIR = Join-Path $root "data\fitbit"
 $env:LIFEFACTORY_DATA_DIR = Join-Path $root "data\lifefactory"
 $env:TELA_GALAXYBOOK3_DATA_DIR = Join-Path $root "data\tela-galaxybook3"
 $env:MELANGER_DATA_DIR = Join-Path $root "data\melanger"
+$env:GALAXY_BUDS4_PRO_DATA_DIR = Join-Path $root "data\galaxy-buds4-pro"
 $env:OLX_MAX_PER_CPU = "$MaxPerCpu"
 
 $success = $false
@@ -123,7 +124,7 @@ try {
 
   # (1) Commita os dados coletados localmente (OLX/dockstations/fitbit). O
   # dashboard NAO entra aqui — ele e gerado adiante, ja sincronizado com o CI.
-  git add data/olx data/dockstations data/fitbit data/lifefactory data/tela-galaxybook3 data/melanger
+  git add data/olx data/dockstations data/fitbit data/lifefactory data/tela-galaxybook3 data/melanger data/galaxy-buds4-pro
   $stamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm")
   $localCommitExists = $false
   if (-not (git diff --staged --quiet)) {

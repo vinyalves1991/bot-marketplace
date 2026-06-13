@@ -13,6 +13,7 @@ const FITBIT_DIR           = process.env.FITBIT_DATA_DIR           ?? path.join(
 const LIFEFACTORY_DIR      = process.env.LIFEFACTORY_DATA_DIR      ?? path.join(ROOT, "data", "lifefactory");
 const TELA_BOOK3_DIR       = process.env.TELA_GALAXYBOOK3_DATA_DIR ?? path.join(ROOT, "data", "tela-galaxybook3");
 const MELANGER_DIR         = process.env.MELANGER_DATA_DIR         ?? path.join(ROOT, "data", "melanger");
+const BUDS4PRO_DIR         = process.env.GALAXY_BUDS4_PRO_DATA_DIR ?? path.join(ROOT, "data", "galaxy-buds4-pro");
 const OUTPUT = path.join(ROOT, "index.html");
 const REPO = "almeida3339/olx-daily";
 const BLOB = `https://github.com/${REPO}/blob/main`;
@@ -32,7 +33,7 @@ export { parseReport, formatRunLabelFromFile, summarizeMachine };
 async function main() {
   const olxDetails = await latestSnapshotDetails(OLX_DIR);
   const enjoeiNbDetails = await latestSnapshotDetails(ENJOEI_NOTEBOOKS_DIR);
-  const [olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3, melanger] = await Promise.all([
+  const [olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3, melanger, buds4Pro] = await Promise.all([
     gather(OLX_DIR, "report-", "report-premium-", olxDetails),
     gather(ENJOEI_NOTEBOOKS_DIR, "report-", "report-premium-", enjoeiNbDetails),
     gather(ENJOEI_DIR, "report-", null),
@@ -41,8 +42,9 @@ async function main() {
     gather(LIFEFACTORY_DIR, "report-", null),
     gather(TELA_BOOK3_DIR, "report-", null),
     gather(MELANGER_DIR, "report-", null),
+    gather(BUDS4PRO_DIR, "report-", null),
   ]);
-  const [olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated] = await Promise.all([
+  const [olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated, buds4ProUpdated] = await Promise.all([
     latestRunLabel(OLX_DIR),
     latestRunLabel(ENJOEI_NOTEBOOKS_DIR),
     latestRunLabel(ENJOEI_DIR),
@@ -51,10 +53,11 @@ async function main() {
     latestRunLabel(LIFEFACTORY_DIR),
     latestRunLabel(TELA_BOOK3_DIR),
     latestRunLabel(MELANGER_DIR),
+    latestRunLabel(BUDS4PRO_DIR),
   ]);
   await fs.writeFile(
     OUTPUT,
-    buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3, melanger, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated }),
+    buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3, melanger, buds4Pro, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated, buds4ProUpdated }),
     "utf8"
   );
   console.log(`Dashboard gerado: ${OUTPUT}`);
@@ -356,7 +359,7 @@ function e(s) {
   return (s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3, melanger, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated }) {
+function buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3, melanger, buds4Pro, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated, buds4ProUpdated }) {
   // Ordenação em dois níveis: primeiro as fontes COM achados recentes (cards com
   // conteúdo), depois as vazias ("Nenhum run com novidades") — sempre no fundo,
   // mesmo que tenham rodado há pouco. Dentro de cada grupo, mais recente primeiro.
@@ -370,6 +373,7 @@ function buildHtml({ olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3
     { chip: "Lifefactory",      title: "Lifefactory",       sub: "OLX + Enjoei · 500ml–1L · R$ 25 – R$ 75",      data: lifefactory, dpath: "data/lifefactory",      upd: lifefactoryUpdated },
     { chip: "Tela Book3",       title: "Tela Galaxy Book3", sub: "BA96-08462A · OLX + Enjoei · até R$ 1.000",    data: telaBook3,   dpath: "data/tela-galaxybook3", upd: telaBook3Updated },
     { chip: "Melanger",         title: "Melanger",          sub: "110V · OLX + Enjoei · R$ 1.000 – R$ 5.000",    data: melanger,    dpath: "data/melanger",         upd: melangerUpdated },
+    { chip: "Galaxy Buds4 Pro", title: "Galaxy Buds4 Pro",  sub: "OLX + Enjoei · R$ 500 – R$ 1.000",             data: buds4Pro,    dpath: "data/galaxy-buds4-pro", upd: buds4ProUpdated },
   ];
 
   // Ordenação e data do card vêm do ÚLTIMO ACHADO (report com novidade), não da
@@ -490,7 +494,7 @@ function platformsOf(dpath) {
 }
 
 function renderSection(title, sub, reports, dpath, stampInfo) {
-  const showSpecs = dpath !== "data/enjoei" && dpath !== "data/dockstations" && dpath !== "data/fitbit" && dpath !== "data/lifefactory" && dpath !== "data/tela-galaxybook3" && dpath !== "data/melanger";
+  const showSpecs = dpath !== "data/enjoei" && dpath !== "data/dockstations" && dpath !== "data/fitbit" && dpath !== "data/lifefactory" && dpath !== "data/tela-galaxybook3" && dpath !== "data/melanger" && dpath !== "data/galaxy-buds4-pro";
   const body = reports.length === 0
     ? `<p class="empty">Nenhum run com novidades recentes.</p>`
     : reports.map((r) => renderCard(r, dpath, showSpecs)).join("\n");
