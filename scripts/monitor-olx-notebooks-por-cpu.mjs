@@ -74,6 +74,7 @@ const EXCLUDE_PATTERNS = [
 
 const args = process.argv.slice(2);
 const headless = args.includes("--headless");
+const visible = args.includes("--visible"); // mostra a janela (padrão: fora da tela, não atrapalha o trabalho)
 const maxAdsPerCpu = Number(getOptionValue(args, "--max-per-cpu") ?? 20);
 const debug = args.includes("--debug");
 const forceOpenDetails = args.includes("--open-details");
@@ -217,7 +218,10 @@ async function launchDedicatedChromeProfile(headlessMode) {
           "--window-size=1280,900",
           "--disable-blink-features=AutomationControlled",
         ]
-      : ["--start-maximized", "--disable-blink-features=AutomationControlled"],
+      : visible
+        ? ["--start-maximized", "--disable-blink-features=AutomationControlled"]
+        // Fora da tela por padrão (não atrapalha o trabalho); janela "real" para o Cloudflare.
+        : ["--window-position=-32000,-32000", "--window-size=1280,900", "--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-blink-features=AutomationControlled"],
   };
   if (!isCI) launchOptions.channel = "chrome";
   if (isCI) {
@@ -234,7 +238,12 @@ async function launchDedicatedChromeProfile(headlessMode) {
 }
 
 async function launchRealChromeProfile(selectedProfileDirectory, headlessMode) {
-  const chromeArgs = ["--start-maximized", `--profile-directory=${selectedProfileDirectory}`];
+  const chromeArgs = [
+    ...(visible
+      ? ["--start-maximized"]
+      : ["--window-position=-32000,-32000", "--window-size=1280,900", "--disable-background-timer-throttling", "--disable-renderer-backgrounding"]),
+    `--profile-directory=${selectedProfileDirectory}`,
+  ];
   const context = await chromium.launchPersistentContext(REAL_CHROME_USER_DATA_DIR, {
     channel: "chrome",
     headless: headlessMode,

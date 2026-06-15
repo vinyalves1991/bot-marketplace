@@ -41,6 +41,7 @@ const NAVIGATION_TIMEOUT_MS = 30_000;
 export async function runWatchlistMonitor(config) {
   const args = process.argv.slice(2);
   const headless = args.includes("--headless");
+  const visible = args.includes("--visible"); // mostra a janela do Chrome (padrão: fora da tela)
   const skipOlx = args.includes("--skip-olx") || process.env.SKIP_OLX === "1";
   const skipEnjoei = args.includes("--skip-enjoei") || process.env.SKIP_ENJOEI === "1";
 
@@ -129,7 +130,7 @@ export async function runWatchlistMonitor(config) {
       const categoryUrls = (config.olxCategoryUrls && config.olxCategoryUrls.length)
         ? config.olxCategoryUrls
         : [OLX_BASE_URL];
-      const { items, failedTerms } = await collectOlx({ terms, categoryUrls, userDataDir, headless, inRange, sizeOk, notExcluded });
+      const { items, failedTerms } = await collectOlx({ terms, categoryUrls, userDataDir, headless, visible, inRange, sizeOk, notExcluded });
       collected.push(...items);
       for (const t of failedTerms) { failedSourceTerms.add(`OLX:${t}`); errors.push(`OLX termo "${t}" falhou`); }
     } catch (error) {
@@ -266,15 +267,20 @@ function buildEnjoeiApiUrl(term, slug) {
 
 // ── OLX (Playwright) ───────────────────────────────────────────────────────────
 
-async function collectOlx({ terms, categoryUrls, userDataDir, headless, inRange, sizeOk, notExcluded }) {
+async function collectOlx({ terms, categoryUrls, userDataDir, headless, visible, inRange, sizeOk, notExcluded }) {
   const isCI = Boolean(process.env.CI);
+  // Local, por padrão a janela roda FORA DA TELA (não atrapalha o trabalho).
+  // --visible mostra maximizada (útil para depurar/resolver Cloudflare).
+  const localArgs = visible
+    ? ["--start-maximized", "--disable-blink-features=AutomationControlled"]
+    : ["--window-position=-32000,-32000", "--window-size=1280,900", "--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-blink-features=AutomationControlled"];
   const launchOptions = {
     headless: headless || isCI,
     viewport: null,
     locale: "pt-BR",
     args: isCI
       ? ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--window-size=1280,900", "--disable-blink-features=AutomationControlled"]
-      : ["--start-maximized", "--disable-blink-features=AutomationControlled"],
+      : localArgs,
   };
   if (!isCI) launchOptions.channel = "chrome";
   if (isCI) {
