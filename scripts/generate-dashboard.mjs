@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { extractGpuLabel, parseBrlPrice, textContainsCpuTerm } from "./lib/parsers.mjs";
+import { extractGpuLabel, extractRamGb, parseBrlPrice, textContainsCpuTerm } from "./lib/parsers.mjs";
 import { extractMercadoLivreNotebookSpecs } from "./lib/mercadolivre-monitor.mjs";
 import { isMercadoLivreNotebookDisplayPrice } from "./lib/mercadolivre-notebook-ranges.mjs";
 
@@ -317,10 +317,12 @@ function extractCpuFromMeta(text) {
     .join(", ") || "n/d";
 }
 
+// Reusa o extrator de RAM canônico (parsers.mjs), que também resolve "16gb"
+// sem qualificador quando há armazenamento separado ("1tb ssd"). Evita manter
+// dois parsers divergentes — era por isso que o card ML mostrava RAM n/d.
 function extractRam(text) {
-  const m = text.match(/\b(\d{1,3})\s*(?:gb|gbs)\s*(?:de\s*)?(?:ram|mem[oó]ria|ddr\d?)\b/i)
-    ?? text.match(/\b(?:ram|mem[oó]ria)\s*:?\s*(\d{1,3})\s*(?:gb|gbs)\b/i);
-  return m ? `${Number(m[1])} GB` : "n/d";
+  const gb = extractRamGb(text ?? "");
+  return gb != null ? `${gb} GB` : "n/d";
 }
 
 function extractSsd(text) {

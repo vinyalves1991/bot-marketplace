@@ -28,7 +28,10 @@ export function extractRamGb(text) {
     /\b(?:ram|mem[oó]ria)\s*:?\s*(\d{1,3})\s*gb\b/i,
     /\b(?:mem[oó]ria\s+ram|ram|mem[oó]ria)\s*[:\r\n-]+\s*(\d{1,3})\s*gb\b/i,
     /\b(\d{1,3})\s*gb\s*ddr\d\b/i,
-    /\b(4|6|8|12|16|24|32|64|128)\s*gb\b(?=.*\b(?:128|256|512|1024|2048|4096)\s*gb\s*(?:ssd|hd|nvme|m\.2|armazenamento|storage)\b)/i,
+    // "16gb" sem qualificador é RAM quando há armazenamento SEPARADO depois —
+    // seja em GB ("512gb ssd") ou em TB ("1tb ssd"/"1tb"). O disco fica
+    // identificado pelo outro token e sobra um valor típico de RAM.
+    /\b(4|6|8|12|16|24|32|64|128)\s*gb\b(?=.*(?:\b(?:128|256|512|1024|2048|4096)\s*gb\s*(?:ssd|hd|nvme|m\.2|armazenamento|storage)\b|\b\d+(?:[.,]\d+)?\s*tb\b))/i,
   ];
   for (const re of patterns) {
     const m = t.match(re);
