@@ -21,7 +21,17 @@ import {
   dedupeMercadoLivreItems,
   mergeMercadoLivreBatch,
   needsMercadoLivreDetail,
+  nonNegativeNumber,
 } from "../scripts/lib/mercadolivre-production.mjs";
+
+test("nonNegativeNumber: arg ausente usa o fallback (nao zera maxDetails)", () => {
+  assert.equal(nonNegativeNumber(null, 8), 8);
+  assert.equal(nonNegativeNumber(undefined, 8), 8);
+  assert.equal(nonNegativeNumber("", 8), 8);
+  assert.equal(nonNegativeNumber("0", 8), 0);   // 0 explícito é respeitado
+  assert.equal(nonNegativeNumber("4", 8), 4);
+  assert.equal(nonNegativeNumber("-1", 8), 8);  // negativo inválido → fallback
+});
 
 test("buildSearchUrl cria uma unica URL de busca", () => {
   assert.equal(

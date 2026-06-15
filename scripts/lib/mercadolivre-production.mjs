@@ -407,7 +407,11 @@ function positiveNumber(value, fallback) {
   return Number.isFinite(number) && number > 0 ? number : fallback;
 }
 
-function nonNegativeNumber(value, fallback) {
+export function nonNegativeNumber(value, fallback) {
+  // value ausente (null/undefined/"") = "não informado" → usa o fallback.
+  // Sem isto, Number(null) === 0 e (0 >= 0) devolvia 0, zerando maxDetails e
+  // desligando a fase de ficha em toda execução sem --max-details explícito.
+  if (value == null || value === "") return fallback;
   const number = Number(value);
   return Number.isFinite(number) && number >= 0 ? number : fallback;
 }
