@@ -1,0 +1,232 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-15T19:53:30.037Z",
+  "run": {
+    "date": "2026-06-15",
+    "timezone": "America/Sao_Paulo",
+    "id": "notebooks",
+    "label": "Notebooks por CPU",
+    "started_at": "2026-06-15T19:52:25.797Z",
+    "completed_at": "2026-06-15T19:53:30.037Z",
+    "partial": false,
+    "aborted": false,
+    "successful_terms": [
+      "13900hx"
+    ],
+    "scheduled_terms": [
+      "13900hx"
+    ],
+    "configured_terms": [
+      "9955hx3d",
+      "290hx",
+      "9955hx",
+      "285hx",
+      "275hx",
+      "aimax395",
+      "7945hx",
+      "7945hx3d",
+      "255hx",
+      "13980hx",
+      "8940hx",
+      "7940hx",
+      "13950hx",
+      "14900hx",
+      "13900hx",
+      "7845hx",
+      "8840hx",
+      "aimax390",
+      "14700hx",
+      "hx470",
+      "12900hx",
+      "12800hx"
+    ],
+    "failed_terms": [],
+    "scheduled_coverage": [
+      "13900hx"
+    ],
+    "successful_coverage": [
+      "13900hx"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "9955hx3d",
+      "290hx",
+      "9955hx",
+      "285hx",
+      "275hx",
+      "aimax395",
+      "7945hx",
+      "7945hx3d",
+      "255hx",
+      "13980hx",
+      "8940hx",
+      "7940hx",
+      "13950hx",
+      "14900hx",
+      "13900hx",
+      "7845hx",
+      "8840hx",
+      "aimax390",
+      "14700hx",
+      "hx470",
+      "12900hx",
+      "12800hx"
+    ]
+  },
+  "filters": {
+    "collection_price_brl": {
+      "min": 2000,
+      "max": 10000
+    },
+    "display_price_brl": {
+      "min": 2000,
+      "max": 8000
+    }
+  },
+  "items": [
+    {
+      "title": "Notebook Gamer Predator Helios Neo 16 - Rtx4070 E I7 14700hx",
+      "url": "https://produto.mercadolivre.com.br/MLB-6788309860-notebook-gamer-predator-helios-neo-16-rtx4070-e-i7-14700hx-_JM?pdp_filters=price%3A2000-10000%7CSHIPPING_ORIGIN%3A10215068#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=10&type=item&tracking_id=e45b8558-4a9a-4b5e-bf74-453e56573fd8&wid=MLB6788309860&sid=search",
+      "price_brl": 7150,
+      "id": "MLB6788309860",
+      "source": "Mercado Livre",
+      "term": "14700hx",
+      "status": "active",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-14",
+      "terms": [
+        "14700hx"
+      ],
+      "price_history": [],
+      "detail_error": null
+    },
+    {
+      "title": "Notebook Asus Rog Strix G16 Rtx 4060 I9 13980hx 16gb 512gb",
+      "url": "https://www.mercadolivre.com.br/notebook-asus-rog-strix-g16-rtx-4060-i9-13980hx-16gb-512gb/up/MLBU3589888321?pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A2000-10000#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=3&type=product&tracking_id=89586aab-4a28-4b34-b568-862f53673198&wid=MLB5955246432&sid=search",
+      "price_brl": 8500,
+      "id": "MLB5955246432",
+      "source": "Mercado Livre",
+      "terms": [
+        "13980hx"
+      ],
+      "status": "active",
+      "first_seen": "2026-06-14",
+      "last_seen": "2026-06-14",
+      "price_history": [
+        {
+          "at": "2026-06-14T14:03:32.324Z",
+          "price_brl": 8500
+        }
+      ],
+      "detail_error": null
+    },
+    {
+      "title": "Notebook Gamer Predator Helios Neo I7-14700hx 16gb Rtx4070",
+      "url": "https://www.mercadolivre.com.br/notebook-gamer-predator-helios-neo-i714700hx-16gb-rtx4070/up/MLBU4073346547?pdp_filters=price%3A2000-10000%7CSHIPPING_ORIGIN%3A10215068#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=4&type=product&tracking_id=e45b8558-4a9a-4b5e-bf74-453e56573fd8&wid=MLB4763407525&sid=search",
+      "price_brl": 8799,
+      "id": "MLB4763407525",
+      "source": "Mercado Livre",
+      "term": "14700hx",
+      "status": "active",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-14",
+      "terms": [
+        "14700hx"
+      ],
+      "price_history": [],
+      "detail_error": null
+    },
+    {
+      "title": "Acer Predator Helios Neo 16 - laptop para jogos, tela Ips Wuxga 165 hz de 16 polegadas, Core i9-14900HX, Geforce Rtx 4060, Ddr5 de 16 GB, Pcle 4.0 de 1 TB, Wifi 6e, Tb 4,... (Novo com caixa aberta)",
+      "url": "https://www.mercadolivre.com.br/acer-predator-helios-neo-16-laptop-para-jogos-tela-ips-wuxga-165-hz-de-16-polegadas-core-i9-14900hx-geforce-rtx-4060-ddr5-de-16-gb-pcle-40-de-1-tb-wifi-6e-tb-4-novo-com-caixa-aberta/p/MLB2022024969?pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A2000-10000#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=6&type=product&tracking_id=174249bb-7152-4bb6-ac25-0a30cc35d004&wid=&sid=search",
+      "price_brl": 8900,
+      "id": "MLB2022024969",
+      "source": "Mercado Livre",
+      "terms": [
+        "14900hx"
+      ],
+      "status": "active",
+      "first_seen": "2026-06-14",
+      "last_seen": "2026-06-14",
+      "price_history": [
+        {
+          "at": "2026-06-14T14:03:32.324Z",
+          "price_brl": 8900
+        }
+      ],
+      "detail_error": null
+    },
+    {
+      "title": "Notebook Gamer Rog Strix G16 Rtx4070 I9 13980hx 32gb 2tb",
+      "url": "https://produto.mercadolivre.com.br/MLB-4761059155-notebook-gamer-rog-strix-g16-rtx4070-i9-13980hx-32gb-2tb-_JM?searchVariation=203696821363&pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A2000-10000#polycard_client=search-desktop&be_origin=backend&searchVariation=203696821363&search_layout=grid&position=5&type=item&tracking_id=89586aab-4a28-4b34-b568-862f53673198",
+      "price_brl": 9000,
+      "id": "MLB4761059155",
+      "source": "Mercado Livre",
+      "terms": [
+        "13980hx"
+      ],
+      "status": "active",
+      "first_seen": "2026-06-14",
+      "last_seen": "2026-06-14",
+      "price_history": [
+        {
+          "at": "2026-06-14T14:03:32.324Z",
+          "price_brl": 9000
+        }
+      ],
+      "detail_error": null
+    },
+    {
+      "title": "Asus Vivobook Pro 16x | I9 13980hx | Rtx 4070 | 16gb Ram",
+      "url": "https://www.mercadolivre.com.br/asus-vivobook-pro-16x--i9-13980hx--rtx-4070--16gb-ram/up/MLBU3708918920?pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A2000-10000#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=4&type=product&tracking_id=89586aab-4a28-4b34-b568-862f53673198&wid=MLB4396872107&sid=search",
+      "price_brl": 9590,
+      "id": "MLB4396872107",
+      "source": "Mercado Livre",
+      "terms": [
+        "13980hx"
+      ],
+      "status": "active",
+      "first_seen": "2026-06-14",
+      "last_seen": "2026-06-14",
+      "price_history": [
+        {
+          "at": "2026-06-14T14:03:32.324Z",
+          "price_brl": 9590
+        }
+      ],
+      "detail_error": null
+    },
+    {
+      "title": "Notebook Gamer Predator Helios Neo / Phn16-72-74vx / Intel® Core I7-14700hx De 14ªgeração / 16gb / 512ssd / Windows 11 Home / Nvidia Geforce Rtx 4070 Gddr6 / Tela 16",
+      "url": "https://www.mercadolivre.com.br/notebook-gamer-predator-helios-neo-phn16-72-74vx-intel-core-i7-14700hx-de-14geraco-16gb-512ssd-windows-11-home-nvidia-geforce-rtx-4070-gddr6-tela-16/p/MLB43497024?pdp_filters=price%3A2000-10000%7CSHIPPING_ORIGIN%3A10215068#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=1&type=product&tracking_id=e45b8558-4a9a-4b5e-bf74-453e56573fd8&wid=MLB4604579597&sid=search",
+      "price_brl": 9698,
+      "id": "MLB4604579597",
+      "source": "Mercado Livre",
+      "term": "14700hx",
+      "status": "active",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-14",
+      "terms": [
+        "14700hx"
+      ],
+      "price_history": [],
+      "detail_error": null
+    },
+    {
+      "title": "Notebook Gamer Acer Predator Helios Neo 16 PHN16-72-75TX • Intel Core i7-14700HX 14ª Geração • 32GB RAM DDR5 • SSD 512GB • RTX 4070 8GB • Windows 11 Home • Tela 16” WQXGA 240Hz",
+      "url": "https://www.mercadolivre.com.br/notebook-gamer-acer-predator-helios-neo-16-phn16-72-75tx-intel-core-i7-14700hx-14-geraco-32gb-ram-ddr5-ssd-512gb-rtx-4070-8gb-windows-11-home-tela-16-wqxga-240hz/p/MLB68481578?pdp_filters=price%3A2000-10000%7CSHIPPING_ORIGIN%3A10215068#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=2&type=product&tracking_id=e45b8558-4a9a-4b5e-bf74-453e56573fd8&wid=MLB4639433915&sid=search",
+      "price_brl": 9999,
+      "id": "MLB4639433915",
+      "source": "Mercado Livre",
+      "term": "14700hx",
+      "status": "active",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-14",
+      "terms": [
+        "14700hx"
+      ],
+      "price_history": [],
+      "detail_error": null
+    }
+  ]
+}

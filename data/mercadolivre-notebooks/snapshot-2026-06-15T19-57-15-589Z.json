@@ -1,0 +1,325 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-15T19:57:15.589Z",
+  "run": {
+    "date": "2026-06-15",
+    "timezone": "America/Sao_Paulo",
+    "id": "notebooks",
+    "label": "Notebooks por CPU",
+    "started_at": "2026-06-15T19:56:14.927Z",
+    "completed_at": "2026-06-15T19:57:15.589Z",
+    "partial": false,
+    "aborted": false,
+    "successful_terms": [
+      "13900hx"
+    ],
+    "scheduled_terms": [
+      "13900hx"
+    ],
+    "configured_terms": [
+      "9955hx3d",
+      "290hx",
+      "9955hx",
+      "285hx",
+      "275hx",
+      "aimax395",
+      "7945hx",
+      "7945hx3d",
+      "255hx",
+      "13980hx",
+      "8940hx",
+      "7940hx",
+      "13950hx",
+      "14900hx",
+      "13900hx",
+      "7845hx",
+      "8840hx",
+      "aimax390",
+      "14700hx",
+      "hx470",
+      "12900hx",
+      "12800hx"
+    ],
+    "failed_terms": [],
+    "scheduled_coverage": [
+      "13900hx"
+    ],
+    "successful_coverage": [
+      "13900hx"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "9955hx3d",
+      "290hx",
+      "9955hx",
+      "285hx",
+      "275hx",
+      "aimax395",
+      "7945hx",
+      "7945hx3d",
+      "255hx",
+      "13980hx",
+      "8940hx",
+      "7940hx",
+      "13950hx",
+      "14900hx",
+      "13900hx",
+      "7845hx",
+      "8840hx",
+      "aimax390",
+      "14700hx",
+      "hx470",
+      "12900hx",
+      "12800hx"
+    ]
+  },
+  "filters": {
+    "collection_price_brl": {
+      "min": 2000,
+      "max": 10000
+    },
+    "display_price_brl": {
+      "min": 2000,
+      "max": 8000
+    }
+  },
+  "items": [
+    {
+      "title": "Notebook Dell Alienware M16 I9-13900hx 16gb 1tb Ssd Rtx4060 (Usado)",
+      "url": "https://produto.mercadolivre.com.br/MLB-4487312637-notebook-dell-alienware-m16-i9-13900hx-16gb-1tb-ssd-rtx4060-_JM?searchVariation=197366187801&pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A2000-10000#polycard_client=search-desktop&be_origin=backend&searchVariation=197366187801&search_layout=grid&position=5&type=item&tracking_id=b0d2baff-bdec-4aff-9eac-630deaa1f53f",
+      "price_brl": 7900,
+      "id": "MLB4487312637",
+      "source": "Mercado Livre",
+      "terms": [
+        "13900hx"
+      ],
+      "status": "active",
+      "condition": "Usado",
+      "specs": [
+        "Marca de placa gráfica integrada: intel",
+        "Linha de placa gráfica integrada: Iris Xe",
+        "Marca de placa gráfica dedicada: NVIDIA",
+        "Linha de placa gráfica dedicada: GeForce RTX",
+        "Modelo de placa gráfica dedicada: RTX 4060",
+        "Capacidade total do módulo de memória RAM: 16 GB",
+        "Tipo de memória RAM: DDR5",
+        "Memória de vídeo: 8 GB",
+        "Marca do processador: Intel",
+        "Linha do processador: Intel Core i9-13900HX",
+        "Modelo do processador: i9-13900HX",
+        "Marca: Dell",
+        "Modelo: Dell Alienware M16 R1",
+        "Modelo alfanumérico: M16 R1",
+        "Capacidade de disco HD: 1 TB",
+        "Capacidade de disco SSD: 1 TB",
+        "Tamanho da tela: 16 \"",
+        "Conectividade: HDMI, Porta ethernet, USB"
+      ],
+      "description": "APRESENTA UM DEFEITO NA TELA - uma faixa sombreada que em nada interfere no desempenho. Vendo porque não tenho tido tempo de utilizar todo o potencial desse notebook que fica praticamente parado. ESTÁ MUITO NOVO, tirando o defeito na tela causado por pressão de meu gato ter acidentalmente saltado de cima da tela.... Conectividade não é um problema, com portas USB, HDMI e Ethernet disponíveis para atender a todas as suas necessidades. O sistema operacional Windows 11 Home e MS 365 Família até 25.08.2026",
+      "details_checked_at": "2026-06-15T19:56:48.652Z",
+      "first_seen": "2026-06-15",
+      "last_seen": "2026-06-15",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-15T19:57:15.589Z",
+          "price_brl": 7900
+        }
+      ]
+    },
+    {
+      "title": "Dell Alienware M16 R1 Core I9 13900hx Rtx 4070 32gb Ram (Usado)",
+      "url": "https://www.mercadolivre.com.br/dell-alienware-m16-r1-core-i9-13900hx-rtx-4070-32gb-ram/up/MLBU3952940946?pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A2000-10000#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=6&type=product&tracking_id=b0d2baff-bdec-4aff-9eac-630deaa1f53f&wid=MLB4660997863&sid=search",
+      "price_brl": 8800,
+      "id": "MLB4660997863",
+      "source": "Mercado Livre",
+      "terms": [
+        "13900hx"
+      ],
+      "status": "active",
+      "condition": "Usado",
+      "specs": [
+        "Modelo de placa gráfica dedicada: RTX 4070",
+        "Linha de placa gráfica dedicada: GeForce RTX",
+        "Marca de placa gráfica dedicada: NVIDIA",
+        "Linha de placa gráfica integrada: Intel Graphics 13900HX",
+        "Marca de placa gráfica integrada: intel",
+        "Processador: Intel Core i9 13900HX",
+        "Capacidade de disco SSD: 1 TB",
+        "Memória RAM: 32 GB",
+        "Interface do SSD: PCIe",
+        "Tamanho da tela: 16 \"",
+        "Tipo de portas de vídeo: Mini DisplayPort",
+        "Marca: Dell",
+        "Modelo: Dell Alienware M16 R1",
+        "Modelo detalhado: AW16-i1300-M20P",
+        "Capacidade total do módulo de memória RAM: 32 GB",
+        "Velocidade da memória RAM: 4,8 GHz",
+        "Tipo de memória RAM: DDR5",
+        "Tipos de memória de vídeo: GDDR6",
+        "Memória de vídeo: 8 GB",
+        "Marca do processador: Intel",
+        "Linha do processador: Core i9",
+        "Modelo do processador: 13900HX",
+        "Velocidade máxima do processador: 5,4 GHz",
+        "Capacidade de armazenamento de dados M2: 1 TB",
+        "Conectividade: HDMI, Porta ethernet, USB"
+      ],
+      "description": "Notebook Gamer Alienware M16 R1 Core I9 Processador: i9- 139000HX 2.2GHz - 13° geração Tela: 16 polegadas- QHD 2.560x 1.600 (240Hz) Teclado ARGB Gamer Desbloqueio Facial Memória RAM 32GB DDR5 5.600 MT/s Armazenamento 1TB SSD M.2 NVME Placa de vídeo: RTX 4070 Full - 8GB Fonte de alimentação 330w Windows 11 Tenho nota fiscal e até a caixa original Ele não apresenta defeito nenhum e nenhuma avaria. O único detalhe que posso dizer é que mesmo usando álcool isopropílico e flanela para limpeza, uma parte do acabamento fosco perto do trackpad foi removida. É algo meramente estético. Conforme fotos Aviso legal A duração da bateria depende do uso que se dê ao produto. Garantia do vendedor: 30 dias",
+      "details_checked_at": "2026-06-15T19:57:15.359Z",
+      "first_seen": "2026-06-15",
+      "last_seen": "2026-06-15",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-15T19:57:15.589Z",
+          "price_brl": 8800
+        }
+      ]
+    },
+    {
+      "title": "Notebook Gamer Predator Helios Neo 16 - Rtx4070 E I7 14700hx",
+      "url": "https://produto.mercadolivre.com.br/MLB-6788309860-notebook-gamer-predator-helios-neo-16-rtx4070-e-i7-14700hx-_JM?pdp_filters=price%3A2000-10000%7CSHIPPING_ORIGIN%3A10215068#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=10&type=item&tracking_id=e45b8558-4a9a-4b5e-bf74-453e56573fd8&wid=MLB6788309860&sid=search",
+      "price_brl": 7150,
+      "id": "MLB6788309860",
+      "source": "Mercado Livre",
+      "term": "14700hx",
+      "status": "active",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-14",
+      "terms": [
+        "14700hx"
+      ],
+      "price_history": [],
+      "detail_error": null
+    },
+    {
+      "title": "Notebook Asus Rog Strix G16 Rtx 4060 I9 13980hx 16gb 512gb",
+      "url": "https://www.mercadolivre.com.br/notebook-asus-rog-strix-g16-rtx-4060-i9-13980hx-16gb-512gb/up/MLBU3589888321?pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A2000-10000#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=3&type=product&tracking_id=89586aab-4a28-4b34-b568-862f53673198&wid=MLB5955246432&sid=search",
+      "price_brl": 8500,
+      "id": "MLB5955246432",
+      "source": "Mercado Livre",
+      "terms": [
+        "13980hx"
+      ],
+      "status": "active",
+      "first_seen": "2026-06-14",
+      "last_seen": "2026-06-14",
+      "price_history": [
+        {
+          "at": "2026-06-14T14:03:32.324Z",
+          "price_brl": 8500
+        }
+      ],
+      "detail_error": null
+    },
+    {
+      "title": "Notebook Gamer Predator Helios Neo I7-14700hx 16gb Rtx4070",
+      "url": "https://www.mercadolivre.com.br/notebook-gamer-predator-helios-neo-i714700hx-16gb-rtx4070/up/MLBU4073346547?pdp_filters=price%3A2000-10000%7CSHIPPING_ORIGIN%3A10215068#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=4&type=product&tracking_id=e45b8558-4a9a-4b5e-bf74-453e56573fd8&wid=MLB4763407525&sid=search",
+      "price_brl": 8799,
+      "id": "MLB4763407525",
+      "source": "Mercado Livre",
+      "term": "14700hx",
+      "status": "active",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-14",
+      "terms": [
+        "14700hx"
+      ],
+      "price_history": [],
+      "detail_error": null
+    },
+    {
+      "title": "Acer Predator Helios Neo 16 - laptop para jogos, tela Ips Wuxga 165 hz de 16 polegadas, Core i9-14900HX, Geforce Rtx 4060, Ddr5 de 16 GB, Pcle 4.0 de 1 TB, Wifi 6e, Tb 4,... (Novo com caixa aberta)",
+      "url": "https://www.mercadolivre.com.br/acer-predator-helios-neo-16-laptop-para-jogos-tela-ips-wuxga-165-hz-de-16-polegadas-core-i9-14900hx-geforce-rtx-4060-ddr5-de-16-gb-pcle-40-de-1-tb-wifi-6e-tb-4-novo-com-caixa-aberta/p/MLB2022024969?pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A2000-10000#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=6&type=product&tracking_id=174249bb-7152-4bb6-ac25-0a30cc35d004&wid=&sid=search",
+      "price_brl": 8900,
+      "id": "MLB2022024969",
+      "source": "Mercado Livre",
+      "terms": [
+        "14900hx"
+      ],
+      "status": "active",
+      "first_seen": "2026-06-14",
+      "last_seen": "2026-06-14",
+      "price_history": [
+        {
+          "at": "2026-06-14T14:03:32.324Z",
+          "price_brl": 8900
+        }
+      ],
+      "detail_error": null
+    },
+    {
+      "title": "Notebook Gamer Rog Strix G16 Rtx4070 I9 13980hx 32gb 2tb",
+      "url": "https://produto.mercadolivre.com.br/MLB-4761059155-notebook-gamer-rog-strix-g16-rtx4070-i9-13980hx-32gb-2tb-_JM?searchVariation=203696821363&pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A2000-10000#polycard_client=search-desktop&be_origin=backend&searchVariation=203696821363&search_layout=grid&position=5&type=item&tracking_id=89586aab-4a28-4b34-b568-862f53673198",
+      "price_brl": 9000,
+      "id": "MLB4761059155",
+      "source": "Mercado Livre",
+      "terms": [
+        "13980hx"
+      ],
+      "status": "active",
+      "first_seen": "2026-06-14",
+      "last_seen": "2026-06-14",
+      "price_history": [
+        {
+          "at": "2026-06-14T14:03:32.324Z",
+          "price_brl": 9000
+        }
+      ],
+      "detail_error": null
+    },
+    {
+      "title": "Asus Vivobook Pro 16x | I9 13980hx | Rtx 4070 | 16gb Ram",
+      "url": "https://www.mercadolivre.com.br/asus-vivobook-pro-16x--i9-13980hx--rtx-4070--16gb-ram/up/MLBU3708918920?pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A2000-10000#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=4&type=product&tracking_id=89586aab-4a28-4b34-b568-862f53673198&wid=MLB4396872107&sid=search",
+      "price_brl": 9590,
+      "id": "MLB4396872107",
+      "source": "Mercado Livre",
+      "terms": [
+        "13980hx"
+      ],
+      "status": "active",
+      "first_seen": "2026-06-14",
+      "last_seen": "2026-06-14",
+      "price_history": [
+        {
+          "at": "2026-06-14T14:03:32.324Z",
+          "price_brl": 9590
+        }
+      ],
+      "detail_error": null
+    },
+    {
+      "title": "Notebook Gamer Predator Helios Neo / Phn16-72-74vx / Intel® Core I7-14700hx De 14ªgeração / 16gb / 512ssd / Windows 11 Home / Nvidia Geforce Rtx 4070 Gddr6 / Tela 16",
+      "url": "https://www.mercadolivre.com.br/notebook-gamer-predator-helios-neo-phn16-72-74vx-intel-core-i7-14700hx-de-14geraco-16gb-512ssd-windows-11-home-nvidia-geforce-rtx-4070-gddr6-tela-16/p/MLB43497024?pdp_filters=price%3A2000-10000%7CSHIPPING_ORIGIN%3A10215068#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=1&type=product&tracking_id=e45b8558-4a9a-4b5e-bf74-453e56573fd8&wid=MLB4604579597&sid=search",
+      "price_brl": 9698,
+      "id": "MLB4604579597",
+      "source": "Mercado Livre",
+      "term": "14700hx",
+      "status": "active",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-14",
+      "terms": [
+        "14700hx"
+      ],
+      "price_history": [],
+      "detail_error": null
+    },
+    {
+      "title": "Notebook Gamer Acer Predator Helios Neo 16 PHN16-72-75TX • Intel Core i7-14700HX 14ª Geração • 32GB RAM DDR5 • SSD 512GB • RTX 4070 8GB • Windows 11 Home • Tela 16” WQXGA 240Hz",
+      "url": "https://www.mercadolivre.com.br/notebook-gamer-acer-predator-helios-neo-16-phn16-72-75tx-intel-core-i7-14700hx-14-geraco-32gb-ram-ddr5-ssd-512gb-rtx-4070-8gb-windows-11-home-tela-16-wqxga-240hz/p/MLB68481578?pdp_filters=price%3A2000-10000%7CSHIPPING_ORIGIN%3A10215068#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=2&type=product&tracking_id=e45b8558-4a9a-4b5e-bf74-453e56573fd8&wid=MLB4639433915&sid=search",
+      "price_brl": 9999,
+      "id": "MLB4639433915",
+      "source": "Mercado Livre",
+      "term": "14700hx",
+      "status": "active",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-14",
+      "terms": [
+        "14700hx"
+      ],
+      "price_history": [],
+      "detail_error": null
+    }
+  ]
+}
