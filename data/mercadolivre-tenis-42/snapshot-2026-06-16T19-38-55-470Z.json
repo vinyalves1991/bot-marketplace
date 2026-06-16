@@ -1,0 +1,184 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-16T19:38:55.470Z",
+  "run": {
+    "date": "2026-06-16",
+    "timezone": "America/Sao_Paulo",
+    "id": "tenis-42",
+    "label": "Tenis 42",
+    "started_at": "2026-06-16T19:35:17.976Z",
+    "completed_at": "2026-06-16T19:38:55.470Z",
+    "partial": false,
+    "aborted": false,
+    "successful_terms": [
+      "vivobarefoot",
+      "xero",
+      "vibram fivefingers",
+      "merrell",
+      "lems",
+      "feet of tomorrow"
+    ],
+    "scheduled_terms": [
+      "vivobarefoot",
+      "xero",
+      "vibram fivefingers",
+      "merrell",
+      "lems",
+      "feet of tomorrow"
+    ],
+    "configured_terms": [
+      "vivobarefoot",
+      "xero",
+      "vibram fivefingers",
+      "merrell",
+      "lems",
+      "feet of tomorrow"
+    ],
+    "failed_terms": [],
+    "scheduled_coverage": [
+      "vivobarefoot",
+      "xero",
+      "vibram fivefingers",
+      "merrell",
+      "lems",
+      "feet of tomorrow"
+    ],
+    "successful_coverage": [
+      "vivobarefoot",
+      "xero",
+      "vibram fivefingers",
+      "merrell",
+      "lems",
+      "feet of tomorrow"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "vivobarefoot",
+      "xero",
+      "vibram fivefingers",
+      "merrell",
+      "lems",
+      "feet of tomorrow"
+    ]
+  },
+  "filters": {
+    "collection_price_brl": {
+      "min": 0,
+      "max": 500
+    },
+    "display_price_brl": {
+      "min": 0,
+      "max": 500
+    }
+  },
+  "items": [
+    {
+      "title": "Mocassim Driver Masculino Exportação Sola Vibram",
+      "url": "https://www.mercadolivre.com.br/mocassim-driver-masculino-exportacao-sola-vibram/up/MLBU790598578?pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-500#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=16&type=product&tracking_id=e0668081-044f-4763-a7c9-2e492a5b78a9&wid=MLB685758738&sid=search",
+      "price_brl": 213.67,
+      "id": "MLB685758738",
+      "source": "Mercado Livre",
+      "term": "vibram",
+      "status": "out_of_scope",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13",
+      "out_of_scope_at": "2026-06-16T19:38:55.470Z"
+    },
+    {
+      "title": "Bota Fly Café Solado Vibram Antiderrapante Super Resistente",
+      "url": "https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count?a=5X0mHHCHVoxm4ppgkQD6mpXeVul0t3XQVvVGq0yI1ZxjKGRCuw%2F4EbLXKv8Ihb3c1D7VAYdmitTQykxpJEPxWiKWuWZxFf%2BuZtoMueWa%2F2o%2Bnta8St60Ck1fqHrsZuiLoHbCWm8rO5YuuFak0dVQ7qbItA%2B1nhmbBCzxRul%2F1%2FC5Mr4DrJsJFNSTvfpCqvNEKhD70WOo8VWTtfILgVkiKzdv6tD1zQzujesMpvA%2Bv6FhI9v4egRpOx5CPylxm%2B0O23B4my7yao8RlxJxixWjcvLkpyU3lPaXFaVwFhnZSvOFgqMTjQtglwwoejyx36SL2EM%2FNVC2lhx%2FZQUYlAECfnyNzqMZA0PIgXe7%2F%2BpmJE7OpVRjJiYyCftakui3jmmMbjrLDBnwuk%2FwvXBR3MfVSDd4PslZq4IwhMGAoerKZU%2FB%2FcamdTfgY7Gl8yLA%2B%2FYw1Nt%2BtFqJrCLpXJq%2Bf7xfQNlr3%2FRXmEbk9l%2FdlriFO61QBnQ0zZ5CRLxxB6Mv8JK2K80GhgBSs10WuIl9Thb5Q1ny%2FZp8xjkdGJFOle7aM2Bej19dMWeWxGKvl9PVTI%2FJTkyD%2BA3O9SgIb66nNtYkuVlunu4dlP3yyT5Ztr5B2JVQQYkKCQn%2BTJ3RaxCQWdpvUo5bwXLnwntuQdoJMWoejzVjwt%2BlrjEtBuaAtcOra9vhqieEC4kxEqdHQfSYj%2BGHUCDuUDNo8TngqEU%2B1Q2wYBN%2FmB4kqdl7hfMmgi4GEKyHLUZes2RgVZVJ%2FA%2BR0rop%2BkDqjVW7JvKtGmV3wNmFK8q2cW00FEXdPFbU70KebEq74sLW0jt280bgTA2qNG%2FyRcKB6anUGeRaRv79NTwI0UvNnOFOvf5PKLJRW7RG4g0TNQMEXE6Bo7jpF1BeLJmPsR0lWHqGwKwelQSV1bUGfMOL9vMqP7jyL3bgHhBUYE36aryg4SsA1QqRWkf9K5RikzVt%2FcxWv3J0ivscdx9q8%2BaNeZAxGlq6bhofW6JP8cBC4v1b1qPT6doItNRc3ME1VtoO3I239FtOG%2BPs9z8bkgOfbw%3D%3D&searchVariation=189417771171&pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-500%7Citem_id%3AMLB5537546944#polycard_client=search-desktop&is_advertising=true&searchVariation=189417771171&backend_model=search-backend&be_origin=backend&search_layout=grid&position=1&type=pad&tracking_id=e0668081-044f-4763-a7c9-2e492a5b78a9",
+      "price_brl": 269.9,
+      "id": "https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count?a=5X0mHHCHVoxm4ppgkQD6mpXeVul0t3XQVvVGq0yI1ZxjKGRCuw%2F4EbLXKv8Ihb3c1D7VAYdmitTQykxpJEPxWiKWuWZxFf%2BuZtoMueWa%2F2o%2Bnta8St60Ck1fqHrsZuiLoHbCWm8rO5YuuFak0dVQ7qbItA%2B1nhmbBCzxRul%2F1%2FC5Mr4DrJsJFNSTvfpCqvNEKhD70WOo8VWTtfILgVkiKzdv6tD1zQzujesMpvA%2Bv6FhI9v4egRpOx5CPylxm%2B0O23B4my7yao8RlxJxixWjcvLkpyU3lPaXFaVwFhnZSvOFgqMTjQtglwwoejyx36SL2EM%2FNVC2lhx%2FZQUYlAECfnyNzqMZA0PIgXe7%2F%2BpmJE7OpVRjJiYyCftakui3jmmMbjrLDBnwuk%2FwvXBR3MfVSDd4PslZq4IwhMGAoerKZU%2FB%2FcamdTfgY7Gl8yLA%2B%2FYw1Nt%2BtFqJrCLpXJq%2Bf7xfQNlr3%2FRXmEbk9l%2FdlriFO61QBnQ0zZ5CRLxxB6Mv8JK2K80GhgBSs10WuIl9Thb5Q1ny%2FZp8xjkdGJFOle7aM2Bej19dMWeWxGKvl9PVTI%2FJTkyD%2BA3O9SgIb66nNtYkuVlunu4dlP3yyT5Ztr5B2JVQQYkKCQn%2BTJ3RaxCQWdpvUo5bwXLnwntuQdoJMWoejzVjwt%2BlrjEtBuaAtcOra9vhqieEC4kxEqdHQfSYj%2BGHUCDuUDNo8TngqEU%2B1Q2wYBN%2FmB4kqdl7hfMmgi4GEKyHLUZes2RgVZVJ%2FA%2BR0rop%2BkDqjVW7JvKtGmV3wNmFK8q2cW00FEXdPFbU70KebEq74sLW0jt280bgTA2qNG%2FyRcKB6anUGeRaRv79NTwI0UvNnOFOvf5PKLJRW7RG4g0TNQMEXE6Bo7jpF1BeLJmPsR0lWHqGwKwelQSV1bUGfMOL9vMqP7jyL3bgHhBUYE36aryg4SsA1QqRWkf9K5RikzVt%2FcxWv3J0ivscdx9q8%2BaNeZAxGlq6bhofW6JP8cBC4v1b1qPT6doItNRc3ME1VtoO3I239FtOG%2BPs9z8bkgOfbw%3D%3D&searchVariation=189417771171&pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-500%7Citem_id%3AMLB5537546944#polycard_client=search-desktop&is_advertising=true&searchVariation=189417771171&backend_model=search-backend&be_origin=backend&search_layout=grid&position=1&type=pad&tracking_id=e0668081-044f-4763-a7c9-2e492a5b78a9",
+      "source": "Mercado Livre",
+      "term": "vibram",
+      "status": "out_of_scope",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13",
+      "out_of_scope_at": "2026-06-16T19:38:55.470Z"
+    },
+    {
+      "title": "Bota Fly Café Solado Vibram Antiderrapante Super Resistente",
+      "url": "https://produto.mercadolivre.com.br/MLB-5537546944-bota-fly-cafe-solado-vibram-antiderrapante-super-resistente-_JM?searchVariation=189417771171&pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-500#polycard_client=search-desktop&be_origin=backend&searchVariation=189417771171&search_layout=grid&position=4&type=item&tracking_id=e0668081-044f-4763-a7c9-2e492a5b78a9",
+      "price_brl": 269.9,
+      "id": "MLB5537546944",
+      "source": "Mercado Livre",
+      "term": "vibram",
+      "status": "out_of_scope",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13",
+      "out_of_scope_at": "2026-06-16T19:38:55.470Z"
+    },
+    {
+      "title": "Bota Em Couro Vnt Extreme Streetwear Com Solado Vibram Resit",
+      "url": "https://produto.mercadolivre.com.br/MLB-4290080753-bota-em-couro-vnt-extreme-streetwear-com-solado-vibram-resit-_JM?searchVariation=192658520907&pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-500#polycard_client=search-desktop&be_origin=backend&searchVariation=192658520907&search_layout=grid&position=7&type=item&tracking_id=e0668081-044f-4763-a7c9-2e492a5b78a9",
+      "price_brl": 279.9,
+      "id": "MLB4290080753",
+      "source": "Mercado Livre",
+      "term": "vibram",
+      "status": "out_of_scope",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13",
+      "out_of_scope_at": "2026-06-16T19:38:55.470Z"
+    },
+    {
+      "title": "Bota Masculina C.a  Ipi Solado Vibram Ou Borracha Resistente",
+      "url": "https://produto.mercadolivre.com.br/MLB-4252914171-bota-masculina-ca-ipi-solado-vibram-ou-borracha-resistente-_JM?searchVariation=186225158742&pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-500#polycard_client=search-desktop&be_origin=backend&searchVariation=186225158742&search_layout=grid&position=10&type=item&tracking_id=e0668081-044f-4763-a7c9-2e492a5b78a9",
+      "price_brl": 279.9,
+      "id": "MLB4252914171",
+      "source": "Mercado Livre",
+      "term": "vibram",
+      "status": "out_of_scope",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13",
+      "out_of_scope_at": "2026-06-16T19:38:55.470Z"
+    },
+    {
+      "title": "Bota Coturno Winter Couro Legítimo Solado Vibram Muito Leve",
+      "url": "https://produto.mercadolivre.com.br/MLB-5489899320-bota-coturno-winter-couro-legitimo-solado-vibram-muito-leve-_JM?searchVariation=184241619196&pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-500#polycard_client=search-desktop&be_origin=backend&searchVariation=184241619196&search_layout=grid&position=15&type=item&tracking_id=e0668081-044f-4763-a7c9-2e492a5b78a9",
+      "price_brl": 329.9,
+      "id": "MLB5489899320",
+      "source": "Mercado Livre",
+      "term": "vibram",
+      "status": "out_of_scope",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13",
+      "out_of_scope_at": "2026-06-16T19:38:55.470Z"
+    },
+    {
+      "title": "Bota Arroyo Couro Confort E Nylon Fast Solado Vibram Leve",
+      "url": "https://produto.mercadolivre.com.br/MLB-4230724077-bota-arroyo-couro-confort-e-nylon-fast-solado-vibram-leve-_JM?searchVariation=185880415324&pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-500#polycard_client=search-desktop&be_origin=backend&searchVariation=185880415324&search_layout=grid&position=13&type=item&tracking_id=e0668081-044f-4763-a7c9-2e492a5b78a9",
+      "price_brl": 425.9,
+      "id": "MLB4230724077",
+      "source": "Mercado Livre",
+      "term": "vibram",
+      "status": "out_of_scope",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13",
+      "out_of_scope_at": "2026-06-16T19:38:55.470Z"
+    },
+    {
+      "title": "Coturno Bota Segurança Fast Arroyo Solado Vibram Leve Macio",
+      "url": "https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count?a=e4KAv82GRyPgw6MQ%2FFOIYs68ExtClsc%2BhiS8R%2B2oUs8E6JgxslQeWAITLnZhO23UOgn8xhEtm7YKGLhbnrXzv34UFhT09DtjjCR7FTEZAHv9k88DKnZCOr6xMqG2nhNWY9%2B6NIDT1bTxjXfPjaNJO7n%2FJJYbrsNibG33XM%2BW%2F%2BFz7YFyRyGv4KiH3%2BjzdIKd1txWOGVlq8UPbh2Lcpla6lgd0LrZSRbre9F9e4In6h18ctDXtD%2BPMCd5PcXbmfFzQC%2BCI3HBfgG3Bwh6b83necC%2BvpnVzRDyFoqwflY%2BUREpMT8hcMyZWnEPkM6rueW1JVUDcp0zx%2F%2FGNqCLUQCMlCZVmpdnIL1lmzmLdCW86joYBA6pnDEUnmuXQ%2BwAOv62MyAyiGAJdKTXizhcjwC2EAWLSlJbMgA6lE3ZtzD00aRESFP%2BkwaYwubzxv8Gx%2BuqLHjqxmT%2BnKVTw1xM5mrw7MgZwCRREE5oCp3unmln2%2FWr50qJLVd62J0INP3NMODReeLWWeX3XsdlRf8pnZkRM%2BI1tzVUghSwiJ1E%2BZsksIjM4zL9w9vW%2B9mwMs7ED4QXGP8f%2FyvldfrKkCa5B0Zu1ajnjvthh1iQZYKc4TRBAgIBWLjqv%2FIhfKu%2B2g0%2BF%2BbMuZQqlymUqZCfjeV8jNGGPcf3Fz8y2wCrHbve5GGvEAhNJH1JS%2FQpYwsnElPjtjLcTcyP3TYZXczssR3p60ICueinGqQGBhcMVMgOLhoeEaxU3wZbFyqwoU3g9PpgUhakn%2FV8dIl7cD35NKLohOgDF%2BgqG7BK3vRFimJt6s3Fy%2BAL3H0B2OLf6kwXXd9aCDT4rf8deMSb%2Fxk9XFLojEeJlAvoxvdYlnA95BmswOe%2FJifKRNZNqVZNoGve86unSndhF5MILgvBSkjSy6bv0FqslR1fIfxclqDseaAsgorQUHIoMhuyqh22qO3EqHh7LteI54Md3EbyTqgJjHhItjg2kakvjua1paFwmNMxE3oyaQYvYuG%2BYwJjj5oXP8VB9VOqwqN2O5VrkoyRGIZDFYVawBLZ9G1j&searchVariation=199025073911&pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-500%7Citem_id%3AMLB5792899160#polycard_client=search-desktop&is_advertising=true&searchVariation=199025073911&backend_model=search-backend&be_origin=backend&search_layout=grid&position=2&type=pad&tracking_id=e0668081-044f-4763-a7c9-2e492a5b78a9",
+      "price_brl": 455.9,
+      "id": "https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count?a=e4KAv82GRyPgw6MQ%2FFOIYs68ExtClsc%2BhiS8R%2B2oUs8E6JgxslQeWAITLnZhO23UOgn8xhEtm7YKGLhbnrXzv34UFhT09DtjjCR7FTEZAHv9k88DKnZCOr6xMqG2nhNWY9%2B6NIDT1bTxjXfPjaNJO7n%2FJJYbrsNibG33XM%2BW%2F%2BFz7YFyRyGv4KiH3%2BjzdIKd1txWOGVlq8UPbh2Lcpla6lgd0LrZSRbre9F9e4In6h18ctDXtD%2BPMCd5PcXbmfFzQC%2BCI3HBfgG3Bwh6b83necC%2BvpnVzRDyFoqwflY%2BUREpMT8hcMyZWnEPkM6rueW1JVUDcp0zx%2F%2FGNqCLUQCMlCZVmpdnIL1lmzmLdCW86joYBA6pnDEUnmuXQ%2BwAOv62MyAyiGAJdKTXizhcjwC2EAWLSlJbMgA6lE3ZtzD00aRESFP%2BkwaYwubzxv8Gx%2BuqLHjqxmT%2BnKVTw1xM5mrw7MgZwCRREE5oCp3unmln2%2FWr50qJLVd62J0INP3NMODReeLWWeX3XsdlRf8pnZkRM%2BI1tzVUghSwiJ1E%2BZsksIjM4zL9w9vW%2B9mwMs7ED4QXGP8f%2FyvldfrKkCa5B0Zu1ajnjvthh1iQZYKc4TRBAgIBWLjqv%2FIhfKu%2B2g0%2BF%2BbMuZQqlymUqZCfjeV8jNGGPcf3Fz8y2wCrHbve5GGvEAhNJH1JS%2FQpYwsnElPjtjLcTcyP3TYZXczssR3p60ICueinGqQGBhcMVMgOLhoeEaxU3wZbFyqwoU3g9PpgUhakn%2FV8dIl7cD35NKLohOgDF%2BgqG7BK3vRFimJt6s3Fy%2BAL3H0B2OLf6kwXXd9aCDT4rf8deMSb%2Fxk9XFLojEeJlAvoxvdYlnA95BmswOe%2FJifKRNZNqVZNoGve86unSndhF5MILgvBSkjSy6bv0FqslR1fIfxclqDseaAsgorQUHIoMhuyqh22qO3EqHh7LteI54Md3EbyTqgJjHhItjg2kakvjua1paFwmNMxE3oyaQYvYuG%2BYwJjj5oXP8VB9VOqwqN2O5VrkoyRGIZDFYVawBLZ9G1j&searchVariation=199025073911&pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-500%7Citem_id%3AMLB5792899160#polycard_client=search-desktop&is_advertising=true&searchVariation=199025073911&backend_model=search-backend&be_origin=backend&search_layout=grid&position=2&type=pad&tracking_id=e0668081-044f-4763-a7c9-2e492a5b78a9",
+      "source": "Mercado Livre",
+      "term": "vibram",
+      "status": "out_of_scope",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13",
+      "out_of_scope_at": "2026-06-16T19:38:55.470Z"
+    },
+    {
+      "title": "Coturno Bota Segurança Fast Arroyo Solado Vibram Leve Macio",
+      "url": "https://produto.mercadolivre.com.br/MLB-5792899160-coturno-bota-seguranca-fast-arroyo-solado-vibram-leve-macio-_JM?searchVariation=199025073911&pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-500#polycard_client=search-desktop&be_origin=backend&searchVariation=199025073911&search_layout=grid&position=5&type=item&tracking_id=e0668081-044f-4763-a7c9-2e492a5b78a9",
+      "price_brl": 455.9,
+      "id": "MLB5792899160",
+      "source": "Mercado Livre",
+      "term": "vibram",
+      "status": "out_of_scope",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13",
+      "out_of_scope_at": "2026-06-16T19:38:55.470Z"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-16T19:33:59.294Z",
+  "run": {
+    "date": "2026-06-16",
+    "timezone": "America/Sao_Paulo",
+    "id": "dockstations",
+    "label": "Dockstations",
+    "started_at": "2026-06-16T19:32:10.442Z",
+    "completed_at": "2026-06-16T19:33:59.294Z",
+    "partial": false,
+    "aborted": false,
+    "successful_terms": [
+      "SD25TB4",
+      "WD22TB4",
+      "40AY0090BR"
+    ],
+    "scheduled_terms": [
+      "SD25TB4",
+      "WD22TB4",
+      "40AY0090BR"
+    ],
+    "configured_terms": [
+      "SD25TB4",
+      "WD22TB4",
+      "40AY0090BR"
+    ],
+    "failed_terms": [],
+    "scheduled_coverage": [
+      "SD25TB4",
+      "WD22TB4",
+      "40AY0090BR"
+    ],
+    "successful_coverage": [
+      "SD25TB4",
+      "WD22TB4",
+      "40AY0090BR"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "SD25TB4",
+      "WD22TB4",
+      "40AY0090BR"
+    ]
+  },
+  "filters": {
+    "collection_price_brl": {
+      "min": 0,
+      "max": 500
+    },
+    "display_price_brl": {
+      "min": 0,
+      "max": 500
+    }
+  },
+  "items": [
+    {
+      "title": "Fonte Carregador Para Dell Dock Wd22tb4 180w",
+      "url": "https://www.mercadolivre.com.br/fonte-carregador-para-dell-dock-wd22tb4-180w/up/MLBU3123451449?pdp_filters=price%3A*-500#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=1&type=product&tracking_id=9caa29ae-d21a-42f6-aa76-ec52606277f0&wid=MLB4033184251&sid=search",
+      "price_brl": 194.5,
+      "id": "MLB4033184251",
+      "source": "Mercado Livre",
+      "term": "WD22TB4",
+      "status": "not_seen",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13"
+    }
+  ]
+}

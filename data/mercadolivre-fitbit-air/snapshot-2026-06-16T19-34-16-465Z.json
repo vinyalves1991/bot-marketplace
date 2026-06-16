@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-16T19:34:16.465Z",
+  "run": {
+    "date": "2026-06-16",
+    "timezone": "America/Sao_Paulo",
+    "id": "fitbit-air",
+    "label": "Fitbit Air",
+    "started_at": "2026-06-16T19:33:59.301Z",
+    "completed_at": "2026-06-16T19:34:16.465Z",
+    "partial": false,
+    "aborted": false,
+    "successful_terms": [
+      "fitbit air"
+    ],
+    "scheduled_terms": [
+      "fitbit air"
+    ],
+    "configured_terms": [
+      "fitbit air"
+    ],
+    "failed_terms": [],
+    "scheduled_coverage": [
+      "fitbit air"
+    ],
+    "successful_coverage": [
+      "fitbit air"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "fitbit air"
+    ]
+  },
+  "filters": {
+    "collection_price_brl": {
+      "min": 300,
+      "max": 600
+    },
+    "display_price_brl": {
+      "min": 300,
+      "max": 600
+    }
+  },
+  "items": [
+    {
+      "title": "Pulseira Google Fitbit Air Active Silicone Small Obsidian Obsidian",
+      "url": "https://www.mercadolivre.com.br/correa-google-fitbit-air-active-silicona-small-obsidian-cs/p/MLB2090401628?pdp_filters=price%3A300-600#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=2&type=product&tracking_id=30135794-0e9b-433c-ba73-ecb35d6a58ae&wid=MLB4715959873&sid=search",
+      "price_brl": 340.12,
+      "id": "MLB4715959873",
+      "source": "Mercado Livre",
+      "term": "fitbit air",
+      "status": "not_seen",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13"
+    },
+    {
+      "title": "Pulseira Google Fitbit Air Performance Loop Ajustável Fog Fog",
+      "url": "https://www.mercadolivre.com.br/alca-ajustavel-para-relogio-fitbit-google-ga11066-ww-/p/MLB2089978844?pdp_filters=price%3A300-600#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=1&type=product&tracking_id=30135794-0e9b-433c-ba73-ecb35d6a58ae&wid=MLB4715971037&sid=search",
+      "price_brl": 340.22,
+      "id": "MLB4715971037",
+      "source": "Mercado Livre",
+      "term": "fitbit air",
+      "status": "not_seen",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13"
+    },
+    {
+      "title": "Pulseira Google Fitbit Air Performance Loop Tamanho Único Be Berry",
+      "url": "https://www.mercadolivre.com.br/a-correa-google-fitbit-air-performance-loop-talla-unica-d/p/MLB2089814800?pdp_filters=price%3A300-600#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=3&type=product&tracking_id=30135794-0e9b-433c-ba73-ecb35d6a58ae&wid=MLB4715946753&sid=search",
+      "price_brl": 340.22,
+      "id": "MLB4715946753",
+      "source": "Mercado Livre",
+      "term": "fitbit air",
+      "status": "not_seen",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13"
+    },
+    {
+      "title": "Po Pulseira Google Fitbit Air Performance Loop Ajustável ..",
+      "url": "https://www.mercadolivre.com.br/po-pulseira-google-fitbit-air-performance-loop-ajustavel-/up/MLBU4077428413?pdp_filters=price%3A300-600#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=4&type=product&tracking_id=30135794-0e9b-433c-ba73-ecb35d6a58ae&wid=MLB6948927916&sid=search",
+      "price_brl": 522.29,
+      "id": "MLB6948927916",
+      "source": "Mercado Livre",
+      "term": "fitbit air",
+      "status": "not_seen",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13"
+    }
+  ]
+}
