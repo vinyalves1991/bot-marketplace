@@ -3,7 +3,13 @@ param(
   [switch]$NoPush     # coleta + regenera dashboard, sem commitar/publicar
 )
 
-$ErrorActionPreference = "Stop"
+# As operações git/node abaixo são nativas e emitem stderr benigno (progresso do
+# fetch, avisos de CRLF, etc.). Sob ErrorActionPreference='Stop' no PowerShell 5.1,
+# esse stderr vira erro TERMINANTE e aborta o script ANTES de coletar — era a causa
+# do "não deu certo" (o run morria no git fetch/rebase do topo). Rodamos sob
+# 'Continue' e verificamos $LASTEXITCODE explicitamente (os `throw` continuam
+# funcionando normalmente, pois throw é sempre terminante).
+$ErrorActionPreference = "Continue"
 $root = Resolve-Path (Join-Path $PSScriptRoot "..")
 $env:MERCADOLIVRE_PROFILE_DIR = Join-Path $root ".chrome-mercadolivre-profile"
 
