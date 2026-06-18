@@ -335,7 +335,12 @@ function extractSsd(text) {
     ?? text.match(/\bssd\s*(?:de\s*)?(\d{2,5})\s*gb\b/i)
     ?? text.match(/\/\s*(\d{2,5})\s*GB\b/i)
     ?? text.match(/\b(128|256|512|1024|2048|4096)\s*gb\b/i);
-  return mGb ? `${Number(mGb[1]).toLocaleString("pt-BR")} GB` : "n/d";
+  if (!mGb) return "n/d";
+  const gb = Number(mGb[1]);
+  // 1024/2048/... GB vira "1 TB"/"2 TB": mais legível e consistente com os
+  // títulos (antes mostrava "1.024 GB", que confunde e diverge dos outros cards).
+  if (gb >= 1024 && gb % 1024 === 0) return `${gb / 1024} TB`;
+  return `${gb.toLocaleString("pt-BR")} GB`;
 }
 
 function extractGpu(text) {

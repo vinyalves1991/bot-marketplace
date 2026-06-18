@@ -102,7 +102,7 @@ test("summarizeMachine identifica Ryzen AI 7 350 sem deixar CPU no modelo", () =
       model: "Zenbook 14 Touch",
       cpu: "Ryzen AI 7 350",
       ram: "32 GB",
-      ssd: "1.024 GB",
+      ssd: "1 TB",
       gpu: null,
     },
   );
