@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-18T19:05:01.029Z",
+  "run": {
+    "date": "2026-06-18",
+    "timezone": "UTC",
+    "id": "galaxy-buds4-pro",
+    "label": "Galaxy Buds4 Pro",
+    "partial": true,
+    "errors": [],
+    "scheduled_coverage": [
+      "Enjoei:galaxy buds4 pro"
+    ],
+    "successful_coverage": [
+      "Enjoei:galaxy buds4 pro"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "Enjoei:galaxy buds4 pro",
+      "OLX:galaxy buds4 pro"
+    ]
+  },
+  "filters": {
+    "price_brl": {
+      "min": 500,
+      "max": 1000
+    },
+    "size_ml": {
+      "min": null,
+      "max": null
+    }
+  },
+  "items": [
+    {
+      "id": "enjoei-144874713",
+      "url": "https://www.enjoei.com.br/p/fone-de-ouvido-samsung-galaxy-buds4-pro-144874713",
+      "title": "fone de ouvido samsung galaxy buds4 pro",
+      "source": "Enjoei",
+      "term": "galaxy buds4 pro",
+      "price_brl": 600,
+      "store_name": "ticiane",
+      "status": "not_seen",
+      "first_seen": "2026-06-16",
+      "last_seen": "2026-06-17",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-16T19:01:00.404Z",
+          "price_brl": 600
+        }
+      ]
+    },
+    {
+      "id": "enjoei-144648647",
+      "url": "https://www.enjoei.com.br/p/fone-de-ouvido-samsung-galaxy-buds4-pro-144648647",
+      "title": "fone de ouvido samsung galaxy buds4 pro",
+      "source": "Enjoei",
+      "term": "galaxy buds4 pro",
+      "price_brl": 600,
+      "store_name": "Shayanna",
+      "status": "not_seen",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13"
+    }
+  ],
+  "price_range_brl": {
+    "min": 500,
+    "max": 1000
+  }
+}
