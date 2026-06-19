@@ -1,0 +1,46 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-19T19:00:45.451Z",
+  "run": {
+    "date": "2026-06-19",
+    "timezone": "UTC",
+    "id": "dockstations",
+    "label": "Dockstations",
+    "partial": true,
+    "errors": [],
+    "scheduled_coverage": [
+      "Enjoei:SD25TB4",
+      "Enjoei:WD22TB4",
+      "Enjoei:40AY0090BR"
+    ],
+    "successful_coverage": [
+      "Enjoei:SD25TB4",
+      "Enjoei:WD22TB4",
+      "Enjoei:40AY0090BR"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "Enjoei:SD25TB4",
+      "Enjoei:WD22TB4",
+      "Enjoei:40AY0090BR",
+      "OLX:SD25TB4",
+      "OLX:WD22TB4",
+      "OLX:40AY0090BR"
+    ]
+  },
+  "filters": {
+    "price_brl": {
+      "min": 0,
+      "max": 500
+    },
+    "size_ml": {
+      "min": null,
+      "max": null
+    }
+  },
+  "items": [],
+  "price_range_brl": {
+    "min": 0,
+    "max": 500
+  }
+}
