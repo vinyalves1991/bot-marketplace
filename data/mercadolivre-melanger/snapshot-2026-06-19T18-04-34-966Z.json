@@ -41,17 +41,5 @@
       "max": 5000
     }
   },
-  "items": [
-    {
-      "title": "Carrinho De Bebê Kiddo Vox Melange Rosa",
-      "url": "https://www.mercadolivre.com.br/carrinho-de-beb-kiddo-vox-melange-rosa/p/MLB38907158?pdp_filters=price%3A1000-5000#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=17&type=product&tracking_id=3513d796-fc93-48fe-98fc-084fc8ecd79f&wid=MLB4264776361&sid=search",
-      "price_brl": 1323,
-      "id": "MLB4264776361",
-      "source": "Mercado Livre",
-      "term": "melanger",
-      "status": "not_seen",
-      "first_seen": "2026-06-13",
-      "last_seen": "2026-06-13"
-    }
-  ]
+  "items": []
 }

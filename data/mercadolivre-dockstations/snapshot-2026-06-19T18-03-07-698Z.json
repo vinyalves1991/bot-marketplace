@@ -53,17 +53,5 @@
       "max": 500
     }
   },
-  "items": [
-    {
-      "title": "Fonte Carregador Para Dell Dock Wd22tb4 180w",
-      "url": "https://www.mercadolivre.com.br/fonte-carregador-para-dell-dock-wd22tb4-180w/up/MLBU3123451449?pdp_filters=price%3A*-500#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=1&type=product&tracking_id=9caa29ae-d21a-42f6-aa76-ec52606277f0&wid=MLB4033184251&sid=search",
-      "price_brl": 194.5,
-      "id": "MLB4033184251",
-      "source": "Mercado Livre",
-      "term": "WD22TB4",
-      "status": "not_seen",
-      "first_seen": "2026-06-13",
-      "last_seen": "2026-06-13"
-    }
-  ]
+  "items": []
 }
