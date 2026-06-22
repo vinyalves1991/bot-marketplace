@@ -1,0 +1,43 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-22T19:00:03.059Z",
+  "run": {
+    "date": "2026-06-22",
+    "timezone": "America/Sao_Paulo",
+    "id": "fitbit-air",
+    "label": "Fitbit Air",
+    "partial": true,
+    "errors": [
+      "OLX termo \"fitbit air\" falhou"
+    ],
+    "scheduled_coverage": [
+      "Enjoei:fitbit air",
+      "OLX:fitbit air"
+    ],
+    "successful_coverage": [
+      "Enjoei:fitbit air"
+    ],
+    "failed_coverage": [
+      "OLX:fitbit air"
+    ],
+    "configured_coverage": [
+      "Enjoei:fitbit air",
+      "OLX:fitbit air"
+    ]
+  },
+  "filters": {
+    "price_brl": {
+      "min": 300,
+      "max": 600
+    },
+    "size_ml": {
+      "min": null,
+      "max": null
+    }
+  },
+  "items": [],
+  "price_range_brl": {
+    "min": 300,
+    "max": 600
+  }
+}
