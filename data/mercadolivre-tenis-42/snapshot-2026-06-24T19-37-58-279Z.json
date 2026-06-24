@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-24T19:37:58.279Z",
+  "run": {
+    "date": "2026-06-24",
+    "timezone": "America/Sao_Paulo",
+    "id": "tenis-42",
+    "label": "Tenis 42",
+    "started_at": "2026-06-24T19:34:37.177Z",
+    "completed_at": "2026-06-24T19:37:58.279Z",
+    "partial": false,
+    "aborted": false,
+    "successful_terms": [
+      "vivobarefoot",
+      "xero",
+      "vibram fivefingers",
+      "merrell",
+      "lems",
+      "feet of tomorrow"
+    ],
+    "scheduled_terms": [
+      "vivobarefoot",
+      "xero",
+      "vibram fivefingers",
+      "merrell",
+      "lems",
+      "feet of tomorrow"
+    ],
+    "configured_terms": [
+      "vivobarefoot",
+      "xero",
+      "vibram fivefingers",
+      "merrell",
+      "lems",
+      "feet of tomorrow"
+    ],
+    "failed_terms": [],
+    "scheduled_coverage": [
+      "vivobarefoot",
+      "xero",
+      "vibram fivefingers",
+      "merrell",
+      "lems",
+      "feet of tomorrow"
+    ],
+    "successful_coverage": [
+      "vivobarefoot",
+      "xero",
+      "vibram fivefingers",
+      "merrell",
+      "lems",
+      "feet of tomorrow"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "vivobarefoot",
+      "xero",
+      "vibram fivefingers",
+      "merrell",
+      "lems",
+      "feet of tomorrow"
+    ]
+  },
+  "filters": {
+    "collection_price_brl": {
+      "min": 0,
+      "max": 500
+    },
+    "display_price_brl": {
+      "min": 0,
+      "max": 500
+    }
+  },
+  "items": []
+}
