@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-25T13:54:26.821Z",
+  "run": {
+    "date": "2026-06-25",
+    "timezone": "America/Sao_Paulo",
+    "id": "melanger",
+    "label": "Melanger",
+    "started_at": "2026-06-25T13:54:01.917Z",
+    "completed_at": "2026-06-25T13:54:26.821Z",
+    "partial": false,
+    "aborted": false,
+    "successful_terms": [
+      "melanger"
+    ],
+    "scheduled_terms": [
+      "melanger"
+    ],
+    "configured_terms": [
+      "melanger"
+    ],
+    "failed_terms": [],
+    "scheduled_coverage": [
+      "melanger"
+    ],
+    "successful_coverage": [
+      "melanger"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "melanger"
+    ]
+  },
+  "filters": {
+    "collection_price_brl": {
+      "min": 1000,
+      "max": 5000
+    },
+    "display_price_brl": {
+      "min": 1000,
+      "max": 5000
+    }
+  },
+  "items": []
+}

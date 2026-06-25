@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-25T13:53:40.667Z",
+  "run": {
+    "date": "2026-06-25",
+    "timezone": "America/Sao_Paulo",
+    "id": "lifefactory",
+    "label": "Lifefactory",
+    "started_at": "2026-06-25T13:53:19.574Z",
+    "completed_at": "2026-06-25T13:53:40.667Z",
+    "partial": false,
+    "aborted": false,
+    "successful_terms": [
+      "lifefactory"
+    ],
+    "scheduled_terms": [
+      "lifefactory"
+    ],
+    "configured_terms": [
+      "lifefactory"
+    ],
+    "failed_terms": [],
+    "scheduled_coverage": [
+      "lifefactory"
+    ],
+    "successful_coverage": [
+      "lifefactory"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "lifefactory"
+    ]
+  },
+  "filters": {
+    "collection_price_brl": {
+      "min": 25,
+      "max": 75
+    },
+    "display_price_brl": {
+      "min": 25,
+      "max": 75
+    }
+  },
+  "items": []
+}
