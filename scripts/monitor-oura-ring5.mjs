@@ -3,6 +3,7 @@
 //   Stealth / Brushed Silver / Gold / Deep Rose  → R$ 1.850–2.700
 //   Cor não identificada                         → união R$ 1.800–2.700 (mostra; você avalia)
 //   Tamanho: se o título declarar (tamanho/size/aro N), exige 9–11; senão mantém.
+//   Geração: EXIGE Gen 5 no título (ring5/gen5/g5); sem número ou Gen 1–4 → fora.
 import path from "node:path";
 import { runWatchlistMonitor } from "./lib/watchlist-monitor.mjs";
 
@@ -13,11 +14,11 @@ const dataDir =
 const norm = (s) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 const normCode = (s) => norm(s).replace(/[^a-z0-9]/g, "");
 
-// Só Gen 5: exclui itens cujo título indica geração 1–4 explícita (gen3, ring4,
-// geração 4, etc.). Itens sem geração no título são MANTIDOS (podem ser gen 5; o
-// usuário avalia). "ring 5"/"gen 5" passam normalmente.
-function isOlderGen(title) {
-  return /(?:ring|gen|geracao)([1-4])(?![0-9])/.test(normCode(title));
+// Só Gen 5: EXIGE que o título aponte a 5ª geração (gen5, ring5, geração 5, g5,
+// "5a geracao"). Títulos sem número OU com geração 1–4 são excluídos.
+function isGen5(title) {
+  return /(?:ring|gen|geracao|g)5(?![0-9])/.test(normCode(title))
+    || /5(?:ageracao|ageraco|gen|geracao)/.test(normCode(title));
 }
 
 // Premium (faixa 1850–2700). "Brushed Silver" é premium e pode vir em qualquer
@@ -50,7 +51,7 @@ runWatchlistMonitor({
   minPrice: 1800, // união; a faixa real (por cor) é aplicada no itemFilter abaixo
   maxPrice: 2700,
   itemFilter: ({ title, price_brl }) => {
-    if (isOlderGen(title)) return false; // exclui Oura Ring 1–4 explícitos (quer só Gen 5)
+    if (!isGen5(title)) return false; // só Gen 5 explícita; sem número também é excluída
     if (!ringSizeOk(title)) return false;
     const [min, max] = ouraRange(title);
     return price_brl != null && price_brl >= min && price_brl <= max;
