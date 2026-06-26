@@ -1,0 +1,210 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-26T23:07:07.561Z",
+  "run": {
+    "date": "2026-06-26",
+    "timezone": "America/Sao_Paulo",
+    "id": "oura-ring-5",
+    "label": "Oura Ring 5",
+    "partial": true,
+    "errors": [],
+    "scheduled_coverage": [
+      "Enjoei:oura ring"
+    ],
+    "successful_coverage": [
+      "Enjoei:oura ring"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "Enjoei:oura ring",
+      "OLX:oura ring"
+    ]
+  },
+  "filters": {
+    "price_brl": {
+      "min": 1800,
+      "max": 2700
+    },
+    "size_ml": {
+      "min": null,
+      "max": null
+    }
+  },
+  "items": [
+    {
+      "id": "enjoei-145252480",
+      "url": "https://www.enjoei.com.br/p/oura-ring-dourado-tamanho-10-acompanha-carregador-original-145252480",
+      "title": "oura ring dourado tamanho 10\nacompanha carregador original",
+      "source": "Enjoei",
+      "term": "oura ring",
+      "price_brl": 2500,
+      "store_name": "Larissa",
+      "status": "active",
+      "first_seen": "2026-06-26",
+      "last_seen": "2026-06-26",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-26T23:07:07.561Z",
+          "price_brl": 2500
+        }
+      ]
+    },
+    {
+      "id": "enjoei-141221707",
+      "url": "https://www.enjoei.com.br/p/anel-oura-ring-3-heritage-preto-141221707",
+      "title": "anel oura ring 3 heritage preto",
+      "source": "Enjoei",
+      "term": "oura ring",
+      "price_brl": 2190,
+      "store_name": "",
+      "status": "active",
+      "first_seen": "2026-06-26",
+      "last_seen": "2026-06-26",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-26T23:07:07.561Z",
+          "price_brl": 2190
+        }
+      ]
+    },
+    {
+      "id": "enjoei-144400374",
+      "url": "https://www.enjoei.com.br/p/oura-ring-gen-3-heritage-144400374",
+      "title": "oura ring gen 3 heritage",
+      "source": "Enjoei",
+      "term": "oura ring",
+      "price_brl": 2069,
+      "store_name": "carol",
+      "status": "active",
+      "first_seen": "2026-06-26",
+      "last_seen": "2026-06-26",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-26T23:07:07.561Z",
+          "price_brl": 2069
+        }
+      ]
+    },
+    {
+      "id": "enjoei-143296947",
+      "url": "https://www.enjoei.com.br/p/oura-ring-4-tamanho-9-prata-fosco-143296947",
+      "title": "oura ring 4 tamanho 9 prata fosco",
+      "source": "Enjoei",
+      "term": "oura ring",
+      "price_brl": 1900,
+      "store_name": "enzo",
+      "status": "active",
+      "first_seen": "2026-06-26",
+      "last_seen": "2026-06-26",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-26T23:07:07.561Z",
+          "price_brl": 1900
+        }
+      ]
+    },
+    {
+      "id": "enjoei-143892100",
+      "url": "https://www.enjoei.com.br/p/oura-ring-gen-3-horizon-cor-stealth-tamanho-10-143892100",
+      "title": "oura ring - gen 3 horizon - cor stealth - tamanho 10",
+      "source": "Enjoei",
+      "term": "oura ring",
+      "price_brl": 2000,
+      "store_name": "denize",
+      "status": "active",
+      "first_seen": "2026-06-26",
+      "last_seen": "2026-06-26",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-26T23:07:07.561Z",
+          "price_brl": 2000
+        }
+      ]
+    },
+    {
+      "id": "enjoei-143994978",
+      "url": "https://www.enjoei.com.br/p/anel-inteligente-oura-ring-4-dourado-9-143994978",
+      "title": "anel inteligente oura ring 4 dourado 9",
+      "source": "Enjoei",
+      "term": "oura ring",
+      "price_brl": 2700,
+      "store_name": "haila",
+      "status": "active",
+      "first_seen": "2026-06-26",
+      "last_seen": "2026-06-26",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-26T23:07:07.561Z",
+          "price_brl": 2700
+        }
+      ]
+    },
+    {
+      "id": "enjoei-142620557",
+      "url": "https://www.enjoei.com.br/p/anel-inteligente-oura-ring-lacrado-142620557",
+      "title": "anel inteligente oura ring lacrado",
+      "source": "Enjoei",
+      "term": "oura ring",
+      "price_brl": 2300,
+      "store_name": "juliana",
+      "status": "active",
+      "first_seen": "2026-06-26",
+      "last_seen": "2026-06-26",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-26T23:07:07.561Z",
+          "price_brl": 2300
+        }
+      ]
+    },
+    {
+      "id": "enjoei-143810573",
+      "url": "https://www.enjoei.com.br/p/oura-ring-4-stealth-tamanho-9-143810573",
+      "title": "oura ring 4 stealth tamanho 9",
+      "source": "Enjoei",
+      "term": "oura ring",
+      "price_brl": 2500,
+      "store_name": "Carlos",
+      "status": "active",
+      "first_seen": "2026-06-26",
+      "last_seen": "2026-06-26",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-26T23:07:07.561Z",
+          "price_brl": 2500
+        }
+      ]
+    },
+    {
+      "id": "enjoei-144861581",
+      "url": "https://www.enjoei.com.br/p/oura-ring-4-silver-brushed-size-9-144861581",
+      "title": "oura ring 4 silver brushed size 9",
+      "source": "Enjoei",
+      "term": "oura ring",
+      "price_brl": 1975,
+      "store_name": "Thaysa",
+      "status": "active",
+      "first_seen": "2026-06-26",
+      "last_seen": "2026-06-26",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-26T23:07:07.561Z",
+          "price_brl": 1975
+        }
+      ]
+    }
+  ],
+  "price_range_brl": {
+    "min": 1800,
+    "max": 2700
+  }
+}

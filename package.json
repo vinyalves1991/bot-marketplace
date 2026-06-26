@@ -15,6 +15,7 @@
     "monitor:tela-galaxybook3": "node scripts/monitor-tela-galaxybook3.mjs",
     "monitor:melanger": "node scripts/monitor-melanger.mjs",
     "monitor:galaxy-buds4-pro": "node scripts/monitor-galaxy-buds4-pro.mjs",
+    "monitor:oura-ring5": "node scripts/monitor-oura-ring5.mjs",
     "monitor:mercadolivre:watchlists": "node scripts/monitor-mercadolivre-watchlists.mjs",
     "monitor:mercadolivre:notebooks": "node scripts/monitor-mercadolivre-notebooks.mjs",
     "monitor:mercadolivre": "node scripts/monitor-mercadolivre-all.mjs",

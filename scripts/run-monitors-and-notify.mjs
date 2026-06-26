@@ -17,6 +17,7 @@ const LIFEFACTORY_DIR      = def("LIFEFACTORY_DATA_DIR",      "monitor-lifefacto
 const TELA_BOOK3_DIR       = def("TELA_GALAXYBOOK3_DATA_DIR", "monitor-tela-galaxybook3");
 const MELANGER_DIR         = def("MELANGER_DATA_DIR",         "monitor-melanger");
 const BUDS4PRO_DIR         = def("GALAXY_BUDS4_PRO_DATA_DIR", "monitor-galaxy-buds4-pro");
+const OURA_DIR             = def("OURA_RING5_DATA_DIR",       "monitor-oura-ring5");
 const MERCADOLIVRE_DIRS = [
   ["Mercado Livre Notebooks", path.join(workspaceRoot, "data", "mercadolivre-notebooks")],
   ["ML Galaxy Buds4 Pro", path.join(workspaceRoot, "data", "mercadolivre-galaxy-buds4-pro")],
@@ -53,6 +54,7 @@ const skipLifefactory    = process.argv.includes("--skip-lifefactory") || proces
 const skipTelaBook3      = process.argv.includes("--skip-tela-book3") || process.env.SKIP_TELA_BOOK3 === "1";
 const skipMelanger       = process.argv.includes("--skip-melanger") || process.env.SKIP_MELANGER === "1";
 const skipBuds4Pro       = process.argv.includes("--skip-buds4-pro") || process.env.SKIP_BUDS4_PRO === "1";
+const skipOura           = process.argv.includes("--skip-oura") || process.env.SKIP_OURA === "1";
 const skipMercadoLivre   = process.argv.includes("--skip-mercadolivre")
   || process.env.SKIP_MERCADOLIVRE === "1"
   || process.env.GITHUB_ACTIONS === "true";
@@ -85,6 +87,7 @@ async function main() {
     if (!skipTelaBook3) jobs.push(["tela-book3", runScript("monitor-tela-galaxybook3.mjs", [])]);
     if (!skipMelanger) jobs.push(["melanger", runScript("monitor-melanger.mjs", [])]);
     if (!skipBuds4Pro) jobs.push(["buds4-pro", runScript("monitor-galaxy-buds4-pro.mjs", [])]);
+    if (!skipOura) jobs.push(["oura", runScript("monitor-oura-ring5.mjs", [])]);
     // Mercado Livre NÃO roda aqui: é desacoplado do fluxo do OLX/Enjoei (que
     // espera todos os jobs antes de publicar). O ML é pesado/lento e roda sob
     // demanda via `npm run monitor:mercadolivre` ou o atalho da barra de tarefas
@@ -104,6 +107,7 @@ async function main() {
       if (name === "tela-book3") { console.error(`Tela Book3 falhou: ${result.reason.message}`); errors.push(`Tela Book3: ${result.reason.message}`); }
       if (name === "melanger") { console.error(`Melanger falhou: ${result.reason.message}`); errors.push(`Melanger: ${result.reason.message}`); }
       if (name === "buds4-pro") { console.error(`Galaxy Buds4 Pro falhou: ${result.reason.message}`); errors.push(`Galaxy Buds4 Pro: ${result.reason.message}`); }
+      if (name === "oura") { console.error(`Oura Ring 5 falhou: ${result.reason.message}`); errors.push(`Oura Ring 5: ${result.reason.message}`); }
     }
   }
 
@@ -113,7 +117,7 @@ async function main() {
   // --skip-monitors (reuso de relatórios para teste), não aplicamos o corte.
   const reportMinTime = skipMonitors ? null : runStart;
   const enjoeiOn = !onlyOlx && !skipEnjoei;
-  const [olxStd, enjoeiReport, enjoeiNbStd, dockReport, fitbitReport, lifefactoryReport, telaBook3Report, melangerReport, buds4ProReport] = await Promise.all([
+  const [olxStd, enjoeiReport, enjoeiNbStd, dockReport, fitbitReport, lifefactoryReport, telaBook3Report, melangerReport, buds4ProReport, ouraReport] = await Promise.all([
     skipOlx          ? null : readLatestReport(OLX_DIR, reportMinTime).catch(() => null),
     enjoeiOn         ? readLatestReport(ENJOEI_DIR, reportMinTime).catch(() => null) : null,
     enjoeiOn         ? readLatestReport(ENJOEI_NOTEBOOKS_DIR, reportMinTime).catch(() => null) : null,
@@ -123,6 +127,7 @@ async function main() {
     skipTelaBook3    ? null : readLatestReport(TELA_BOOK3_DIR, reportMinTime).catch(() => null),
     skipMelanger     ? null : readLatestReport(MELANGER_DIR, reportMinTime).catch(() => null),
     skipBuds4Pro     ? null : readLatestReport(BUDS4PRO_DIR, reportMinTime).catch(() => null),
+    skipOura         ? null : readLatestReport(OURA_DIR, reportMinTime).catch(() => null),
   ]);
 
   // Cada fonte conta itens NOVOS e ALTERAÇÕES DE PREÇO (antes só contava novos do range padrão).
@@ -136,6 +141,7 @@ async function main() {
     { label: "Tela Book3",       report: telaBook3Report, newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,                 newSec: "## Novos produtos",  priceSec: "## Mudanças de preço" },
     { label: "Melanger",         report: melangerReport, newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,                  newSec: "## Novos produtos",  priceSec: "## Mudanças de preço" },
     { label: "Galaxy Buds4 Pro", report: buds4ProReport, newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,                  newSec: "## Novos produtos",  priceSec: "## Mudanças de preço" },
+    { label: "Oura Ring 5",      report: ouraReport,   newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,                    newSec: "## Novos produtos",  priceSec: "## Mudanças de preço" },
   ].map((s) => ({
     ...s,
     newCount:   extractNewCount(s.report, s.newRe),

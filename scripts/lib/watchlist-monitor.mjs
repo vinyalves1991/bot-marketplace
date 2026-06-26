@@ -92,6 +92,10 @@ export async function runWatchlistMonitor(config) {
     if (recorded && candidateTerms.some((t) => normalizeCode(t) === normalizeCode(recorded))) return true;
     return candidateTerms.some((t) => textMatchesTerm(item.title ?? "", t));
   };
+  // Filtro arbitrário por item (recebe { title, price_brl }) — para regras que
+  // dependem de múltiplos atributos juntos, ex.: faixa de preço condicional à cor
+  // ou tamanho declarado no título. Default: aceita tudo.
+  const itemFilter = config.itemFilter ?? (() => true);
 
   const now = new Date();
   const runDate = now.toISOString().slice(0, 10);
@@ -115,7 +119,7 @@ export async function runWatchlistMonitor(config) {
 
   if (!skipEnjoei) {
     try {
-      const { items, failedTerms } = await collectEnjoei({ terms, slug, inRange, sizeOk, notExcluded });
+      const { items, failedTerms } = await collectEnjoei({ terms, slug, inRange, sizeOk, notExcluded, itemFilter });
       collected.push(...items);
       for (const t of failedTerms) { failedSourceTerms.add(`Enjoei:${t}`); errors.push(`Enjoei termo "${t}" falhou`); }
     } catch (error) {
@@ -130,7 +134,7 @@ export async function runWatchlistMonitor(config) {
       const categoryUrls = (config.olxCategoryUrls && config.olxCategoryUrls.length)
         ? config.olxCategoryUrls
         : [OLX_BASE_URL];
-      const { items, failedTerms } = await collectOlx({ terms, categoryUrls, userDataDir, headless, visible, inRange, sizeOk, notExcluded });
+      const { items, failedTerms } = await collectOlx({ terms, categoryUrls, userDataDir, headless, visible, inRange, sizeOk, notExcluded, itemFilter });
       collected.push(...items);
       for (const t of failedTerms) { failedSourceTerms.add(`OLX:${t}`); errors.push(`OLX termo "${t}" falhou`); }
     } catch (error) {
@@ -146,6 +150,7 @@ export async function runWatchlistMonitor(config) {
     (i) => (i.price_brl == null || inRange(i.price_brl))
       && sizeOk(i.title ?? "")
       && notExcluded(i.title ?? "")
+      && itemFilter({ title: i.title ?? "", price_brl: i.price_brl })
   );
   const configuredSources = ["Enjoei", "OLX"];
   const scheduledSources = configuredSources.filter((source) =>
@@ -195,7 +200,7 @@ export async function runWatchlistMonitor(config) {
 
 // ── Enjoei (API GraphQL) ───────────────────────────────────────────────────────
 
-async function collectEnjoei({ terms, slug, inRange, sizeOk, notExcluded }) {
+async function collectEnjoei({ terms, slug, inRange, sizeOk, notExcluded, itemFilter }) {
   const out = [];
   const failedTerms = new Set();
   for (let i = 0; i < terms.length; i += 1) {
@@ -229,6 +234,7 @@ async function collectEnjoei({ terms, slug, inRange, sizeOk, notExcluded }) {
         if (!textMatchesTerm(`${title} ${brand}`, term)) continue;
         if (!sizeOk(`${title} ${brand}`)) continue;
         if (!notExcluded(`${title} ${brand}`)) continue;
+        if (!itemFilter({ title: `${title} ${brand}`, price_brl: price })) continue;
         out.push({
           id: `enjoei-${node.id}`,
           url: `${ENJOEI_SITE_ORIGIN}/p/${node.path}`,
@@ -267,7 +273,7 @@ function buildEnjoeiApiUrl(term, slug) {
 
 // ── OLX (Playwright) ───────────────────────────────────────────────────────────
 
-async function collectOlx({ terms, categoryUrls, userDataDir, headless, visible, inRange, sizeOk, notExcluded }) {
+async function collectOlx({ terms, categoryUrls, userDataDir, headless, visible, inRange, sizeOk, notExcluded, itemFilter }) {
   const isCI = Boolean(process.env.CI);
   // Local, por padrão a janela roda FORA DA TELA (não atrapalha o trabalho).
   // --visible mostra maximizada (útil para depurar/resolver Cloudflare).
@@ -323,6 +329,7 @@ async function collectOlx({ terms, categoryUrls, userDataDir, headless, visible,
             if (!textMatchesTerm(card.title, term)) continue;
             if (!sizeOk(card.title)) continue;
             if (!notExcluded(card.title)) continue;
+            if (!itemFilter({ title: card.title, price_brl: card.price_brl })) continue;
             out.push({
               id: extractOlxId(card.url) ?? card.url,
               url: card.url,

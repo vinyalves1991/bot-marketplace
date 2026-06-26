@@ -50,6 +50,7 @@ $env:LIFEFACTORY_DATA_DIR = Join-Path $root "data\lifefactory"
 $env:TELA_GALAXYBOOK3_DATA_DIR = Join-Path $root "data\tela-galaxybook3"
 $env:MELANGER_DATA_DIR = Join-Path $root "data\melanger"
 $env:GALAXY_BUDS4_PRO_DATA_DIR = Join-Path $root "data\galaxy-buds4-pro"
+$env:OURA_RING5_DATA_DIR = Join-Path $root "data\oura-ring5"
 $env:MERCADOLIVRE_PROFILE_DIR = Join-Path $root ".chrome-mercadolivre-profile"
 $env:OLX_MAX_PER_CPU = "$MaxPerCpu"
 
@@ -125,7 +126,7 @@ try {
 
   # (1) Commita os dados coletados localmente (OLX/dockstations/fitbit). O
   # dashboard NAO entra aqui — ele e gerado adiante, ja sincronizado com o CI.
-  git add data/olx data/dockstations data/fitbit data/lifefactory data/tela-galaxybook3 data/melanger data/galaxy-buds4-pro data/mercadolivre-notebooks data/mercadolivre-galaxy-buds4-pro data/mercadolivre-dockstations data/mercadolivre-fitbit-air data/mercadolivre-lifefactory data/mercadolivre-tela-galaxybook3 data/mercadolivre-melanger data/mercadolivre-tenis-42
+  git add data/olx data/dockstations data/fitbit data/lifefactory data/tela-galaxybook3 data/melanger data/galaxy-buds4-pro data/oura-ring5 data/mercadolivre-notebooks data/mercadolivre-galaxy-buds4-pro data/mercadolivre-dockstations data/mercadolivre-fitbit-air data/mercadolivre-lifefactory data/mercadolivre-tela-galaxybook3 data/mercadolivre-melanger data/mercadolivre-tenis-42
   $stamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm")
   $localCommitExists = $false
   if (-not (git diff --staged --quiet)) {

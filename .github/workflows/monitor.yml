@@ -43,6 +43,7 @@ jobs:
           TELA_GALAXYBOOK3_DATA_DIR: ${{ github.workspace }}/data/tela-galaxybook3
           MELANGER_DATA_DIR: ${{ github.workspace }}/data/melanger
           GALAXY_BUDS4_PRO_DATA_DIR: ${{ github.workspace }}/data/galaxy-buds4-pro
+          OURA_RING5_DATA_DIR: ${{ github.workspace }}/data/oura-ring5
         run: node scripts/run-monitors-and-notify.mjs
 
       # O dashboard NAO e gerado aqui: ele depende de TODOS os dados (OLX do
@@ -60,6 +61,7 @@ jobs:
           TELA_GALAXYBOOK3_DATA_DIR: ${{ github.workspace }}/data/tela-galaxybook3
           MELANGER_DATA_DIR: ${{ github.workspace }}/data/melanger
           GALAXY_BUDS4_PRO_DATA_DIR: ${{ github.workspace }}/data/galaxy-buds4-pro
+          OURA_RING5_DATA_DIR: ${{ github.workspace }}/data/oura-ring5
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
