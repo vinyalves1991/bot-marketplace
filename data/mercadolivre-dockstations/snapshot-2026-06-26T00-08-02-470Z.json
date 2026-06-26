@@ -1,0 +1,57 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-26T00:08:02.470Z",
+  "run": {
+    "date": "2026-06-26",
+    "timezone": "America/Sao_Paulo",
+    "id": "dockstations",
+    "label": "Dockstations",
+    "started_at": "2026-06-26T00:06:21.214Z",
+    "completed_at": "2026-06-26T00:08:02.470Z",
+    "partial": false,
+    "aborted": false,
+    "successful_terms": [
+      "SD25TB4",
+      "WD22TB4",
+      "40AY0090BR"
+    ],
+    "scheduled_terms": [
+      "SD25TB4",
+      "WD22TB4",
+      "40AY0090BR"
+    ],
+    "configured_terms": [
+      "SD25TB4",
+      "WD22TB4",
+      "40AY0090BR"
+    ],
+    "failed_terms": [],
+    "scheduled_coverage": [
+      "SD25TB4",
+      "WD22TB4",
+      "40AY0090BR"
+    ],
+    "successful_coverage": [
+      "SD25TB4",
+      "WD22TB4",
+      "40AY0090BR"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "SD25TB4",
+      "WD22TB4",
+      "40AY0090BR"
+    ]
+  },
+  "filters": {
+    "collection_price_brl": {
+      "min": 0,
+      "max": 500
+    },
+    "display_price_brl": {
+      "min": 0,
+      "max": 500
+    }
+  },
+  "items": []
+}
