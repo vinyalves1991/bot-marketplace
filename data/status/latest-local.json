@@ -1,0 +1,12 @@
+{
+  "generated_at": "2026-06-27T10:00:02.980Z",
+  "source": "local",
+  "delivery": {
+    "email": "sent",
+    "whatsapp": "sent"
+  },
+  "pending_failures": [],
+  "acknowledged_failure_ids": [],
+  "email": "sent",
+  "whatsapp": "sent"
+}
