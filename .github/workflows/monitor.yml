@@ -44,6 +44,8 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: Rodar monitores e notificar
+        id: monitor_run
+        continue-on-error: true
         env:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
@@ -68,6 +70,7 @@ jobs:
       # ja sincronizado com origin. Gerar antes produziria um index.html defasado
       # que, no rebase, sobrescreveria o do outro lado (corrida CI x local).
       - name: Salvar snapshots e publicar dashboard
+        if: always()
         env:
           OLX_DATA_DIR: ${{ github.workspace }}/data/olx
           ENJOEI_DATA_DIR: ${{ github.workspace }}/data/enjoei
@@ -127,3 +130,7 @@ jobs:
           done
           echo "Falha ao publicar apos 4 tentativas."
           exit 1
+
+      - name: Sinalizar falha dos monitores
+        if: steps.monitor_run.outcome == 'failure'
+        run: exit 1

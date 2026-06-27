@@ -1,13 +1,22 @@
-import { spawn } from "node:child_process";
+import child_process from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import nodemailer from "nodemailer";
-import { buildDeliveryStatus, buildPriorFailureNote } from "./lib/notification-status.mjs";
+import {
+  buildDeliveryStatus,
+  buildPriorFailureNote,
+  reconcilePendingFailures,
+  mergePendingFailures,
+  sanitizeErrorMessage
+} from "./lib/notification-status.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const workspaceRoot = path.resolve(__dirname, "..");
-const STATUS_FILE = path.join(workspaceRoot, "data", "status", "latest-run.json");
+function getStatusFilePath() {
+  const source = process.env.GITHUB_ACTIONS === "true" ? "ci" : "local";
+  return path.join(workspaceRoot, "data", "status", `latest-${source}.json`);
+}
 
 const def = (env, fallback) => process.env[env] ?? path.join(process.env.USERPROFILE ?? process.env.HOME ?? "", ".codex", "automations", fallback);
 const OLX_DIR              = def("OLX_DATA_DIR",              "monitor-olx-notebooks-por-cpu");
@@ -62,9 +71,14 @@ const skipMercadoLivre   = process.argv.includes("--skip-mercadolivre")
   || process.env.GITHUB_ACTIONS === "true";
 const olxMaxPerCpu       = getArgValue("--olx-max-per-cpu") ?? process.env.OLX_MAX_PER_CPU ?? "12";
 
-main().catch((err) => { console.error(`Falha geral: ${err.message}`); process.exitCode = 1; });
+// Se executado diretamente, roda o main. Caso contrário, exporta para testes.
+import { fileURLToPath as urlToPath } from "node:url";
+const isMain = process.argv[1] === urlToPath(import.meta.url);
+if (isMain) {
+  main().catch((err) => { console.error(`Falha geral: ${err.message}`); process.exitCode = 1; });
+}
 
-async function main() {
+export async function main() {
   const runStart = Date.now();
   console.log(`Iniciando rodada: ${new Date().toISOString()}`);
   const errors = [];
@@ -177,9 +191,16 @@ async function main() {
     console.log(`  ${s.label}: ${s.newCount} novo(s), ${s.priceCount} preço(s)`);
   }
 
-  // Memória entre rodadas: se a anterior falhou ao notificar, a desta menciona.
-  const previousStatus = await readDeliveryStatus();
-  const priorNote      = buildPriorFailureNote(previousStatus);
+  // Memória entre rodadas: lê status de ambos os ambientes e reconcilia a fila de falhas pendentes.
+  const localStatusFile = path.join(workspaceRoot, "data", "status", "latest-local.json");
+  const ciStatusFile    = path.join(workspaceRoot, "data", "status", "latest-ci.json");
+  const [localStatus, ciStatus] = await Promise.all([
+    readStatusFile(localStatusFile),
+    readStatusFile(ciStatusFile),
+  ]);
+
+  const priorPending = reconcilePendingFailures(localStatus, ciStatus);
+  const priorNote    = buildPriorFailureNote(priorPending);
 
   const subject     = buildSubject(sources, errors);
   const body        = (priorNote ? `> ${priorNote}\n\n` : "") + buildBody(sources, errors);
@@ -203,35 +224,77 @@ async function main() {
     sendWhatsApp(whatsappMsg),
   ]);
 
+  const emailDelivered = !sendingEmail || emailResult.status === "fulfilled";
+  const whatsappDelivered = waResult.status === "fulfilled";
+  const delivered = emailDelivered || whatsappDelivered;
+
   if (sendingEmail) {
     if (emailResult.status === "fulfilled") console.log(`Email enviado para ${NOTIFY_TO}.`);
-    else console.warn(`Email não enviado: ${emailResult.reason.message}`);
+    else console.warn(`Email não enviado: ${emailResult.reason?.message}`);
   }
   if (waResult.status === "fulfilled") console.log("WhatsApp enviado.");
-  else console.warn(`WhatsApp não enviado: ${waResult.reason.message}`);
+  else console.warn(`WhatsApp não enviado: ${waResult.reason?.message}`);
 
-  // Persiste o estado de entrega. Falha de notificação NÃO derruba a rodada nem a
-  // publicação (já feita pelos scripts de monitor); apenas fica registrada aqui.
+  // Se entregou com sucesso em pelo menos um canal, a fila de pendências antigas é limpa.
+  // Caso contrário (ambos falharam, ou e-mail falhou e whatsapp falhou), as pendências antigas permanecem.
+  let workingPending = delivered ? [] : priorPending;
+
+  // Adiciona novas falhas desta rodada (com mensagem sanitizada)
+  const newFailures = [];
+  const runNow = new Date();
+  if (sendingEmail && emailResult.status === "rejected") {
+    newFailures.push({
+      channel: "email",
+      at: runNow.toISOString(),
+      error: sanitizeErrorMessage(emailResult.reason?.message)
+    });
+  }
+  if (waResult.status === "rejected") {
+    newFailures.push({
+      channel: "whatsapp",
+      at: runNow.toISOString(),
+      error: sanitizeErrorMessage(waResult.reason?.message)
+    });
+  }
+
+  // Merge final das pendências e escrita
+  const finalPending = mergePendingFailures(workingPending, newFailures);
+
   const status = buildDeliveryStatus({
-    now: new Date(),
+    now: runNow,
     sendingEmail,
     email: sendingEmail
       ? { ok: emailResult.status === "fulfilled", error: emailResult.reason?.message }
       : undefined,
     whatsapp: { ok: waResult.status === "fulfilled", error: waResult.reason?.message },
+    pendingFailures: finalPending,
+    source: process.env.GITHUB_ACTIONS === "true" ? "ci" : "local"
   });
+
   await writeDeliveryStatus(status);
+
+  // Propagação de erro se algum monitor falhou
+  if (errors.length > 0) {
+    console.error(`Rodada concluída com ${errors.length} erro(s) de monitoramento.`);
+    process.exitCode = 1;
+  }
 }
 
 async function readDeliveryStatus() {
-  try { return JSON.parse(await fs.readFile(STATUS_FILE, "utf8")); }
+  try { return JSON.parse(await fs.readFile(getStatusFilePath(), "utf8")); }
+  catch { return null; }
+}
+
+async function readStatusFile(filePath) {
+  try { return JSON.parse(await fs.readFile(filePath, "utf8")); }
   catch { return null; }
 }
 
 async function writeDeliveryStatus(status) {
   try {
-    await fs.mkdir(path.dirname(STATUS_FILE), { recursive: true });
-    await fs.writeFile(STATUS_FILE, JSON.stringify(status, null, 2), "utf8");
+    const filePath = getStatusFilePath();
+    await fs.mkdir(path.dirname(filePath), { recursive: true });
+    await fs.writeFile(filePath, JSON.stringify(status, null, 2), "utf8");
   } catch (err) {
     console.warn(`Não consegui gravar status de entrega: ${err.message}`);
   }
@@ -261,7 +324,7 @@ function runOlxMonitor() {
 
 function runCommand(command, args) {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { stdio: "inherit", cwd: workspaceRoot });
+    const child = child_process.spawn(command, args, { stdio: "inherit", cwd: workspaceRoot });
     child.on("close", (code) => (code === 0 ? resolve() : reject(new Error(`Saiu com código ${code}`))));
     child.on("error", reject);
   });
