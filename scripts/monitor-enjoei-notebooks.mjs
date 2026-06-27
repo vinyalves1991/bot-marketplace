@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { extractCpuLabel, extractGpuLabel, extractRamGb, extractStorageGb, textContainsCpuTerm } from "./lib/parsers.mjs";
 import { mergeMonitorSnapshot } from "./lib/monitor-core.mjs";
 import { DEFAULT_CPU_TERMS, cpuSearchQuery } from "./lib/cpu-terms.mjs";
@@ -38,10 +38,15 @@ const terms = cpuArg
   ? cpuArg.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean)
   : DEFAULT_CPU_TERMS;
 
-main().catch((error) => {
-  console.error(`\nFalha: ${formatError(error)}`);
-  process.exitCode = 1;
-});
+// Só executa quando rodado diretamente (node monitor-enjoei-notebooks.mjs).
+// Importado por testes, NÃO dispara a coleta de rede.
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (isMain) {
+  main().catch((error) => {
+    console.error(`\nFalha: ${formatError(error)}`);
+    process.exitCode = 1;
+  });
+}
 
 function formatError(error) {
   if (!error) return "Erro desconhecido.";
@@ -67,8 +72,12 @@ async function main() {
   console.log(`Faixa: R$ ${minPriceBrl}–R$ ${maxPriceBrl}`);
   console.log(`Snapshot anterior: ${previousSnapshotPath ?? "(nenhum)"}\n`);
 
-  const { items: collected, failedTerms, successfulTerms } = await collectProducts(previousSnapshot);
-  const snapshot = mergeWithPreviousSnapshot({ runDate, collected, previousSnapshot, failedTerms, successfulTerms });
+  const { items: collected, failedTerms, successfulTerms, incompleteTerms } = await collectProducts(previousSnapshot);
+  const snapshot = mergeEnjoeiNotebookSnapshot({
+    runDate, collected, previousSnapshot,
+    scheduledTerms: terms, successfulTerms, failedTerms, incompleteTerms,
+    priceMin: minPriceBrl, priceMax: maxPriceBrl,
+  });
   backfillSpecsFromTitle(snapshot);
   verifyCarriedItems(snapshot);
 
@@ -77,12 +86,20 @@ async function main() {
   const snapshotPath = path.join(automationRoot, `snapshot-${runId}.json`);
   await fs.writeFile(snapshotPath, JSON.stringify(snapshot, null, 2), "utf8");
 
-  const report = buildReport({ runDate, snapshot, previousSnapshot });
+  const report = buildReport({ runDate, snapshot, previousSnapshot, failedTerms, incompleteTerms });
   const reportPath = path.join(automationRoot, `report-${runId}.md`);
   await fs.writeFile(reportPath, report, "utf8");
 
   console.log(`Coletados: ${collected.length} | Snapshot: ${snapshotPath}`);
   console.log(`Relatório: ${reportPath}`);
+
+  // Falha total: TODOS os termos lançaram erro (nada coletado). Preservamos o
+  // snapshot anterior (o merge já mantém os itens), mas saímos com código != 0
+  // para o orquestrador e o GitHub Actions detectarem a falha.
+  if (successfulTerms.length === 0) {
+    console.error("Falha total: nenhum termo do Enjoei Notebooks foi coletado nesta rodada; snapshot anterior preservado.");
+    process.exitCode = 1;
+  }
 }
 
 // ── coleta ───────────────────────────────────────────────────────────────────
@@ -91,6 +108,7 @@ async function collectProducts(previousSnapshot) {
   const byId = new Map();
   const failedTerms = [];
   const successfulTerms = [];
+  const incompleteTerms = [];
 
   for (let i = 0; i < terms.length; i++) {
     const term = terms[i];
@@ -128,6 +146,11 @@ async function collectProducts(previousSnapshot) {
         }
       }
       successfulTerms.push(term);
+      // Cobertura truncada: a busca persistida do Enjoei devolve no máximo `first`
+      // itens e não expõe cursor utilizável. Página cheia (ou hasNextPage) significa
+      // que pode haver itens relevantes além do corte — marcamos o termo como
+      // INCOMPLETO para não marcar como not_seen o que ficou só de fora da página.
+      if (isTruncatedPage(products, first)) incompleteTerms.push(term);
     } catch (err) {
       console.warn(`  Aviso: falha em "${term}" — ${err.message}`);
       failedTerms.push(term);
@@ -135,8 +158,16 @@ async function collectProducts(previousSnapshot) {
   }
 
   if (failedTerms.length) console.warn(`Termos com falha: ${failedTerms.join(", ")}`);
+  if (incompleteTerms.length) console.warn(`Termos truncados (cobertura incompleta): ${incompleteTerms.join(", ")}`);
   const items = await enrichMissingDetails(Array.from(byId.values()), previousSnapshot);
-  return { items, failedTerms, successfulTerms };
+  return { items, failedTerms, successfulTerms, incompleteTerms };
+}
+
+// Página truncada: bateu no limite `first` (ou a API sinaliza próxima página).
+// Pura, para teste. Ver collectProducts.
+export function isTruncatedPage(products, first) {
+  const edges = products?.edges ?? [];
+  return Boolean(products?.pageInfo?.hasNextPage) || edges.length >= first;
 }
 
 async function fetchWithRetry(url, options) {
@@ -231,62 +262,84 @@ function isLikelyNotebookSearchHit(item) {
 
 // ── snapshot ─────────────────────────────────────────────────────────────────
 
-function titleConfirmsAnyTerm(item) {
-  const text = `${item.title ?? ""} ${item.brand ?? ""}`;
-  return (item.cpu_terms ?? []).some((t) => textContainsCpuTerm(text, t));
+function someTermIn(text, cpuTerms) {
+  return cpuTerms.some((t) => textContainsCpuTerm(text, t));
 }
 
-async function enrichMissingDetails(items, previousSnapshot) {
+// Enriquece com detalhes do anúncio e confirma o CPU. Distingue:
+//  - termo confirmado na evidência → mantém com o(s) termo(s) corretos;
+//  - mismatch CONCLUSIVO (buscamos a descrição e mesmo assim nada confere) → descarta;
+//  - inconclusivo TEMPORÁRIO (fetch falhou OU orçamento de detalhes esgotado) →
+//    preserva o item se ele já tinha CPU validado em rodada anterior; senão descarta.
+// fetchDetails/detailMax/cpuTerms são injetáveis para teste.
+export async function enrichMissingDetails(items, previousSnapshot, {
+  fetchDetails = fetchProductDetails,
+  detailMax: maxDetails = detailMax,
+  cpuTerms = DEFAULT_CPU_TERMS,
+} = {}) {
   const previousById = new Map((previousSnapshot?.items ?? []).map((item) => [item.id ?? item.url, item]));
   let opened = 0;
-  const out = [];
+  let dropped = 0;
+  let preserved = 0;
+  const verified = [];
 
   for (const item of items) {
     const previous = previousById.get(item.id ?? item.url);
     let merged = mergeCachedDetails(item, previous);
-    // Texto-evidência usado para confirmar o CPU de fato. Começa com título+marca
-    // e ganha a descrição quando buscamos os detalhes.
-    let evidence = `${merged.title ?? ""} ${merged.brand ?? ""}`;
-    // Buscamos os detalhes quando faltam specs OU quando o título sozinho não
-    // confirma nenhum termo — nesse caso precisamos da descrição para verificar
-    // o CPU e não aceitar cegamente qualquer notebook que a busca difusa do
-    // Enjoei devolveu (ex.: i5-12450HX retornado para o termo 13450hx).
-    if ((needsProductDetails(merged) || !titleConfirmsAnyTerm(merged)) && opened < detailMax) {
-      const details = await fetchProductDetails(merged).catch((error) => {
+    // CPU já validado em rodadas anteriores entra na evidência: um item confirmado
+    // no passado não é descartado só porque o título atual é curto.
+    const prevTerms = (previous?.cpu_terms ?? []).filter((t) => cpuTerms.includes(t));
+    let evidence = `${merged.title ?? ""} ${merged.brand ?? ""} ${previous?.cpu ?? ""}`;
+
+    let fetchAttempted = false;
+    let fetchSucceeded = false;
+    // Busca a descrição quando faltam specs OU quando a evidência atual não
+    // confirma nenhum termo — sem ela não dá pra aceitar cegamente o que a busca
+    // difusa do Enjoei devolveu (ex.: i5-12450HX retornado para o termo 13450hx).
+    if ((needsProductDetails(merged) || !someTermIn(evidence, cpuTerms)) && opened < maxDetails) {
+      fetchAttempted = true;
+      opened += 1;
+      const details = await fetchDetails(merged).catch((error) => {
         console.warn(`  Aviso: não consegui enriquecer "${merged.title}" — ${error.message}`);
         return null;
       });
-      opened += 1;
       if (details) {
+        fetchSucceeded = true;
         merged = mergeCachedDetails(merged, details);
         if (details.text) evidence += ` ${details.text}`;
       }
     }
-    merged.__evidence = evidence;
-    out.push(merged);
-  }
-  if (opened > 0) console.log(`Detalhes Enjoei abertos: ${opened}`);
 
-  // Verificação de precisão: mantém só os termos de CPU realmente presentes no
-  // título/descrição e descarta itens que não confirmam nenhum (falsos
-  // positivos da busca difusa). Isso elimina casos como "i5-13420H" marcado
-  // como 13620h ou "Ultra 7 255H" marcado como 255hx.
-  let dropped = 0;
-  const verified = [];
-  for (const item of out) {
-    const evidence = item.__evidence ?? `${item.title ?? ""} ${item.brand ?? ""}`;
-    delete item.__evidence;
     // Re-deriva os termos a partir da evidência (não só o termo da busca): um
-    // anúncio devolvido por uma busca mas que na verdade é outra CPU da lista
-    // recebe a etiqueta correta, em vez de ser descartado.
-    const terms = DEFAULT_CPU_TERMS.filter((t) => textContainsCpuTerm(evidence, t));
-    if (terms.length === 0) {
-      dropped += 1;
-      console.log(`  Descartado (CPU não confere): "${item.title}" [buscado: ${(item.cpu_terms ?? []).join(", ")}]`);
+    // anúncio que na verdade é outra CPU da lista recebe a etiqueta correta.
+    const matched = cpuTerms.filter((t) => textContainsCpuTerm(evidence, t));
+    if (matched.length > 0) {
+      verified.push({ ...merged, cpu_terms: matched });
       continue;
     }
-    verified.push({ ...item, cpu_terms: terms });
+
+    // Sem termo confirmado. Só descartamos como "CPU não confere" quando a
+    // verificação foi CONCLUSIVA (conseguimos a descrição e mesmo assim nada bate).
+    const conclusive = fetchSucceeded;
+    if (conclusive) {
+      dropped += 1;
+      console.log(`  Descartado (CPU não confere): "${merged.title}" [buscado: ${(item.cpu_terms ?? []).join(", ")}]`);
+      continue;
+    }
+    // Inconclusivo nesta rodada (fetch falhou ou orçamento esgotado): preserva se
+    // já havia CPU validado antes; item novo não confirmável é descartado.
+    if (prevTerms.length > 0) {
+      preserved += 1;
+      console.log(`  Mantido sem reconfirmar (inconclusivo nesta rodada): "${merged.title}" [cpu prévio: ${prevTerms.join(", ")}]`);
+      verified.push({ ...merged, cpu_terms: prevTerms });
+      continue;
+    }
+    dropped += 1;
+    console.log(`  Descartado (não confirmável e sem histórico): "${merged.title}"`);
   }
+
+  if (opened > 0) console.log(`Detalhes Enjoei abertos: ${opened}`);
+  if (preserved > 0) console.log(`Itens preservados sem reconfirmar (inconclusivo): ${preserved}`);
   if (dropped > 0) console.log(`Itens descartados por CPU não confirmado: ${dropped}`);
   return verified;
 }
@@ -365,30 +418,54 @@ function verifyCarriedItems(snapshot) {
   });
 }
 
-function mergeWithPreviousSnapshot({ runDate, collected, previousSnapshot, failedTerms, successfulTerms }) {
+// Merge com cobertura por termo de CPU. Função pura (sem rede/I/O), exportada
+// para teste de regressão.
+//  - termo que FALHOU → seus itens não viram not_seen (preservados);
+//  - termo TRUNCADO (incompleto) → idem (pode haver itens além da página);
+//  - item com 2 termos, um ok e um falho → preservado;
+//  - grava run.partial + contagens + coverage arrays.
+export function mergeEnjoeiNotebookSnapshot({
+  runDate,
+  collected,
+  previousSnapshot,
+  scheduledTerms,
+  successfulTerms = [],
+  failedTerms = [],
+  incompleteTerms = [],
+  priceMin,
+  priceMax,
+}) {
   const previousItems = (previousSnapshot?.items ?? []).filter(
-    (i) => i.price_brl != null && i.price_brl >= minPriceBrl && i.price_brl <= maxPriceBrl
+    (i) => i.price_brl != null && i.price_brl >= priceMin && i.price_brl <= priceMax
   );
-  // Cobertura por termo de CPU: itens cujos termos TODOS falharam não são marcados
-  // como not_seen — a ausência pode ser falha de rede, não remoção do anúncio.
+  // Termos truncados entram na cobertura FALHA (impede falsos not_seen). Seus
+  // itens coletados continuam active (o merge sempre marca o coletado como active).
+  const failedCoverage = [...new Set([...failedTerms, ...incompleteTerms])];
   const result = mergeMonitorSnapshot({
     previousSnapshot: previousSnapshot ? { ...previousSnapshot, items: previousItems } : null,
     collected,
     now: new Date(`${runDate}T12:00:00Z`),
-    scheduledCoverage: terms,
+    run: {
+      partial: failedCoverage.length > 0,
+      successful_term_count: successfulTerms.length,
+      failed_term_count: failedTerms.length,
+      incomplete_term_count: incompleteTerms.length,
+      incomplete_coverage: [...new Set(incompleteTerms)],
+    },
+    scheduledCoverage: scheduledTerms,
     successfulCoverage: successfulTerms,
-    failedCoverage: failedTerms,
-    configuredCoverage: terms,
+    failedCoverage,
+    configuredCoverage: scheduledTerms,
     itemCoverage: (item) => item.cpu_terms ?? [],
   });
-  result.price_range_brl = { min: minPriceBrl, max: maxPriceBrl };
+  result.price_range_brl = { min: priceMin, max: priceMax };
   result.filters = { ...result.filters, price_brl: result.price_range_brl };
   return result;
 }
 
 // ── relatório ─────────────────────────────────────────────────────────────────
 
-function buildReport({ runDate, snapshot, previousSnapshot }) {
+function buildReport({ runDate, snapshot, previousSnapshot, failedTerms = [], incompleteTerms = [] }) {
   const currentItems = snapshot.items.filter(
     (i) => i.status === "active" && i.price_brl != null && i.price_brl >= minPriceBrl && i.price_brl <= maxPriceBrl
   );
@@ -421,7 +498,17 @@ function buildReport({ runDate, snapshot, previousSnapshot }) {
   lines.push(`- Não vistos nesta rodada: **${notSeen.length}**`);
   lines.push(`- Alterações de preço: **${priceChanges.length}**`);
   lines.push(`- Termos: ${terms.join(", ")}`);
+  if (snapshot.run?.partial) {
+    lines.push(`- ⚠️ Cobertura parcial: ${failedTerms.length} com falha, ${incompleteTerms.length} truncado(s) — itens desses termos foram preservados (não marcados como não vistos).`);
+  }
   lines.push("");
+
+  if (failedTerms.length || incompleteTerms.length) {
+    lines.push("## Cobertura incompleta");
+    if (failedTerms.length) lines.push(`- Termos com falha: ${failedTerms.join(", ")}`);
+    if (incompleteTerms.length) lines.push(`- Termos truncados (atingiram o limite de ${first} resultados): ${incompleteTerms.join(", ")}`);
+    lines.push("");
+  }
 
   lines.push(`## Novos notebooks`);
   if (!newItems.length) {

@@ -3,9 +3,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import nodemailer from "nodemailer";
+import { buildDeliveryStatus, buildPriorFailureNote } from "./lib/notification-status.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const workspaceRoot = path.resolve(__dirname, "..");
+const STATUS_FILE = path.join(workspaceRoot, "data", "status", "latest-run.json");
 
 const def = (env, fallback) => process.env[env] ?? path.join(process.env.USERPROFILE ?? process.env.HOME ?? "", ".codex", "automations", fallback);
 const OLX_DIR              = def("OLX_DATA_DIR",              "monitor-olx-notebooks-por-cpu");
@@ -175,9 +177,13 @@ async function main() {
     console.log(`  ${s.label}: ${s.newCount} novo(s), ${s.priceCount} preço(s)`);
   }
 
+  // Memória entre rodadas: se a anterior falhou ao notificar, a desta menciona.
+  const previousStatus = await readDeliveryStatus();
+  const priorNote      = buildPriorFailureNote(previousStatus);
+
   const subject     = buildSubject(sources, errors);
-  const body        = buildBody(sources, errors);
-  const whatsappMsg = buildWhatsAppMessage(sources, errors);
+  const body        = (priorNote ? `> ${priorNote}\n\n` : "") + buildBody(sources, errors);
+  const whatsappMsg = (priorNote ? `${priorNote}\n\n` : "") + buildWhatsAppMessage(sources, errors);
 
   // WhatsApp sempre (heartbeat de execução).
   // Email quando há novos itens, alterações de preço ou erros (evita caixa cheia com confirmações vazias).
@@ -203,6 +209,32 @@ async function main() {
   }
   if (waResult.status === "fulfilled") console.log("WhatsApp enviado.");
   else console.warn(`WhatsApp não enviado: ${waResult.reason.message}`);
+
+  // Persiste o estado de entrega. Falha de notificação NÃO derruba a rodada nem a
+  // publicação (já feita pelos scripts de monitor); apenas fica registrada aqui.
+  const status = buildDeliveryStatus({
+    now: new Date(),
+    sendingEmail,
+    email: sendingEmail
+      ? { ok: emailResult.status === "fulfilled", error: emailResult.reason?.message }
+      : undefined,
+    whatsapp: { ok: waResult.status === "fulfilled", error: waResult.reason?.message },
+  });
+  await writeDeliveryStatus(status);
+}
+
+async function readDeliveryStatus() {
+  try { return JSON.parse(await fs.readFile(STATUS_FILE, "utf8")); }
+  catch { return null; }
+}
+
+async function writeDeliveryStatus(status) {
+  try {
+    await fs.mkdir(path.dirname(STATUS_FILE), { recursive: true });
+    await fs.writeFile(STATUS_FILE, JSON.stringify(status, null, 2), "utf8");
+  } catch (err) {
+    console.warn(`Não consegui gravar status de entrega: ${err.message}`);
+  }
 }
 
 // ── scripts ───────────────────────────────────────────────────────────────────

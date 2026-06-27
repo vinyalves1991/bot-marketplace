@@ -3,8 +3,9 @@ name: Monitor
 on:
   workflow_dispatch:        # disparado pelo cron-job.org via API (07:00, 16:00 BRT — Enjoei only; OLX roda local)
 
+# Permissão mínima por padrão; só o job monitor recebe contents: write (publica).
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   test:
@@ -23,6 +24,8 @@ jobs:
   monitor:
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4

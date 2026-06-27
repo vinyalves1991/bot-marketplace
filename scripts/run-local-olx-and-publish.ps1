@@ -14,7 +14,7 @@ $root = Resolve-Path (Join-Path $PSScriptRoot "..")
 # falharia de imediato. Aqui aguardamos a conectividade ficar disponivel (ate
 # WaitForInternetSeconds) antes de comecar; assim que a rede sobe, seguimos.
 function Wait-ForInternet {
-  param([int]$TimeoutSeconds = 1200, [int]$IntervalSeconds = 15)
+  param([int]$TimeoutSeconds = 300, [int]$IntervalSeconds = 15)
   $probeHosts = @("github.com", "www.olx.com.br")
   $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
   while ((Get-Date) -lt $deadline) {
@@ -126,7 +126,7 @@ try {
 
   # (1) Commita os dados coletados localmente (OLX/dockstations/fitbit). O
   # dashboard NAO entra aqui — ele e gerado adiante, ja sincronizado com o CI.
-  git add data/olx data/dockstations data/fitbit data/lifefactory data/tela-galaxybook3 data/melanger data/galaxy-buds4-pro data/oura-ring5 data/mercadolivre-notebooks data/mercadolivre-galaxy-buds4-pro data/mercadolivre-dockstations data/mercadolivre-fitbit-air data/mercadolivre-lifefactory data/mercadolivre-tela-galaxybook3 data/mercadolivre-melanger data/mercadolivre-tenis-42
+  git add data/olx data/dockstations data/fitbit data/lifefactory data/tela-galaxybook3 data/melanger data/galaxy-buds4-pro data/oura-ring5 data/status data/mercadolivre-notebooks data/mercadolivre-galaxy-buds4-pro data/mercadolivre-dockstations data/mercadolivre-fitbit-air data/mercadolivre-lifefactory data/mercadolivre-tela-galaxybook3 data/mercadolivre-melanger data/mercadolivre-tenis-42
   $stamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm")
   $localCommitExists = $false
   if (-not (git diff --staged --quiet)) {
