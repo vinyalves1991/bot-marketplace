@@ -309,11 +309,6 @@ export async function main({
 }
 }
 
-async function readDeliveryStatus() {
-  try { return JSON.parse(await fsApi.readFile(getStatusFilePath(), "utf8")); }
-  catch { return null; }
-}
-
 async function readStatusFile(filePath) {
   try { return JSON.parse(await fsApi.readFile(filePath, "utf8")); }
   catch { return null; }

@@ -43,33 +43,68 @@ export function sanitizeErrorMessage(message) {
   return out;
 }
 
-// Junta falhas anteriores com as novas, removendo duplicadas por (channel, error)
-// (mantendo a ocorrência mais recente, incrementando contagem) e limitando o tamanho da fila.
-export function mergePendingFailures(priorPending = [], newFailures = [], nowIso = new Date().toISOString(), maxPending = 20) {
-  // Deep copy/normalize to avoid mutating input array
-  const merged = priorPending.map(f => ({
+// Fingerprint determinístico de uma falha: depende apenas de canal + erro sanitizado.
+// Serve para agrupamento visual e deduplicação dentro de uma mesma fila pendente.
+// NUNCA armazenar em acknowledged_failure_ids — acknowledgements usam id/UUID por episódio.
+export function generateFailureFingerprint(channel, error) {
+  const sanitized = sanitizeErrorMessage(error || "unknown");
+  const hash = crypto
+    .createHash("sha256")
+    .update(`${channel || ""}\0${sanitized}`)
+    .digest("hex");
+  return `fp-${hash.slice(0, 24)}`;
+}
+
+// Auxiliar para gerar ID determinístico para status legados
+export function generateLegacyId(source, channel, generatedAt, error) {
+  const cleanErr = sanitizeErrorMessage(error || "failed");
+  const input = `${source || "unknown"}:${channel || ""}:${generatedAt || ""}:${cleanErr}`;
+  return crypto.createHash("sha256").update(input).digest("hex");
+}
+
+// Normaliza um registro de falha garantindo presença de fingerprint.
+function normalizeFailure(f, nowIso) {
+  const channel = f.channel || "";
+  const error = f.error || "unknown";
+  return {
     id: f.id || crypto.randomUUID(),
-    channel: f.channel,
+    fingerprint: f.fingerprint || generateFailureFingerprint(channel, error),
+    channel,
     first_seen_at: f.first_seen_at || f.at || nowIso,
     last_seen_at: f.last_seen_at || f.at || nowIso,
-    error: f.error || "unknown",
+    error,
     count: f.count || 1
-  }));
+  };
+}
+
+// Junta falhas anteriores com as novas.
+// Deduplicação por episódio: usa id quando disponível, senão fingerprint (mesma sessão pendente).
+// Acknowledgements continuam operando exclusivamente por id.
+export function mergePendingFailures(priorPending = [], newFailures = [], nowIso = new Date().toISOString(), maxPending = 20) {
+  const merged = priorPending.map(f => normalizeFailure(f, nowIso));
 
   for (const nf of newFailures) {
     if (!nf || !nf.channel) continue;
-    const keyError = nf.error || "unknown";
-    const existing = merged.find(f => f.channel === nf.channel && f.error === keyError);
+    const fp = generateFailureFingerprint(nf.channel, nf.error || "unknown");
+
+    // 1. Procurar por id quando o novo registro já tiver ID
+    let existing = nf.id ? merged.find(f => f.id === nf.id) : null;
+    // 2. Caso seja falha nova sem ID, procurar por fingerprint
+    if (!existing) {
+      existing = merged.find(f => f.fingerprint === fp);
+    }
+
     if (existing) {
       existing.last_seen_at = nf.last_seen_at || nf.at || nowIso;
       existing.count += 1;
     } else {
       merged.push({
         id: nf.id || crypto.randomUUID(),
+        fingerprint: fp,
         channel: nf.channel,
         first_seen_at: nf.first_seen_at || nf.at || nowIso,
         last_seen_at: nf.last_seen_at || nf.at || nowIso,
-        error: keyError,
+        error: nf.error || "unknown",
         count: nf.count || 1
       });
     }
@@ -83,13 +118,6 @@ export function mergePendingFailures(priorPending = [], newFailures = [], nowIso
   return merged;
 }
 
-// Auxiliar para gerar ID determinístico para status legados
-export function generateLegacyId(source, channel, generatedAt, error) {
-  const cleanErr = sanitizeErrorMessage(error || "failed");
-  const input = `${source || "unknown"}:${channel || ""}:${generatedAt || ""}:${cleanErr}`;
-  return crypto.createHash("sha256").update(input).digest("hex");
-}
-
 // Auxiliar para converter status legado para formato de fila de pendências
 function convertLegacyStatusToPending(status, defaultSource) {
   const pending = [];
@@ -100,6 +128,7 @@ function convertLegacyStatusToPending(status, defaultSource) {
     const error = status.email_error || "failed";
     pending.push({
       id: generateLegacyId(source, "email", genAt, error),
+      fingerprint: generateFailureFingerprint("email", error),
       channel: "email",
       first_seen_at: genAt,
       last_seen_at: genAt,
@@ -111,6 +140,7 @@ function convertLegacyStatusToPending(status, defaultSource) {
     const error = status.whatsapp_error || "failed";
     pending.push({
       id: generateLegacyId(source, "whatsapp", genAt, error),
+      fingerprint: generateFailureFingerprint("whatsapp", error),
       channel: "whatsapp",
       first_seen_at: genAt,
       last_seen_at: genAt,
@@ -131,26 +161,22 @@ export function mergeAcks(localAcks = [], ciAcks = [], maxAcks = 100) {
 }
 
 // Reconcilia as filas de pendência dos status local e CI.
-// Remove apenas pendências cujo ID esteja presente na lista de acknowledged_failure_ids consolidada.
+// Filtragem por id apenas — fingerprint não é usado para acknowledgement.
+// Registros sem fingerprint são normalizados durante a fusão.
 export function reconcilePendingFailures(localStatus, ciStatus) {
   const localPending = localStatus?.pending_failures || (localStatus && !localStatus.pending_failures ? convertLegacyStatusToPending(localStatus, "local") : []);
   const ciPending = ciStatus?.pending_failures || (ciStatus && !ciStatus.pending_failures ? convertLegacyStatusToPending(ciStatus, "ci") : []);
 
-  // Merge prior lists of pending failures
+  const nowIso = new Date().toISOString();
   const mergedPending = [];
   const allPending = [...localPending, ...ciPending];
   for (const f of allPending) {
     if (!f || !f.channel) continue;
-    const norm = {
-      id: f.id || crypto.randomUUID(),
-      channel: f.channel,
-      first_seen_at: f.first_seen_at || f.at || new Date().toISOString(),
-      last_seen_at: f.last_seen_at || f.at || new Date().toISOString(),
-      error: f.error || "unknown",
-      count: f.count || 1
-    };
+    const norm = normalizeFailure(f, nowIso);
+    // Dedup por id (mesmo episódio vindo dos dois arquivos)
     const existing = mergedPending.find(x => x.id === norm.id);
     if (existing) {
+      existing.fingerprint = existing.fingerprint || norm.fingerprint;
       existing.first_seen_at = new Date(Math.min(Date.parse(existing.first_seen_at), Date.parse(norm.first_seen_at))).toISOString();
       existing.last_seen_at = new Date(Math.max(Date.parse(existing.last_seen_at), Date.parse(norm.last_seen_at))).toISOString();
       existing.count = Math.max(existing.count, norm.count);
@@ -159,7 +185,7 @@ export function reconcilePendingFailures(localStatus, ciStatus) {
     }
   }
 
-  // Merge acknowledged lists
+  // Merge acknowledged lists (apenas ids de episódios, nunca fingerprints)
   const localAcks = localStatus?.acknowledged_failure_ids || [];
   const ciAcks = ciStatus?.acknowledged_failure_ids || [];
   const allAcks = mergeAcks(localAcks, ciAcks);
@@ -230,15 +256,16 @@ export function buildPriorFailureNote(input) {
 
   if (pending.length === 0) return null;
 
-  const failedChannels = [];
-  const hasEmail = pending.some(f => f.channel === "email");
-  const hasWhatsapp = pending.some(f => f.channel === "whatsapp");
+  const emailEpisodes = pending.filter(f => f.channel === "email");
+  const whatsappEpisodes = pending.filter(f => f.channel === "whatsapp");
 
-  if (hasEmail) failedChannels.push("e-mail");
-  if (hasWhatsapp) failedChannels.push("WhatsApp");
+  const parts = [];
+  if (emailEpisodes.length > 0) {
+    parts.push(emailEpisodes.length > 1 ? `e-mail (${emailEpisodes.length} episódios)` : "e-mail");
+  }
+  if (whatsappEpisodes.length > 0) {
+    parts.push(whatsappEpisodes.length > 1 ? `WhatsApp (${whatsappEpisodes.length} episódios)` : "WhatsApp");
+  }
 
-  const times = Array.from(new Set(pending.map(f => f.last_seen_at || f.first_seen_at || f.at).filter(Boolean)));
-  const whenStr = times.length === 1 ? ` (${times[0]})` : "";
-
-  return `⚠️ Rodada anterior${whenStr}: falha ao notificar por ${failedChannels.join(" e ")}.`;
+  return `⚠️ Falhas anteriores de notificação: ${parts.join(" e ")}.`;
 }

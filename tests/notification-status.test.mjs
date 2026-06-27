@@ -7,7 +7,8 @@ import {
   mergePendingFailures,
   reconcilePendingFailures,
   mergeAcks,
-  generateLegacyId
+  generateLegacyId,
+  generateFailureFingerprint
 } from "../scripts/lib/notification-status.mjs";
 
 const NOW = new Date("2026-06-26T19:00:00Z");
@@ -127,7 +128,7 @@ test("reconcilePendingFailures mescla local e CI e filtra os que estao em acknow
   assert.equal(reconciled[0].id, "id-2");
 });
 
-test("nota de falha anterior e formatação de pendências", () => {
+test("nota de falha anterior exibe canais afetados", () => {
   assert.equal(buildPriorFailureNote(null), null);
   assert.equal(buildPriorFailureNote([]), null);
 
@@ -135,9 +136,17 @@ test("nota de falha anterior e formatação de pendências", () => {
     { channel: "email", last_seen_at: "2026-06-26T16:00:00.000Z", error: "Auth failed" }
   ];
   const note = buildPriorFailureNote(pending);
-  assert.match(note, /Rodada anterior/);
   assert.match(note, /e-mail/);
-  assert.match(note, /2026-06-26T16:00:00.000Z/);
+  assert.match(note, /⚠️/);
+});
+
+test("nota de falha anterior com múltiplos episódios mostra contagem", () => {
+  const pending = [
+    { channel: "email", error: "SMTP error" },
+    { channel: "email", error: "SMTP error 2" }
+  ];
+  const note = buildPriorFailureNote(pending);
+  assert.match(note, /e-mail.*2.*episódios|2.*episódios.*e-mail/);
 });
 
 test("mergeAcks limita quantidade de IDs acks", () => {
@@ -277,4 +286,161 @@ test("cenario: entrada legada produz o mesmo ID em duas chamadas", () => {
   assert.equal(reconciled1.length, 1);
   assert.equal(reconciled2.length, 1);
   assert.equal(reconciled1[0].id, reconciled2[0].id);
+});
+
+// ── Fingerprint ────────────────────────────────────────────────────────────────
+
+test("fingerprint: mesmo canal + mesmo erro produz mesmo fingerprint", () => {
+  const fp1 = generateFailureFingerprint("email", "SMTP authentication failed");
+  const fp2 = generateFailureFingerprint("email", "SMTP authentication failed");
+  assert.equal(fp1, fp2);
+});
+
+test("fingerprint: canal diferente + mesmo erro produz fingerprint diferente", () => {
+  const fpEmail = generateFailureFingerprint("email", "Auth error");
+  const fpWA = generateFailureFingerprint("whatsapp", "Auth error");
+  assert.notEqual(fpEmail, fpWA);
+});
+
+test("fingerprint: secrets com valores diferentes mas sanitização equivalente produz mesmo fingerprint e não expõe segredos", () => {
+  const fp1 = generateFailureFingerprint("email", "apikey=SECRET_A");
+  const fp2 = generateFailureFingerprint("email", "apikey=SECRET_B");
+  // Após sanitização, ambos ficam "apikey=[redacted]" → mesmo fingerprint
+  assert.equal(fp1, fp2);
+  // O fingerprint em si não contém os valores secretos
+  assert.doesNotMatch(fp1, /SECRET_A|SECRET_B/);
+});
+
+test("fingerprint: não muda entre chamadas (determinístico)", () => {
+  const fp1 = generateFailureFingerprint("whatsapp", "Timeout error");
+  const fp2 = generateFailureFingerprint("whatsapp", "Timeout error");
+  const fp3 = generateFailureFingerprint("whatsapp", "Timeout error");
+  assert.equal(fp1, fp2);
+  assert.equal(fp2, fp3);
+});
+
+test("fingerprint: começa com prefixo fp- e tem comprimento fixo", () => {
+  const fp = generateFailureFingerprint("email", "some error");
+  assert.match(fp, /^fp-[0-9a-f]{24}$/);
+});
+
+// ── Episódios com fingerprint ──────────────────────────────────────────────────
+
+test("falha nova recebe UUID e fingerprint", () => {
+  const merged = mergePendingFailures([], [{ channel: "email", error: "SMTP error" }], NOW.toISOString());
+  assert.equal(merged.length, 1);
+  assert.ok(merged[0].id, "deve ter id");
+  assert.match(merged[0].id, /^[0-9a-f-]{36}$/); // UUID
+  assert.ok(merged[0].fingerprint, "deve ter fingerprint");
+  assert.match(merged[0].fingerprint, /^fp-/);
+});
+
+test("repetição pendente mantém UUID, fingerprint e incrementa count", () => {
+  const prior = [{ id: "ep-uuid", channel: "email", error: "SMTP error", count: 1 }];
+  const merged = mergePendingFailures(prior, [{ channel: "email", error: "SMTP error" }], NOW.toISOString());
+  assert.equal(merged.length, 1);
+  assert.equal(merged[0].id, "ep-uuid");
+  assert.equal(merged[0].count, 2);
+  assert.match(merged[0].fingerprint, /^fp-/);
+});
+
+test("falha reconhecida + removida: nova falha igual recebe novo UUID, mesmo fingerprint, count 1", () => {
+  // Episódio original
+  const prior = [{ id: "ep-old", channel: "email", error: "SMTP error", count: 3 }];
+  const fpOld = generateFailureFingerprint("email", "SMTP error");
+
+  // Ack remove o episódio
+  const acked = prior.filter(f => f.id !== "ep-old");
+  assert.equal(acked.length, 0);
+
+  // Nova falha do mesmo tipo
+  const merged = mergePendingFailures(acked, [{ channel: "email", error: "SMTP error" }], NOW.toISOString());
+  assert.equal(merged.length, 1);
+  assert.notEqual(merged[0].id, "ep-old"); // novo UUID
+  assert.equal(merged[0].fingerprint, fpOld); // mesmo fingerprint
+  assert.equal(merged[0].count, 1); // reinicia
+});
+
+// ── Local e CI com fingerprint ─────────────────────────────────────────────────
+
+test("local ID A e CI ID B, mesmo channel/error: dois registros, mesmo fingerprint", () => {
+  const local = { pending_failures: [{ id: "A", channel: "email", error: "SMTP error" }] };
+  const ci = { pending_failures: [{ id: "B", channel: "email", error: "SMTP error" }] };
+  const reconciled = reconcilePendingFailures(local, ci);
+  assert.equal(reconciled.length, 2);
+  const fpA = reconciled.find(f => f.id === "A").fingerprint;
+  const fpB = reconciled.find(f => f.id === "B").fingerprint;
+  assert.equal(fpA, fpB);
+  assert.match(fpA, /^fp-/);
+});
+
+test("somente B acknowledged: B some, A permanece (fingerprint iguais não se eliminam)", () => {
+  const local = {
+    pending_failures: [{ id: "A", channel: "email", error: "SMTP error" }],
+    acknowledged_failure_ids: ["B"]
+  };
+  const ci = {
+    pending_failures: [{ id: "B", channel: "email", error: "SMTP error" }]
+  };
+  const reconciled = reconcilePendingFailures(local, ci);
+  assert.equal(reconciled.length, 1);
+  assert.equal(reconciled[0].id, "A");
+});
+
+test("ambos acknowledged: nenhum permanece mesmo que fingerprint seja o mesmo", () => {
+  const local = {
+    pending_failures: [{ id: "A", channel: "email", error: "SMTP error" }],
+    acknowledged_failure_ids: ["A", "B"]
+  };
+  const ci = {
+    pending_failures: [{ id: "B", channel: "email", error: "SMTP error" }]
+  };
+  const reconciled = reconcilePendingFailures(local, ci);
+  assert.equal(reconciled.length, 0);
+});
+
+// ── Compatibilidade ────────────────────────────────────────────────────────────
+
+test("registro antigo sem fingerprint recebe fingerprint ao ser normalizado", () => {
+  const prior = [{ id: "old-id", channel: "email", error: "Old error" }];
+  const merged = mergePendingFailures(prior, [], NOW.toISOString());
+  assert.ok(merged[0].fingerprint, "deve receber fingerprint");
+  assert.match(merged[0].fingerprint, /^fp-/);
+});
+
+test("registro legado ganha fingerprint via reconcile", () => {
+  const legacyStatus = {
+    generated_at: "2026-06-26T10:00:00.000Z",
+    source: "local",
+    email: "failed",
+    email_error: "Auth error"
+  };
+  const reconciled = reconcilePendingFailures(legacyStatus, null);
+  assert.equal(reconciled.length, 1);
+  assert.ok(reconciled[0].fingerprint, "deve ter fingerprint");
+  assert.match(reconciled[0].fingerprint, /^fp-/);
+  // ID legado é determinístico (hash sha256 sem prefixo)
+  assert.doesNotMatch(reconciled[0].id, /^fp-/);
+});
+
+// ── Semântica dos acknowledgements ────────────────────────────────────────────
+
+test("acknowledged_failure_ids contém apenas UUIDs/IDs de episódios, nunca fingerprints", () => {
+  const priorFailure = { id: "ep-uuid-123", channel: "email", error: "SMTP error", count: 1 };
+  const fp = generateFailureFingerprint(priorFailure.channel, priorFailure.error);
+  priorFailure.fingerprint = fp;
+
+  // Simula: falha foi notificada e acked
+  const ackedIds = [priorFailure.id];
+  const status = buildDeliveryStatus({
+    now: NOW,
+    sendingEmail: true,
+    email: { ok: true },
+    whatsapp: { ok: true },
+    pendingFailures: [],
+    acknowledgedFailureIds: ackedIds
+  });
+
+  assert.ok(status.acknowledged_failure_ids.includes(priorFailure.id));
+  assert.ok(!status.acknowledged_failure_ids.includes(priorFailure.fingerprint));
 });
