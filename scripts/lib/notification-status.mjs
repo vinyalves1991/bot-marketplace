@@ -83,26 +83,38 @@ export function mergePendingFailures(priorPending = [], newFailures = [], nowIso
   return merged;
 }
 
+// Auxiliar para gerar ID determinístico para status legados
+export function generateLegacyId(source, channel, generatedAt, error) {
+  const cleanErr = sanitizeErrorMessage(error || "failed");
+  const input = `${source || "unknown"}:${channel || ""}:${generatedAt || ""}:${cleanErr}`;
+  return crypto.createHash("sha256").update(input).digest("hex");
+}
+
 // Auxiliar para converter status legado para formato de fila de pendências
-function convertLegacyStatusToPending(status) {
+function convertLegacyStatusToPending(status, defaultSource) {
   const pending = [];
+  const source = status.source || defaultSource;
+  const genAt = status.generated_at || "";
+
   if (status.email === "failed") {
+    const error = status.email_error || "failed";
     pending.push({
-      id: crypto.randomUUID(),
+      id: generateLegacyId(source, "email", genAt, error),
       channel: "email",
-      first_seen_at: status.generated_at,
-      last_seen_at: status.generated_at,
-      error: status.email_error || "failed",
+      first_seen_at: genAt,
+      last_seen_at: genAt,
+      error: sanitizeErrorMessage(error),
       count: 1
     });
   }
   if (status.whatsapp === "failed") {
+    const error = status.whatsapp_error || "failed";
     pending.push({
-      id: crypto.randomUUID(),
+      id: generateLegacyId(source, "whatsapp", genAt, error),
       channel: "whatsapp",
-      first_seen_at: status.generated_at,
-      last_seen_at: status.generated_at,
-      error: status.whatsapp_error || "failed",
+      first_seen_at: genAt,
+      last_seen_at: genAt,
+      error: sanitizeErrorMessage(error),
       count: 1
     });
   }
@@ -121,8 +133,8 @@ export function mergeAcks(localAcks = [], ciAcks = [], maxAcks = 100) {
 // Reconcilia as filas de pendência dos status local e CI.
 // Remove apenas pendências cujo ID esteja presente na lista de acknowledged_failure_ids consolidada.
 export function reconcilePendingFailures(localStatus, ciStatus) {
-  const localPending = localStatus?.pending_failures || (localStatus && !localStatus.pending_failures ? convertLegacyStatusToPending(localStatus) : []);
-  const ciPending = ciStatus?.pending_failures || (ciStatus && !ciStatus.pending_failures ? convertLegacyStatusToPending(ciStatus) : []);
+  const localPending = localStatus?.pending_failures || (localStatus && !localStatus.pending_failures ? convertLegacyStatusToPending(localStatus, "local") : []);
+  const ciPending = ciStatus?.pending_failures || (ciStatus && !ciStatus.pending_failures ? convertLegacyStatusToPending(ciStatus, "ci") : []);
 
   // Merge prior lists of pending failures
   const mergedPending = [];
@@ -137,9 +149,8 @@ export function reconcilePendingFailures(localStatus, ciStatus) {
       error: f.error || "unknown",
       count: f.count || 1
     };
-    const existing = mergedPending.find(x => x.channel === norm.channel && x.error === norm.error);
+    const existing = mergedPending.find(x => x.id === norm.id);
     if (existing) {
-      if (f.id && !existing.id) existing.id = f.id;
       existing.first_seen_at = new Date(Math.min(Date.parse(existing.first_seen_at), Date.parse(norm.first_seen_at))).toISOString();
       existing.last_seen_at = new Date(Math.max(Date.parse(existing.last_seen_at), Date.parse(norm.last_seen_at))).toISOString();
       existing.count = Math.max(existing.count, norm.count);
@@ -205,11 +216,15 @@ export function buildPriorFailureNote(input) {
     pending = input.pending_failures;
   } else {
     // Old status format backward compatibility
+    const source = input.source || "unknown";
+    const genAt = input.generated_at || "";
     if (input.email === "failed") {
-      pending.push({ id: crypto.randomUUID(), channel: "email", first_seen_at: input.generated_at, last_seen_at: input.generated_at });
+      const error = input.email_error || "failed";
+      pending.push({ id: generateLegacyId(source, "email", genAt, error), channel: "email", first_seen_at: genAt, last_seen_at: genAt });
     }
     if (input.whatsapp === "failed") {
-      pending.push({ id: crypto.randomUUID(), channel: "whatsapp", first_seen_at: input.generated_at, last_seen_at: input.generated_at });
+      const error = input.whatsapp_error || "failed";
+      pending.push({ id: generateLegacyId(source, "whatsapp", genAt, error), channel: "whatsapp", first_seen_at: genAt, last_seen_at: genAt });
     }
   }
 

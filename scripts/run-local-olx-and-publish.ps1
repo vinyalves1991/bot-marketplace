@@ -176,8 +176,6 @@ try {
   }
   if (-not $pushed) { $ErrorActionPreference = $prevEAP; throw "git push falhou apos 4 tentativas." }
 
-  $published = $true
-
   if (-not $monitorFailed) {
     $fullSuccess = $true
   }

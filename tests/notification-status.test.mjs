@@ -6,7 +6,8 @@ import {
   sanitizeErrorMessage,
   mergePendingFailures,
   reconcilePendingFailures,
-  mergeAcks
+  mergeAcks,
+  generateLegacyId
 } from "../scripts/lib/notification-status.mjs";
 
 const NOW = new Date("2026-06-26T19:00:00Z");
@@ -218,4 +219,62 @@ test("cenario: repetição da mesma falha incrementa count sem crescer indefinid
   assert.equal(merged.length, 1);
   assert.equal(merged[0].count, 6);
   assert.equal(merged[0].id, "id-1");
+});
+
+test("cenario: local pending ID A e CI pending ID B com mesmo channel/error", () => {
+  const localStatus = {
+    pending_failures: [{ id: "A", channel: "email", error: "SMTP error" }]
+  };
+  const ciStatus = {
+    pending_failures: [{ id: "B", channel: "email", error: "SMTP error" }]
+  };
+  const reconciled = reconcilePendingFailures(localStatus, ciStatus);
+  assert.equal(reconciled.length, 2);
+  assert.ok(reconciled.some(f => f.id === "A"));
+  assert.ok(reconciled.some(f => f.id === "B"));
+});
+
+test("cenario: somente B reconhecido: B some e A permanece", () => {
+  const localStatus = {
+    pending_failures: [{ id: "A", channel: "email", error: "SMTP error" }],
+    acknowledged_failure_ids: ["B"]
+  };
+  const ciStatus = {
+    pending_failures: [{ id: "B", channel: "email", error: "SMTP error" }]
+  };
+  const reconciled = reconcilePendingFailures(localStatus, ciStatus);
+  assert.equal(reconciled.length, 1);
+  assert.equal(reconciled[0].id, "A");
+});
+
+test("cenario: ambos reconhecidos: ambos somem", () => {
+  const localStatus = {
+    pending_failures: [{ id: "A", channel: "email", error: "SMTP error" }],
+    acknowledged_failure_ids: ["A", "B"]
+  };
+  const ciStatus = {
+    pending_failures: [{ id: "B", channel: "email", error: "SMTP error" }]
+  };
+  const reconciled = reconcilePendingFailures(localStatus, ciStatus);
+  assert.equal(reconciled.length, 0);
+});
+
+test("cenario: entrada legada produz o mesmo ID em duas chamadas", () => {
+  const legacyStatus1 = {
+    generated_at: "2026-06-26T10:00:00.000Z",
+    source: "local",
+    email: "failed",
+    email_error: "Auth error"
+  };
+  const legacyStatus2 = {
+    generated_at: "2026-06-26T10:00:00.000Z",
+    source: "local",
+    email: "failed",
+    email_error: "Auth error"
+  };
+  const reconciled1 = reconcilePendingFailures(legacyStatus1, null);
+  const reconciled2 = reconcilePendingFailures(legacyStatus2, null);
+  assert.equal(reconciled1.length, 1);
+  assert.equal(reconciled2.length, 1);
+  assert.equal(reconciled1[0].id, reconciled2[0].id);
 });

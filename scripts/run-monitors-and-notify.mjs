@@ -57,23 +57,7 @@ const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD?.replace(/\s+/g, "");
 const NOTIFY_TO          = process.env.NOTIFY_EMAIL_TO ?? GMAIL_USER;
 const CALLMEBOT_PHONE    = process.env.CALLMEBOT_PHONE;
 const CALLMEBOT_APIKEY   = process.env.CALLMEBOT_APIKEY;
-const forceEmail         = process.argv.includes("--force-email");
-const skipMonitors       = process.argv.includes("--skip-monitors");
-const dryRun             = process.argv.includes("--dry-run"); // imprime mensagens e NÃO envia nada
-const onlyOlx            = process.argv.includes("--only-olx");
-const skipOlx            = process.argv.includes("--skip-olx") || process.env.SKIP_OLX === "1";
-const skipEnjoei         = process.argv.includes("--skip-enjoei") || process.env.SKIP_ENJOEI === "1";
-const skipDockstations   = process.argv.includes("--skip-dockstations") || process.env.SKIP_DOCKSTATIONS === "1";
-const skipFitbit         = process.argv.includes("--skip-fitbit") || process.env.SKIP_FITBIT === "1";
-const skipLifefactory    = process.argv.includes("--skip-lifefactory") || process.env.SKIP_LIFEFACTORY === "1";
-const skipTelaBook3      = process.argv.includes("--skip-tela-book3") || process.env.SKIP_TELA_BOOK3 === "1";
-const skipMelanger       = process.argv.includes("--skip-melanger") || process.env.SKIP_MELANGER === "1";
-const skipBuds4Pro       = process.argv.includes("--skip-buds4-pro") || process.env.SKIP_BUDS4_PRO === "1";
-const skipOura           = process.argv.includes("--skip-oura") || process.env.SKIP_OURA === "1";
-const skipMercadoLivre   = process.argv.includes("--skip-mercadolivre")
-  || process.env.SKIP_MERCADOLIVRE === "1"
-  || process.env.GITHUB_ACTIONS === "true";
-const olxMaxPerCpu       = getArgValue("--olx-max-per-cpu") ?? process.env.OLX_MAX_PER_CPU ?? "12";
+// As variáveis de linha de comando agora são interpretadas dinamicamente dentro de main()
 
 // Se executado diretamente, roda o main. Caso contrário, exporta para testes.
 import { fileURLToPath as urlToPath } from "node:url";
@@ -87,7 +71,8 @@ export async function main({
   sendEmailFn = sendEmail,
   sendWhatsAppFn = sendWhatsApp,
   fsApi: fsApiIn = fs,
-  nowFn = () => new Date()
+  nowFn = () => new Date(),
+  args = process.argv
 } = {}) {
   const prevFsApi = fsApi;
   const prevRunCommandFn = runCommandFn;
@@ -95,6 +80,24 @@ export async function main({
   runCommandFn = runCommandIn;
 
   try {
+    const forceEmail         = args.includes("--force-email");
+    const skipMonitors       = args.includes("--skip-monitors");
+    const dryRun             = args.includes("--dry-run");
+    const onlyOlx            = args.includes("--only-olx");
+    const skipOlx            = args.includes("--skip-olx") || process.env.SKIP_OLX === "1";
+    const skipEnjoei         = args.includes("--skip-enjoei") || process.env.SKIP_ENJOEI === "1";
+    const skipDockstations   = args.includes("--skip-dockstations") || process.env.SKIP_DOCKSTATIONS === "1";
+    const skipFitbit         = args.includes("--skip-fitbit") || process.env.SKIP_FITBIT === "1";
+    const skipLifefactory    = args.includes("--skip-lifefactory") || process.env.SKIP_LIFEFACTORY === "1";
+    const skipTelaBook3      = args.includes("--skip-tela-book3") || process.env.SKIP_TELA_BOOK3 === "1";
+    const skipMelanger       = args.includes("--skip-melanger") || process.env.SKIP_MELANGER === "1";
+    const skipBuds4Pro       = args.includes("--skip-buds4-pro") || process.env.SKIP_BUDS4_PRO === "1";
+    const skipOura           = args.includes("--skip-oura") || process.env.SKIP_OURA === "1";
+    const skipMercadoLivre   = args.includes("--skip-mercadolivre")
+      || process.env.SKIP_MERCADOLIVRE === "1"
+      || process.env.GITHUB_ACTIONS === "true";
+    const olxMaxPerCpu       = getArgValue("--olx-max-per-cpu", args) ?? process.env.OLX_MAX_PER_CPU ?? "12";
+
     const runNow = nowFn();
     const runStart = runNow.getTime();
   console.log(`Iniciando rodada: ${new Date().toISOString()}`);
@@ -105,7 +108,7 @@ export async function main({
   } else {
     console.log("Rodando monitores em paralelo...");
     const jobs = [];
-    if (!skipOlx) jobs.push(["olx", runOlxMonitor()]);
+    if (!skipOlx) jobs.push(["olx", runOlxMonitor(olxMaxPerCpu)]);
     else console.log("OLX pulado nesta rodada.");
     if (!onlyOlx && !skipEnjoei) {
       jobs.push(["enjoei-tenis", runScript("monitor-enjoei-tenis.mjs", [])]);
@@ -333,7 +336,7 @@ function runScript(scriptName, extraArgs) {
   return runCommandFn(process.execPath, [scriptPath, ...extraArgs]);
 }
 
-function runOlxMonitor() {
+function runOlxMonitor(olxMaxPerCpu) {
   if (process.platform === "win32" && process.env.GITHUB_ACTIONS !== "true") {
     return runCommandFn("powershell.exe", [
       "-NoProfile",
@@ -356,9 +359,9 @@ function runCommand(command, args) {
   });
 }
 
-function getArgValue(name) {
-  const index = process.argv.indexOf(name);
-  return index >= 0 ? process.argv[index + 1] : null;
+function getArgValue(name, args = process.argv) {
+  const index = args.indexOf(name);
+  return index >= 0 ? args[index + 1] : null;
 }
 
 async function readLatestReport(dir, minTime = null) {

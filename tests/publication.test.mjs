@@ -35,8 +35,16 @@ test("publicacao local nao aborta imediatamente em caso de erro do monitor", asy
   const script = await fs.readFile(path.join(root, "scripts", "run-local-olx-and-publish.ps1"), "utf8");
   // Verifica se a variável $monitorFailed está definida
   assert.match(script, /\$monitorFailed\s*=\s*\$monitorExit\s*-ne\s*0/);
-  // Verifica se o git add ocorre antes de subir o erro final do monitor
+
+  // Verifica a ordem das chamadas: git add < git push < throw final do monitor
   const gitAddIdx = script.indexOf("git add data/");
+  const gitPushIdx = script.indexOf("git push");
   const throwIdx = script.lastIndexOf("Monitor OLX local falhou");
-  assert.ok(gitAddIdx < throwIdx, "git add deve ocorrer antes de subir o erro final");
+
+  assert.ok(gitAddIdx !== -1, "git add não encontrado");
+  assert.ok(gitPushIdx !== -1, "git push não encontrado");
+  assert.ok(throwIdx !== -1, "throw do monitor não encontrado");
+
+  assert.ok(gitAddIdx < gitPushIdx, "git add deve ocorrer antes do git push");
+  assert.ok(gitPushIdx < throwIdx, "git push deve ocorrer antes de lançar erro do monitor");
 });

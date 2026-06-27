@@ -52,7 +52,9 @@ test.describe("Orquestrador - Integração e Propagação de Erros", () => {
 
   test.afterEach(() => {
     process.exitCode = originalExitCode;
-    process.env.GITHUB_ACTIONS = originalGithubActions;
+
+    if (originalGithubActions === undefined) delete process.env.GITHUB_ACTIONS;
+    else process.env.GITHUB_ACTIONS = originalGithubActions;
 
     if (originalGmailUser === undefined) delete process.env.GMAIL_USER;
     else process.env.GMAIL_USER = originalGmailUser;
@@ -170,31 +172,25 @@ test.describe("Orquestrador - Integração e Propagação de Erros", () => {
   });
 
   test("se houver falha de monitor, dry-run define exitCode = 1 sem fazer I/O", async (t) => {
-    // 1. Configura --dry-run
-    process.argv = [...originalArgv, "--dry-run"];
-
     const runCommandFn = t.mock.fn(async (cmd, args) => {
       throw new Error("Monitor falhou");
     });
-    const sendEmailFn = t.mock.fn(async () => {
-      throw new Error("SendEmail nao deve ser chamado em dry-run");
-    });
-    const sendWhatsAppFn = t.mock.fn(async () => {
-      throw new Error("SendWhatsApp nao deve ser chamado em dry-run");
-    });
+    const sendEmailFn = t.mock.fn(async () => Promise.resolve());
+    const sendWhatsAppFn = t.mock.fn(async () => Promise.resolve());
 
     const fsApi = {
       readFile: t.mock.fn(async () => "{}"),
-      writeFile: t.mock.fn(async () => {
-        throw new Error("WriteFile nao deve ser chamado em dry-run");
-      }),
-      mkdir: t.mock.fn(async () => {}),
+      writeFile: t.mock.fn(async () => Promise.resolve()),
+      mkdir: t.mock.fn(async () => Promise.resolve()),
       readdir: t.mock.fn(async () => [])
     };
 
-    await main({ runCommandFn, sendEmailFn, sendWhatsAppFn, fsApi });
+    await main({ runCommandFn, sendEmailFn, sendWhatsAppFn, fsApi, args: ["--dry-run"] });
 
     assert.equal(process.exitCode, 1, "Exit code deve ser 1 em dry-run se monitores falharem");
+    assert.equal(sendEmailFn.mock.calls.length, 0, "sendEmailFn não deve ser chamado em dry-run");
+    assert.equal(sendWhatsAppFn.mock.calls.length, 0, "sendWhatsAppFn não deve ser chamado em dry-run");
+    assert.equal(fsApi.writeFile.mock.calls.length, 0, "fsApi.writeFile não deve ser chamado em dry-run");
   });
 });
 
