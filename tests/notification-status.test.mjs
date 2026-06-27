@@ -425,6 +425,24 @@ test("registro legado ganha fingerprint via reconcile", () => {
 
 // ── Semântica dos acknowledgements ────────────────────────────────────────────
 
+test("prior ID A + incoming ID B, mesmo canal/erro → dois registros distintos", () => {
+  const prior = [{ id: "A", channel: "email", error: "SMTP error", count: 1 }];
+  const incoming = [{ id: "B", channel: "email", error: "SMTP error" }];
+  const merged = mergePendingFailures(prior, incoming, NOW.toISOString());
+  assert.equal(merged.length, 2);
+  assert.ok(merged.some(f => f.id === "A"));
+  assert.ok(merged.some(f => f.id === "B"));
+});
+
+test("prior ID A + incoming sem ID, mesmo canal/erro → um registro, ID A preservado e count incrementado", () => {
+  const prior = [{ id: "A", channel: "email", error: "SMTP error", count: 1 }];
+  const incoming = [{ channel: "email", error: "SMTP error" }];
+  const merged = mergePendingFailures(prior, incoming, NOW.toISOString());
+  assert.equal(merged.length, 1);
+  assert.equal(merged[0].id, "A");
+  assert.equal(merged[0].count, 2);
+});
+
 test("acknowledged_failure_ids contém apenas UUIDs/IDs de episódios, nunca fingerprints", () => {
   const priorFailure = { id: "ep-uuid-123", channel: "email", error: "SMTP error", count: 1 };
   const fp = generateFailureFingerprint(priorFailure.channel, priorFailure.error);

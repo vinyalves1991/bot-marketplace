@@ -87,12 +87,9 @@ export function mergePendingFailures(priorPending = [], newFailures = [], nowIso
     if (!nf || !nf.channel) continue;
     const fp = generateFailureFingerprint(nf.channel, nf.error || "unknown");
 
-    // 1. Procurar por id quando o novo registro já tiver ID
-    let existing = nf.id ? merged.find(f => f.id === nf.id) : null;
-    // 2. Caso seja falha nova sem ID, procurar por fingerprint
-    if (!existing) {
-      existing = merged.find(f => f.fingerprint === fp);
-    }
+    const existing = nf.id
+      ? merged.find(f => f.id === nf.id)
+      : merged.find(f => f.fingerprint === fp);
 
     if (existing) {
       existing.last_seen_at = nf.last_seen_at || nf.at || nowIso;
