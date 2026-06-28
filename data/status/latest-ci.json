@@ -1,24 +1,14 @@
 {
-  "generated_at": "2026-06-27T19:00:59.047Z",
+  "generated_at": "2026-06-28T11:01:06.877Z",
   "source": "ci",
   "delivery": {
-    "email": "failed",
-    "email_error": "Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?[redacted] 6a1803df08f44-8df7f018011sm261691646d6.5 - gsmtp",
+    "email": "skipped",
     "whatsapp": "sent"
   },
-  "pending_failures": [
-    {
-      "id": "989d7e3b-36d6-48c2-b9c5-8aee4d454fcd",
-      "fingerprint": "fp-286b451aa110b6913aaa0d54",
-      "channel": "email",
-      "first_seen_at": "2026-06-27T19:00:59.047Z",
-      "last_seen_at": "2026-06-27T19:00:59.047Z",
-      "error": "Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?[redacted] 6a1803df08f44-8df7f018011sm261691646d6.5 - gsmtp",
-      "count": 1
-    }
+  "pending_failures": [],
+  "acknowledged_failure_ids": [
+    "989d7e3b-36d6-48c2-b9c5-8aee4d454fcd"
   ],
-  "acknowledged_failure_ids": [],
-  "email": "failed",
-  "email_error": "Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?[redacted] 6a1803df08f44-8df7f018011sm261691646d6.5 - gsmtp",
+  "email": "skipped",
   "whatsapp": "sent"
 }
