@@ -1,12 +1,15 @@
 {
-  "generated_at": "2026-06-29T00:16:41.404Z",
+  "generated_at": "2026-06-29T10:51:39.387Z",
   "source": "local",
   "delivery": {
     "email": "sent",
     "whatsapp": "sent"
   },
   "pending_failures": [],
-  "acknowledged_failure_ids": [],
+  "acknowledged_failure_ids": [
+    "989d7e3b-36d6-48c2-b9c5-8aee4d454fcd",
+    "12324b29-8f6b-4842-8855-b57d4d66f06d"
+  ],
   "email": "sent",
   "whatsapp": "sent"
 }
