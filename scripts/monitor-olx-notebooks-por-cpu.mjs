@@ -597,7 +597,7 @@ async function waitForRawBody(tab) {
   const started = Date.now();
   while (Date.now() - started < DETAIL_TIMEOUT_MS) {
     const textLength = await rawEvaluate(tab, "document.body?.innerText?.length || 0").catch(() => 0);
-    if (Number(textLength) > 200) return;
+    if (Number(textLength) > 800) return;
     await delay(800);
   }
   throw new Error("não consegui ler o corpo do anúncio");
@@ -878,7 +878,7 @@ async function enrichAd(listingPage, card) {
     const bodyLocator = page.locator("body");
     await bodyLocator.waitFor({ state: "visible", timeout: 15000 }).catch(() => {});
     await page
-      .waitForFunction(() => (document.body?.innerText?.length || 0) > 200 || document.readyState === "complete", null, {
+      .waitForFunction(() => (document.body?.innerText?.length || 0) > 800, null, {
         timeout: 15000,
         polling: 150,
       })
