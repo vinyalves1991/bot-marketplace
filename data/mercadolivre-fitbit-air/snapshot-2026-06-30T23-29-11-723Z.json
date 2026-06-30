@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-30T23:29:11.723Z",
+  "run": {
+    "date": "2026-06-30",
+    "timezone": "America/Sao_Paulo",
+    "id": "fitbit-air",
+    "label": "Fitbit Air",
+    "started_at": "2026-06-30T23:28:50.877Z",
+    "completed_at": "2026-06-30T23:29:11.723Z",
+    "partial": false,
+    "aborted": false,
+    "successful_terms": [
+      "fitbit air"
+    ],
+    "scheduled_terms": [
+      "fitbit air"
+    ],
+    "configured_terms": [
+      "fitbit air"
+    ],
+    "failed_terms": [],
+    "scheduled_coverage": [
+      "fitbit air"
+    ],
+    "successful_coverage": [
+      "fitbit air"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "fitbit air"
+    ]
+  },
+  "filters": {
+    "collection_price_brl": {
+      "min": 300,
+      "max": 600
+    },
+    "display_price_brl": {
+      "min": 300,
+      "max": 600
+    }
+  },
+  "items": []
+}

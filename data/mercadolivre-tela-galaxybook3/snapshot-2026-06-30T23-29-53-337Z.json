@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-06-30T23:29:53.337Z",
+  "run": {
+    "date": "2026-06-30",
+    "timezone": "America/Sao_Paulo",
+    "id": "tela-galaxybook3",
+    "label": "Tela Galaxy Book3",
+    "started_at": "2026-06-30T23:29:33.911Z",
+    "completed_at": "2026-06-30T23:29:53.337Z",
+    "partial": false,
+    "aborted": false,
+    "successful_terms": [
+      "BA96-08462A"
+    ],
+    "scheduled_terms": [
+      "BA96-08462A"
+    ],
+    "configured_terms": [
+      "BA96-08462A"
+    ],
+    "failed_terms": [],
+    "scheduled_coverage": [
+      "BA96-08462A"
+    ],
+    "successful_coverage": [
+      "BA96-08462A"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "BA96-08462A"
+    ]
+  },
+  "filters": {
+    "collection_price_brl": {
+      "min": 0,
+      "max": 1000
+    },
+    "display_price_brl": {
+      "min": 0,
+      "max": 1000
+    }
+  },
+  "items": []
+}
