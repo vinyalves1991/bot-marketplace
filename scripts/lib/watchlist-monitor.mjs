@@ -134,7 +134,7 @@ export async function runWatchlistMonitor(config) {
       const categoryUrls = (config.olxCategoryUrls && config.olxCategoryUrls.length)
         ? config.olxCategoryUrls
         : [OLX_BASE_URL];
-      const { items, failedTerms } = await collectOlx({ terms, categoryUrls, userDataDir, headless, visible, inRange, sizeOk, notExcluded, itemFilter });
+      const { items, failedTerms } = await collectOlx({ terms, categoryUrls, userDataDir, headless, visible, inRange, sizeOk, notExcluded, itemFilter, olxDeliveryOnly: config.olxDeliveryOnly ?? false });
       collected.push(...items);
       for (const t of failedTerms) { failedSourceTerms.add(`OLX:${t}`); errors.push(`OLX termo "${t}" falhou`); }
     } catch (error) {
@@ -273,7 +273,7 @@ function buildEnjoeiApiUrl(term, slug) {
 
 // ── OLX (Playwright) ───────────────────────────────────────────────────────────
 
-async function collectOlx({ terms, categoryUrls, userDataDir, headless, visible, inRange, sizeOk, notExcluded, itemFilter }) {
+async function collectOlx({ terms, categoryUrls, userDataDir, headless, visible, inRange, sizeOk, notExcluded, itemFilter, olxDeliveryOnly = false }) {
   const isCI = Boolean(process.env.CI);
   // Local, por padrão a janela roda FORA DA TELA (não atrapalha o trabalho).
   // --visible mostra maximizada (útil para depurar/resolver Cloudflare).
@@ -313,7 +313,7 @@ async function collectOlx({ terms, categoryUrls, userDataDir, headless, visible,
   try {
     for (const categoryUrl of categoryUrls) {
       for (const term of terms) {
-        const url = `${categoryUrl}?q=${encodeURIComponent(term)}`;
+        const url = `${categoryUrl}?q=${encodeURIComponent(term)}${olxDeliveryOnly ? "&opst=2" : ""}`;
         console.log(`OLX termo: ${term} -> ${url}`);
         try {
           await page.goto(url, { waitUntil: "domcontentloaded", timeout: NAVIGATION_TIMEOUT_MS });

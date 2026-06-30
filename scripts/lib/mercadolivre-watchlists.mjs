@@ -66,6 +66,22 @@ export const mercadoLivreWatchlists = [
     searchOptions: { localShipping: true },
   },
   {
+    id: "oled-monitores",
+    label: "Monitores OLED",
+    terms: [
+      "aw2726dm", "aw2725d", "aw2725df", "aw3225qf", "aw3423dw", "aw3423dwf", "aw3425dw",
+      "odyssey g5 oled", "odyssey g6 oled", "ls32dg800", "odyssey g9 oled",
+      "cepheus p1",
+      "mag 271qp", "mag 274qp", "mpg 491cqp",
+      "27gx790a", "27gx704a",
+      "xg27acdng",
+    ],
+    minPrice: 0,
+    maxPrice: 3000,
+    relevantDetails: ["modelo", "tamanho", "taxa de atualizacao", "resolucao", "condicao"],
+    searchOptions: { localShipping: true },
+  },
+  {
     id: "tenis-42",
     label: "Tenis 42",
     terms: ["vivobarefoot", "xero", "vibram fivefingers", "merrell", "lems", "feet of tomorrow"],

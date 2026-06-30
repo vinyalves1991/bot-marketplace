@@ -33,6 +33,7 @@ const TELA_BOOK3_DIR       = def("TELA_GALAXYBOOK3_DATA_DIR", "monitor-tela-gala
 const MELANGER_DIR         = def("MELANGER_DATA_DIR",         "monitor-melanger");
 const BUDS4PRO_DIR         = def("GALAXY_BUDS4_PRO_DATA_DIR", "monitor-galaxy-buds4-pro");
 const OURA_DIR             = def("OURA_RING5_DATA_DIR",       "monitor-oura-ring5");
+const OLED_MONITORES_DIR   = def("OLED_MONITORES_DATA_DIR",   "monitor-oled-monitores");
 const MERCADOLIVRE_DIRS = [
   ["Mercado Livre Notebooks", path.join(workspaceRoot, "data", "mercadolivre-notebooks")],
   ["ML Galaxy Buds4 Pro", path.join(workspaceRoot, "data", "mercadolivre-galaxy-buds4-pro")],
@@ -42,6 +43,7 @@ const MERCADOLIVRE_DIRS = [
   ["ML Tela Book3", path.join(workspaceRoot, "data", "mercadolivre-tela-galaxybook3")],
   ["ML Melanger", path.join(workspaceRoot, "data", "mercadolivre-melanger")],
   ["ML Tênis 42", path.join(workspaceRoot, "data", "mercadolivre-tenis-42")],
+  ["ML Monitores OLED", path.join(workspaceRoot, "data", "mercadolivre-oled-monitores")],
 ];
 
 // NUNCA usar defaults hardcoded para credenciais: este repositório é público
@@ -93,6 +95,7 @@ export async function main({
     const skipMelanger       = args.includes("--skip-melanger") || process.env.SKIP_MELANGER === "1";
     const skipBuds4Pro       = args.includes("--skip-buds4-pro") || process.env.SKIP_BUDS4_PRO === "1";
     const skipOura           = args.includes("--skip-oura") || process.env.SKIP_OURA === "1";
+    const skipOledMonitores  = args.includes("--skip-oled-monitores") || process.env.SKIP_OLED_MONITORES === "1";
     const skipMercadoLivre   = args.includes("--skip-mercadolivre")
       || process.env.SKIP_MERCADOLIVRE === "1"
       || process.env.GITHUB_ACTIONS === "true";
@@ -124,6 +127,7 @@ export async function main({
     if (!skipMelanger) jobs.push(["melanger", runScript("monitor-melanger.mjs", [])]);
     if (!skipBuds4Pro) jobs.push(["buds4-pro", runScript("monitor-galaxy-buds4-pro.mjs", [])]);
     if (!skipOura) jobs.push(["oura", runScript("monitor-oura-ring5.mjs", [])]);
+    if (!skipOledMonitores) jobs.push(["oled-monitores", runScript("monitor-oled-monitores.mjs", [])]);
     // Mercado Livre NÃO roda aqui: é desacoplado do fluxo do OLX/Enjoei (que
     // espera todos os jobs antes de publicar). O ML é pesado/lento e roda sob
     // demanda via `npm run monitor:mercadolivre` ou o atalho da barra de tarefas
@@ -144,6 +148,7 @@ export async function main({
       if (name === "melanger") { console.error(`Melanger falhou: ${result.reason.message}`); errors.push(`Melanger: ${result.reason.message}`); }
       if (name === "buds4-pro") { console.error(`Galaxy Buds4 Pro falhou: ${result.reason.message}`); errors.push(`Galaxy Buds4 Pro: ${result.reason.message}`); }
       if (name === "oura") { console.error(`Oura Ring 5 falhou: ${result.reason.message}`); errors.push(`Oura Ring 5: ${result.reason.message}`); }
+      if (name === "oled-monitores") { console.error(`Monitores OLED falhou: ${result.reason.message}`); errors.push(`Monitores OLED: ${result.reason.message}`); }
     }
   }
 

@@ -63,6 +63,7 @@ jobs:
           MELANGER_DATA_DIR: ${{ github.workspace }}/data/melanger
           GALAXY_BUDS4_PRO_DATA_DIR: ${{ github.workspace }}/data/galaxy-buds4-pro
           OURA_RING5_DATA_DIR: ${{ github.workspace }}/data/oura-ring5
+          OLED_MONITORES_DATA_DIR: ${{ github.workspace }}/data/oled-monitores
         run: node scripts/run-monitors-and-notify.mjs
 
       # O dashboard NAO e gerado aqui: ele depende de TODOS os dados (OLX do
@@ -82,6 +83,7 @@ jobs:
           MELANGER_DATA_DIR: ${{ github.workspace }}/data/melanger
           GALAXY_BUDS4_PRO_DATA_DIR: ${{ github.workspace }}/data/galaxy-buds4-pro
           OURA_RING5_DATA_DIR: ${{ github.workspace }}/data/oura-ring5
+          OLED_MONITORES_DATA_DIR: ${{ github.workspace }}/data/oled-monitores
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
