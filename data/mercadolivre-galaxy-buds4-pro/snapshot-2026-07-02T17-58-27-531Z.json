@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-07-02T17:58:27.531Z",
+  "run": {
+    "date": "2026-07-02",
+    "timezone": "America/Sao_Paulo",
+    "id": "galaxy-buds4-pro",
+    "label": "Galaxy Buds4 Pro",
+    "started_at": "2026-07-02T17:58:10.063Z",
+    "completed_at": "2026-07-02T17:58:27.531Z",
+    "partial": false,
+    "aborted": false,
+    "successful_terms": [
+      "galaxy buds4 pro"
+    ],
+    "scheduled_terms": [
+      "galaxy buds4 pro"
+    ],
+    "configured_terms": [
+      "galaxy buds4 pro"
+    ],
+    "failed_terms": [],
+    "scheduled_coverage": [
+      "galaxy buds4 pro"
+    ],
+    "successful_coverage": [
+      "galaxy buds4 pro"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "galaxy buds4 pro"
+    ]
+  },
+  "filters": {
+    "collection_price_brl": {
+      "min": 500,
+      "max": 1000
+    },
+    "display_price_brl": {
+      "min": 500,
+      "max": 1000
+    }
+  },
+  "items": []
+}
