@@ -110,30 +110,39 @@ export async function main({
     console.log("--skip-monitors ativo: usando relatórios existentes.");
   } else {
     console.log("Rodando monitores em paralelo...");
+    // Cada job de watchlist (dockstations, fitbit, lifefactory, tela-book3,
+    // melanger, buds4-pro, oura, oled-monitores) e o job "olx" (notebooks por
+    // CPU) abrem sua PRÓPRIA instância de Chromium (perfil isolado). Deixá-los
+    // todos concorrentes satura CPU/rede da máquina e derruba navegações do OLX
+    // por timeout (30s) — incidente observado ao somar o 9º job concorrente
+    // (oled-monitores). Por isso rodam com concorrência limitada
+    // (OLX_JOB_CONCURRENCY, default 3); os jobs Enjoei (API, sem Chrome) seguem
+    // irrestritos.
+    const browserJobConcurrency = Number(process.env.OLX_JOB_CONCURRENCY) || 3;
     const jobs = [];
-    if (!skipOlx) jobs.push(["olx", runOlxMonitor(olxMaxPerCpu)]);
+    if (!skipOlx) jobs.push(["olx", () => runOlxMonitor(olxMaxPerCpu), true]);
     else console.log("OLX pulado nesta rodada.");
     if (!onlyOlx && !skipEnjoei) {
-      jobs.push(["enjoei-tenis", runScript("monitor-enjoei-tenis.mjs", [])]);
-      jobs.push(["enjoei-notebooks", runScript("monitor-enjoei-notebooks.mjs", [])]);
+      jobs.push(["enjoei-tenis", () => runScript("monitor-enjoei-tenis.mjs", []), false]);
+      jobs.push(["enjoei-notebooks", () => runScript("monitor-enjoei-notebooks.mjs", []), false]);
     }
     // Dockstations combina OLX (Playwright) + Enjoei (API) num único script e
     // trata falhas de cada fonte internamente, então roda independente dos flags
     // only-olx/skip-enjoei (assim funciona tanto no Task Scheduler local quanto no CI).
-    if (!skipDockstations) jobs.push(["dockstations", runScript("monitor-dockstations.mjs", [])]);
-    if (!skipFitbit) jobs.push(["fitbit", runScript("monitor-fitbit.mjs", [])]);
-    if (!skipLifefactory) jobs.push(["lifefactory", runScript("monitor-lifefactory.mjs", [])]);
-    if (!skipTelaBook3) jobs.push(["tela-book3", runScript("monitor-tela-galaxybook3.mjs", [])]);
-    if (!skipMelanger) jobs.push(["melanger", runScript("monitor-melanger.mjs", [])]);
-    if (!skipBuds4Pro) jobs.push(["buds4-pro", runScript("monitor-galaxy-buds4-pro.mjs", [])]);
-    if (!skipOura) jobs.push(["oura", runScript("monitor-oura-ring5.mjs", [])]);
-    if (!skipOledMonitores) jobs.push(["oled-monitores", runScript("monitor-oled-monitores.mjs", [])]);
+    if (!skipDockstations) jobs.push(["dockstations", () => runScript("monitor-dockstations.mjs", []), true]);
+    if (!skipFitbit) jobs.push(["fitbit", () => runScript("monitor-fitbit.mjs", []), true]);
+    if (!skipLifefactory) jobs.push(["lifefactory", () => runScript("monitor-lifefactory.mjs", []), true]);
+    if (!skipTelaBook3) jobs.push(["tela-book3", () => runScript("monitor-tela-galaxybook3.mjs", []), true]);
+    if (!skipMelanger) jobs.push(["melanger", () => runScript("monitor-melanger.mjs", []), true]);
+    if (!skipBuds4Pro) jobs.push(["buds4-pro", () => runScript("monitor-galaxy-buds4-pro.mjs", []), true]);
+    if (!skipOura) jobs.push(["oura", () => runScript("monitor-oura-ring5.mjs", []), true]);
+    if (!skipOledMonitores) jobs.push(["oled-monitores", () => runScript("monitor-oled-monitores.mjs", []), true]);
     // Mercado Livre NÃO roda aqui: é desacoplado do fluxo do OLX/Enjoei (que
     // espera todos os jobs antes de publicar). O ML é pesado/lento e roda sob
     // demanda via `npm run monitor:mercadolivre` ou o atalho da barra de tarefas
     // (run-mercadolivre-and-publish.ps1), que coleta e publica por conta própria.
 
-    const results = await Promise.allSettled(jobs.map(([, promise]) => promise));
+    const results = await runJobsWithBrowserLimit(jobs, browserJobConcurrency);
     for (let i = 0; i < jobs.length; i += 1) {
       const [name] = jobs[i];
       const result = results[i];
@@ -327,6 +336,47 @@ async function writeDeliveryStatus(status) {
   } catch (err) {
     console.warn(`Não consegui gravar status de entrega: ${err.message}`);
   }
+}
+
+// ── concorrência ─────────────────────────────────────────────────────────────
+
+/**
+ * Roda `jobs` (tuplas [name, factory, isBrowserJob]) preservando a semântica de
+ * Promise.allSettled (array de {status, reason?} na ordem original), mas limita
+ * quantos jobs marcados `isBrowserJob` (cada um abre seu próprio Chromium) rodam
+ * ao mesmo tempo. Jobs não marcados (Enjoei via API, sem Chrome) disparam de
+ * imediato, sem entrar na fila.
+ */
+async function runJobsWithBrowserLimit(jobs, limit) {
+  const results = new Array(jobs.length);
+  const settle = async (index, factory) => {
+    try {
+      await factory();
+      results[index] = { status: "fulfilled" };
+    } catch (reason) {
+      results[index] = { status: "rejected", reason };
+    }
+  };
+
+  const immediate = [];
+  const browserQueue = [];
+  jobs.forEach(([, factory, isBrowserJob], index) => {
+    if (isBrowserJob) browserQueue.push(index);
+    else immediate.push(settle(index, factory));
+  });
+
+  let nextQueueIndex = 0;
+  const worker = async () => {
+    while (nextQueueIndex < browserQueue.length) {
+      const index = browserQueue[nextQueueIndex];
+      nextQueueIndex += 1;
+      await settle(index, jobs[index][1]);
+    }
+  };
+  const workers = Array.from({ length: Math.min(limit, browserQueue.length) }, worker);
+
+  await Promise.all([...immediate, ...workers]);
+  return results;
 }
 
 // ── scripts ───────────────────────────────────────────────────────────────────
