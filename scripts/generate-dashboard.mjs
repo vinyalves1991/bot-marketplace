@@ -619,10 +619,10 @@ h1{font-size:1.3rem;color:#f0f6fc;margin-bottom:5px}
   <a class="trig" href="https://github.com/${REPO}/actions/workflows/monitor.yml" target="_blank" rel="noopener noreferrer" title="Abre a página do workflow no GitHub Actions — clique em &quot;Run workflow&quot; para disparar a coleta Enjoei (nuvem)">
     ▶ Disparar Enjoei <span class="tip">(GitHub Actions)</span>
   </a>
-  <button type="button" class="trig" onclick="copyTrigger(this,'node scripts/run-monitors-and-notify.mjs --only-olx')" title="Copia o comando PowerShell para rodar o OLX localmente (não roda em CI)">
+  <button type="button" class="trig" onclick="copyTrigger(this,'cd C:\\Users\\docra\\Downloads\\olx-daily; node scripts\\run-monitors-and-notify.mjs --only-olx')" title="Copia o comando PowerShell (com cd para a pasta do repo) para rodar o OLX localmente (não roda em CI)">
     ▶ Disparar OLX <span class="tip">(copia comando local)</span>
   </button>
-  <button type="button" class="trig" onclick="copyTrigger(this,'.\\scripts\\run-mercadolivre-and-publish.ps1')" title="Copia o comando PowerShell para rodar o Mercado Livre localmente (usa perfil autenticado do navegador)">
+  <button type="button" class="trig" onclick="copyTrigger(this,'cd C:\\Users\\docra\\Downloads\\olx-daily; .\\scripts\\run-mercadolivre-and-publish.ps1')" title="Copia o comando PowerShell (com cd para a pasta do repo) para rodar o Mercado Livre localmente (usa perfil autenticado do navegador)">
     ▶ Disparar Mercado Livre <span class="tip">(copia comando local)</span>
   </button>
 </div>
