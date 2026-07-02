@@ -1,0 +1,40 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-07-02T19:00:02.398Z",
+  "run": {
+    "date": "2026-07-02",
+    "timezone": "America/Sao_Paulo",
+    "id": "fitbit-air",
+    "label": "Fitbit Air",
+    "partial": false,
+    "errors": [],
+    "scheduled_coverage": [
+      "Enjoei:fitbit air",
+      "OLX:fitbit air"
+    ],
+    "successful_coverage": [
+      "Enjoei:fitbit air",
+      "OLX:fitbit air"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "Enjoei:fitbit air",
+      "OLX:fitbit air"
+    ]
+  },
+  "filters": {
+    "price_brl": {
+      "min": 300,
+      "max": 600
+    },
+    "size_ml": {
+      "min": null,
+      "max": null
+    }
+  },
+  "items": [],
+  "price_range_brl": {
+    "min": 300,
+    "max": 600
+  }
+}

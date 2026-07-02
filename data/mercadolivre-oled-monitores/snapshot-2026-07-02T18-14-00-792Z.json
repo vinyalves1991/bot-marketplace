@@ -1,0 +1,320 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-07-02T18:14:00.792Z",
+  "run": {
+    "date": "2026-07-02",
+    "timezone": "America/Sao_Paulo",
+    "id": "oled-monitores",
+    "label": "Monitores OLED",
+    "started_at": "2026-07-02T18:01:30.899Z",
+    "completed_at": "2026-07-02T18:14:00.792Z",
+    "partial": false,
+    "aborted": false,
+    "successful_terms": [
+      "aw2726dm",
+      "aw2725d",
+      "aw2725df",
+      "aw3225qf",
+      "aw3423dw",
+      "aw3423dwf",
+      "aw3425dw",
+      "odyssey g5 oled",
+      "odyssey g6 oled",
+      "ls32dg800",
+      "odyssey g9 oled",
+      "cepheus p1",
+      "mag 271qp",
+      "mag 274qp",
+      "mpg 491cqp",
+      "27gx790a",
+      "27gx704a",
+      "xg27acdng"
+    ],
+    "scheduled_terms": [
+      "aw2726dm",
+      "aw2725d",
+      "aw2725df",
+      "aw3225qf",
+      "aw3423dw",
+      "aw3423dwf",
+      "aw3425dw",
+      "odyssey g5 oled",
+      "odyssey g6 oled",
+      "ls32dg800",
+      "odyssey g9 oled",
+      "cepheus p1",
+      "mag 271qp",
+      "mag 274qp",
+      "mpg 491cqp",
+      "27gx790a",
+      "27gx704a",
+      "xg27acdng"
+    ],
+    "configured_terms": [
+      "aw2726dm",
+      "aw2725d",
+      "aw2725df",
+      "aw3225qf",
+      "aw3423dw",
+      "aw3423dwf",
+      "aw3425dw",
+      "odyssey g5 oled",
+      "odyssey g6 oled",
+      "ls32dg800",
+      "odyssey g9 oled",
+      "cepheus p1",
+      "mag 271qp",
+      "mag 274qp",
+      "mpg 491cqp",
+      "27gx790a",
+      "27gx704a",
+      "xg27acdng"
+    ],
+    "failed_terms": [],
+    "scheduled_coverage": [
+      "aw2726dm",
+      "aw2725d",
+      "aw2725df",
+      "aw3225qf",
+      "aw3423dw",
+      "aw3423dwf",
+      "aw3425dw",
+      "odyssey g5 oled",
+      "odyssey g6 oled",
+      "ls32dg800",
+      "odyssey g9 oled",
+      "cepheus p1",
+      "mag 271qp",
+      "mag 274qp",
+      "mpg 491cqp",
+      "27gx790a",
+      "27gx704a",
+      "xg27acdng"
+    ],
+    "successful_coverage": [
+      "aw2726dm",
+      "aw2725d",
+      "aw2725df",
+      "aw3225qf",
+      "aw3423dw",
+      "aw3423dwf",
+      "aw3425dw",
+      "odyssey g5 oled",
+      "odyssey g6 oled",
+      "ls32dg800",
+      "odyssey g9 oled",
+      "cepheus p1",
+      "mag 271qp",
+      "mag 274qp",
+      "mpg 491cqp",
+      "27gx790a",
+      "27gx704a",
+      "xg27acdng"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "aw2726dm",
+      "aw2725d",
+      "aw2725df",
+      "aw3225qf",
+      "aw3423dw",
+      "aw3423dwf",
+      "aw3425dw",
+      "odyssey g5 oled",
+      "odyssey g6 oled",
+      "ls32dg800",
+      "odyssey g9 oled",
+      "cepheus p1",
+      "mag 271qp",
+      "mag 274qp",
+      "mpg 491cqp",
+      "27gx790a",
+      "27gx704a",
+      "xg27acdng"
+    ]
+  },
+  "filters": {
+    "collection_price_brl": {
+      "min": 0,
+      "max": 3000
+    },
+    "display_price_brl": {
+      "min": 0,
+      "max": 3000
+    }
+  },
+  "items": [
+    {
+      "title": "Base Suporte Para Monitor Dell Alienware Aw2725df",
+      "url": "https://www.mercadolivre.com.br/base-suporte-para-monitor-dell-alienware-aw2725df/up/MLBU3510845555?pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-3000#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=1&type=product&float_highlight=last_units&tracking_id=419fa54f-02e1-409a-a9b1-f2e2c41dfb3a&wid=MLB4271951323&sid=search",
+      "price_brl": 89.99,
+      "id": "MLB4271951323",
+      "source": "Mercado Livre",
+      "terms": [
+        "aw2725df"
+      ],
+      "status": "active",
+      "condition": "Novo",
+      "specs": [
+        "Marca: Dell Alienware",
+        "Modelo: AW2725DF",
+        "Com portas USB: Não"
+      ],
+      "description": "ATENÇÃO: PRODUTO PODE CONTER PEQUENAS MARCAS DE USO, NO ENTANTO, ESTA EM PERFEITO ESTADO DE FUNCIONAMENTO!!! A base do monitor foi projetada para oferecer suporte ergonômico completo, permitindo que você configure a tela para o seu conforto. Ajuste de altura: A base permite ajustar a altura em até 110 mm. Ajuste de inclinação: É possível inclinar a tela entre -5° e 21°. Ajuste de rotação (swivel): A base permite girar a tela em um ângulo de +/- 20°. Giro (pivot): O monitor pode ser girado em 90° em qualquer direção (modo retrato ou paisagem). Compatibilidade VESA: A base pode ser removida para usar um suporte de terceiros, com compatibilidade para o padrão VESA de 100 mm x 100 mm Sem garantia",
+      "details_checked_at": "2026-07-02T18:12:24.940Z",
+      "first_seen": "2026-07-02",
+      "last_seen": "2026-07-02",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-07-02T18:14:00.792Z",
+          "price_brl": 89.99
+        }
+      ]
+    },
+    {
+      "title": "Placa T-con P/ Monitor Alienware Aw2725df 24_mqbtpo_mv0.1hf",
+      "url": "https://www.mercadolivre.com.br/placa-t-con-p-monitor-alienware-aw2725df-24mqbtpomv01hf/p/MLB2076008283?pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-3000#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=2&type=product&tracking_id=419fa54f-02e1-409a-a9b1-f2e2c41dfb3a&wid=MLB4480310173&sid=search",
+      "price_brl": 390,
+      "id": "MLB4480310173",
+      "source": "Mercado Livre",
+      "terms": [
+        "aw2725df"
+      ],
+      "status": "active",
+      "condition": "Novo",
+      "specs": [
+        "Marca: Dell",
+        "Modelo: AW2725DF 24_MQBTPO_MV0.1HF",
+        "Modelo de TV compatível: Alienware AW2725DF"
+      ],
+      "description": "Placa T-Con para Monitor Alienware AW2725DF ? Modelo 24_MQBTPO_MV0.1HF Placa T-Con (Timing Controller) de reposição compatível com o monitor Alienware AW2725DF, modelo 24_MQBTPO_MV0.1HF. Responsável pelo controle e sincronização do painel de vídeo, esta placa é indicada para substituição de unidades defeituosas que apresentam problemas como imagem com linhas, tela sem vídeo, cores distorcidas ou sincronismo irregular. Produto ideal para técnicos e usuários que desejam restaurar a funcionalidade do monitor sem a necessidade de troca completa do equipamento. Especificações principais: Compatível com: Monitor Alienware AW2725DF Modelo da placa: 24_MQBTPO_MV0.1HF Função: T-Con (Timing Controller) Aplicação: Reposição de peças defeituosas Condição: (Informe se é novo, usado ou testado, conforme o caso) Indicações de uso: Solução para monitores com falhas de imagem Reparos profissionais ou manutenção técnica Peça original ou compatível de alta qualidade Antes de comprar, confirme o modelo exato do seu monitor para garantir a compatibilidade.",
+      "details_checked_at": "2026-07-02T18:12:59.909Z",
+      "first_seen": "2026-07-02",
+      "last_seen": "2026-07-02",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-07-02T18:14:00.792Z",
+          "price_brl": 390
+        }
+      ]
+    },
+    {
+      "title": "Base Suporte Para Monitor Alienware Aw3225qf (Usado)",
+      "url": "https://www.mercadolivre.com.br/base-suporte-para-monitor-alienware-aw3225qf/up/MLBU3812087068?pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-3000#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=15&type=product&tracking_id=83ee22b5-7d19-4ebf-a168-72449f421c3c&wid=MLB6291355430&sid=search",
+      "price_brl": 149.9,
+      "id": "MLB6291355430",
+      "source": "Mercado Livre",
+      "terms": [
+        "aw3225qf"
+      ],
+      "status": "active",
+      "condition": "Usado",
+      "specs": [
+        "Marca: MATC",
+        "Modelo: Alienware AW3225QF",
+        "Com portas USB: Não"
+      ],
+      "description": "PEÇA ORIGINAL DELL – MODELO: Alienware AW3225QF SOBRE O PRODUTO – Produto Usado; – Testado e 100% funcional; – Ideal para reposição técnica com qualidade garantida; – Enviado conforme as imagens do anúncio; – Pode conter pequenas marcas. INFORMAÇÕES TÉCNICAS – Marca: Dell Alienware; – Cor: Branco; – Tipo de Aplicação: Monitor; - Modelos compatíveis: - AW3225QF GARANTIA E DOCUMENTAÇÃO - Garantia do vendedor: 90 dias contra defeitos de funcionamento; - Produto embalado com segurança e proteção adequada para envio; - Produto disponível para envio imediato. ATENDIMENTO E DÚVIDAS - Tire todas as suas dúvidas antes de finalizar a compra; - Nosso atendimento está pronto para auxiliar com compatibilidade e instalação. - ATENÇÃO: Compare sempre o seu produto físico com as fotos do anúncio. Anunciado por MC Sem garantia",
+      "details_checked_at": "2026-07-02T18:13:31.974Z",
+      "first_seen": "2026-07-02",
+      "last_seen": "2026-07-02",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-07-02T18:14:00.792Z",
+          "price_brl": 149.9
+        }
+      ]
+    },
+    {
+      "title": "Adaptador Vesa Monitor Samsung Odyssey G9 Oled Sem Furação",
+      "url": "https://www.mercadolivre.com.br/adaptador-vesa-monitor-samsung-odyssey-g9-oled-sem-furacao/up/MLBU3489512577?pdp_filters=price%3A*-3000%7CSHIPPING_ORIGIN%3A10215068#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=1&type=product&tracking_id=77b68363-652e-4627-8e6d-1ee2be8e098a&wid=MLB5806720410&sid=search",
+      "price_brl": 224.9,
+      "id": "MLB5806720410",
+      "source": "Mercado Livre",
+      "terms": [
+        "odyssey g9 oled"
+      ],
+      "status": "active",
+      "condition": "Novo",
+      "specs": [
+        "Marca: VESAFIX",
+        "Modelo: ABC-1045"
+      ],
+      "description": "A ABC SUPORTES trabalha apenas com Produtos NOVOS, ORIGINAIS e a PRONTA ENTREGA. Todos os nossos produtos são enviados com NOTA FISCAL e possuem GARANTIA de Fábrica ou do Vendedor. Descrição: Adaptador Vesa Monitor SAMSUNG ODYSSEY G9 OLED Sem Furação Vesa Cor: Preto Modelo: ABC-1045 Marca: Vesafix Garantia: 01 ano Dimensões da Embalagem (A x L x P): 4 cm x 15 cm x 17 cm Peso com Embalagem: 0,420 kg Peso do Produto: 0,375 kg Itens por Caixa: 01 unidade Conteúdo da Embalagem: 01 Placa do Adaptador, 01 Encaixe do Monitor e 01 Kit de Parafusos. Prazo de validade: Indeterminado Composição: Aço Carbono e Plástico PLA. - Produto com Excelente qualidade e 100% Nacional; - Design Exclusivo; - Fácil e Prático de Instalar; - Suporte RESISTENTE; - Pintura Epoxi MicroTexturizada (Eletrostática). Padrão Vesa: 100 x 100mm Atenção: Este Adaptador é utilizado apenas para Monitor Samsung G9 OLED 49 Polegadas LS49CG930SLMZD, verifique o modelo de encaixe do seu monitor conforme imagens do anúncio. Importante: Necessita o uso de Suporte (não incluso). Kit de Parafusos: 04 Parafuso Francês com Porca 04 Parafuso Philips com Porca 04 Arruela de Plástico 04 Arruela de Aço Caso ainda tenha alguma dúvida nos envie uma mensagem. Garantia do vendedor: 12 meses",
+      "details_checked_at": "2026-07-02T18:14:00.547Z",
+      "first_seen": "2026-07-02",
+      "last_seen": "2026-07-02",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-07-02T18:14:00.792Z",
+          "price_brl": 224.9
+        }
+      ]
+    },
+    {
+      "title": "Adaptador Vesa Monitor Samsung Odyssey G9 Oled Sem Furação",
+      "url": "https://www.mercadolivre.com.br/adaptador-vesa-monitor-samsung-odyssey-g9-oled-sem-furacao/up/MLBU3496452424?pdp_filters=price%3A*-3000%7CSHIPPING_ORIGIN%3A10215068#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=2&type=product&tracking_id=77b68363-652e-4627-8e6d-1ee2be8e098a&wid=MLB5806539884&sid=search",
+      "price_brl": 224.9,
+      "id": "MLB5806539884",
+      "source": "Mercado Livre",
+      "terms": [
+        "odyssey g9 oled"
+      ],
+      "status": "active",
+      "first_seen": "2026-07-02",
+      "last_seen": "2026-07-02",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-07-02T18:14:00.792Z",
+          "price_brl": 224.9
+        }
+      ]
+    },
+    {
+      "title": "Cabo Força Orig 27gx704a 27gx790a 27gx790b 27qn880 28lj720b",
+      "url": "https://www.mercadolivre.com.br/cabo-forca-orig-27gx704a-27gx790a-27gx790b-27qn880-28lj720b/up/MLBU3759260167?pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-3000#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=12&type=product&tracking_id=cd3dc957-646b-4fe2-8d06-2cd0e2107119&wid=MLB6211071014&sid=search",
+      "price_brl": 78.99,
+      "id": "MLB6211071014",
+      "source": "Mercado Livre",
+      "terms": [
+        "27gx790a",
+        "27gx704a"
+      ],
+      "status": "active",
+      "first_seen": "2026-07-02",
+      "last_seen": "2026-07-02",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-07-02T18:14:00.792Z",
+          "price_brl": 78.99
+        }
+      ]
+    },
+    {
+      "title": "Fonte Externa Monitor Lg 27gr95qe 27gx704a 34uc98",
+      "url": "https://www.mercadolivre.com.br/fonte-externa-monitor-lg-27gr95qe-27gx704a-34uc98/up/MLBU3843953852?pdp_filters=SHIPPING_ORIGIN%3A10215068%7Cprice%3A*-3000#polycard_client=search-desktop&be_origin=backend&search_layout=grid&position=23&type=product&tracking_id=7c291d78-74c9-4828-93a2-9f21a2a8127f&wid=MLB6442322224&sid=search",
+      "price_brl": 231.17,
+      "id": "MLB6442322224",
+      "source": "Mercado Livre",
+      "terms": [
+        "27gx704a"
+      ],
+      "status": "active",
+      "first_seen": "2026-07-02",
+      "last_seen": "2026-07-02",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-07-02T18:14:00.792Z",
+          "price_brl": 231.17
+        }
+      ]
+    }
+  ]
+}
