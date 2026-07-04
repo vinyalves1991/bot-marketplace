@@ -1,0 +1,40 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-07-04T10:00:13.147Z",
+  "run": {
+    "date": "2026-07-04",
+    "timezone": "America/Sao_Paulo",
+    "id": "melanger",
+    "label": "Melanger",
+    "partial": false,
+    "errors": [],
+    "scheduled_coverage": [
+      "Enjoei:melanger",
+      "OLX:melanger"
+    ],
+    "successful_coverage": [
+      "Enjoei:melanger",
+      "OLX:melanger"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "Enjoei:melanger",
+      "OLX:melanger"
+    ]
+  },
+  "filters": {
+    "price_brl": {
+      "min": 1000,
+      "max": 5000
+    },
+    "size_ml": {
+      "min": null,
+      "max": null
+    }
+  },
+  "items": [],
+  "price_range_brl": {
+    "min": 1000,
+    "max": 5000
+  }
+}
