@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-07-06T19:00:02.532Z",
+  "run": {
+    "date": "2026-07-06",
+    "timezone": "America/Sao_Paulo",
+    "id": "dockstations",
+    "label": "Dockstations",
+    "partial": false,
+    "errors": [],
+    "scheduled_coverage": [
+      "Enjoei:SD25TB4",
+      "Enjoei:WD22TB4",
+      "OLX:SD25TB4",
+      "OLX:WD22TB4"
+    ],
+    "successful_coverage": [
+      "Enjoei:SD25TB4",
+      "Enjoei:WD22TB4",
+      "OLX:SD25TB4",
+      "OLX:WD22TB4"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "Enjoei:SD25TB4",
+      "Enjoei:WD22TB4",
+      "OLX:SD25TB4",
+      "OLX:WD22TB4"
+    ]
+  },
+  "filters": {
+    "price_brl": {
+      "min": 0,
+      "max": 500
+    },
+    "size_ml": {
+      "min": null,
+      "max": null
+    }
+  },
+  "items": [
+    {
+      "id": "1495818840",
+      "url": "https://pr.olx.com.br/regiao-de-maringa/informatica/perifericos-de-computador/lenovo-thinkpad-universal-usb-c-dock-40ay0090br-novo-nota-fiscal-1495818840",
+      "title": "Lenovo Thinkpad Universal Usb C Dock 40ay0090br Novo Nota Fiscal",
+      "source": "OLX",
+      "term": "40AY0090BR",
+      "price_brl": 500,
+      "location": "Maringá -  PR",
+      "status": "out_of_scope",
+      "first_seen": "2026-06-29",
+      "last_seen": "2026-06-29",
+      "out_of_scope_at": "2026-06-29T19:00:58.612Z",
+      "price_history": [
+        {
+          "at": "2026-06-29T00:16:42.172Z",
+          "price_brl": 500
+        }
+      ]
+    }
+  ],
+  "price_range_brl": {
+    "min": 0,
+    "max": 500
+  }
+}

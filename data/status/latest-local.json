@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-07-05T19:00:02.965Z",
+  "generated_at": "2026-07-06T19:00:01.962Z",
   "source": "local",
   "delivery": {
-    "email": "skipped",
+    "email": "sent",
     "whatsapp": "sent"
   },
   "pending_failures": [],
@@ -14,6 +14,6 @@
     "c86917d2-3ba7-4d07-89d0-b46ffbb7f212",
     "9afc0a68-4804-4db2-af9a-373c18a9a0e8"
   ],
-  "email": "skipped",
+  "email": "sent",
   "whatsapp": "sent"
 }
