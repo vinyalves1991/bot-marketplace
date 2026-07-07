@@ -20,7 +20,6 @@ runWatchlistMonitor({
     "aw3423dwf",
     "aw3425dw",
     // Samsung Odyssey OLED
-    "odyssey g5 oled",
     "odyssey g6 oled",
     "ls32dg800",      // Odyssey G8 OLED (modelo LS32DG800*)
     "odyssey g9 oled",
@@ -36,7 +35,7 @@ runWatchlistMonitor({
     // Asus
     "xg27acdng",
   ],
-  minPrice: 0,
+  minPrice: 1500,
   maxPrice: 3000,
   olxDeliveryOnly: true,
 }).catch((error) => {

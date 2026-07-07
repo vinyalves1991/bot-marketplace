@@ -27,7 +27,7 @@ const MERCADOLIVRE_WATCHLISTS = [
   ["Tela Book3", "Mercado Livre Tela Galaxy Book3", "BA96-08462A · até R$ 1.000", "mercadolivre-tela-galaxybook3"],
   ["Melanger", "Mercado Livre Melanger", "110/127V · R$ 1.000 - R$ 5.000", "mercadolivre-melanger"],
   ["Tênis 42", "Mercado Livre Tênis 42", "masculino · tamanho 42 · até R$ 500", "mercadolivre-tenis-42"],
-  ["Monitores OLED", "Mercado Livre Monitores OLED", "até R$ 3.000", "mercadolivre-oled-monitores"],
+  ["Monitores OLED", "Mercado Livre Monitores OLED", "R$ 1.500 – R$ 3.000", "mercadolivre-oled-monitores"],
 ];
 const OUTPUT = path.join(ROOT, "index.html");
 const REPO = "almeida3339/olx-daily";
@@ -503,7 +503,7 @@ function buildHtml({ olx, enjoeiNb, mercadoLivre, mercadoLivreWatchlists, enjoei
     { chip: "Melanger",         title: "Melanger",          sub: "110V · OLX + Enjoei · R$ 1.000 – R$ 5.000",    data: melanger,    dpath: "data/melanger",         upd: melangerUpdated },
     { chip: "Galaxy Buds4 Pro", title: "Galaxy Buds4 Pro",  sub: "OLX + Enjoei · R$ 500 – R$ 1.000",             data: buds4Pro,    dpath: "data/galaxy-buds4-pro", upd: buds4ProUpdated },
     { chip: "Oura Ring 5",      title: "Oura Ring 5",       sub: "OLX + Enjoei · tam 9-11 · R$ 1.800 – R$ 2.700",data: oura,           dpath: "data/oura-ring5",         upd: ouraUpdated },
-    { chip: "Monitores OLED",   title: "Monitores OLED",    sub: "OLX c/ entrega + Enjoei · até R$ 3.000",        data: oledMonitores,  dpath: "data/oled-monitores",     upd: oledMonitoresUpdated },
+    { chip: "Monitores OLED",   title: "Monitores OLED",    sub: "OLX c/ entrega + Enjoei · R$ 1.500 – R$ 3.000", data: oledMonitores,  dpath: "data/oled-monitores",     upd: oledMonitoresUpdated },
   ];
 
   // Ordenação e data do card vêm do ÚLTIMO ACHADO (report com novidade), não da
