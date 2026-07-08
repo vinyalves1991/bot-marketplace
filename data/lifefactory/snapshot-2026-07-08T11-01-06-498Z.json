@@ -1,0 +1,58 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-07-08T11:01:06.498Z",
+  "run": {
+    "date": "2026-07-08",
+    "timezone": "UTC",
+    "id": "lifefactory",
+    "label": "Lifefactory",
+    "partial": true,
+    "errors": [],
+    "scheduled_coverage": [
+      "Enjoei:lifefactory"
+    ],
+    "successful_coverage": [
+      "Enjoei:lifefactory"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "Enjoei:lifefactory",
+      "OLX:lifefactory"
+    ]
+  },
+  "filters": {
+    "price_brl": {
+      "min": 25,
+      "max": 75
+    },
+    "size_ml": {
+      "min": 500,
+      "max": 1000
+    }
+  },
+  "items": [
+    {
+      "id": "enjoei-143172452",
+      "url": "https://www.enjoei.com.br/p/garrafa-life-factory-pink-500-ml-143172452",
+      "title": "garrafa life factory pink 500 ml",
+      "source": "Enjoei",
+      "term": "lifefactory",
+      "price_brl": 60,
+      "store_name": "Melissa",
+      "status": "active",
+      "first_seen": "2026-06-04",
+      "last_seen": "2026-07-08",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-07-04T10:00:08.441Z",
+          "price_brl": 60
+        }
+      ]
+    }
+  ],
+  "price_range_brl": {
+    "min": 25,
+    "max": 75
+  }
+}
