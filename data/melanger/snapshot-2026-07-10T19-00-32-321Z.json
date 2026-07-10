@@ -1,0 +1,43 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-07-10T19:00:32.321Z",
+  "run": {
+    "date": "2026-07-10",
+    "timezone": "America/Sao_Paulo",
+    "id": "melanger",
+    "label": "Melanger",
+    "partial": true,
+    "errors": [
+      "OLX termo \"melanger\" falhou"
+    ],
+    "scheduled_coverage": [
+      "Enjoei:melanger",
+      "OLX:melanger"
+    ],
+    "successful_coverage": [
+      "Enjoei:melanger"
+    ],
+    "failed_coverage": [
+      "OLX:melanger"
+    ],
+    "configured_coverage": [
+      "Enjoei:melanger",
+      "OLX:melanger"
+    ]
+  },
+  "filters": {
+    "price_brl": {
+      "min": 1000,
+      "max": 5000
+    },
+    "size_ml": {
+      "min": null,
+      "max": null
+    }
+  },
+  "items": [],
+  "price_range_brl": {
+    "min": 1000,
+    "max": 5000
+  }
+}
