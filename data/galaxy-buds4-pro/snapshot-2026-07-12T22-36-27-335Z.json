@@ -1,0 +1,279 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-07-12T22:36:27.335Z",
+  "run": {
+    "date": "2026-07-12",
+    "timezone": "UTC",
+    "id": "galaxy-buds4-pro",
+    "label": "Galaxy Buds4 Pro",
+    "partial": true,
+    "errors": [],
+    "scheduled_coverage": [
+      "Enjoei:galaxy buds4 pro"
+    ],
+    "successful_coverage": [
+      "Enjoei:galaxy buds4 pro"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "Enjoei:galaxy buds4 pro",
+      "OLX:galaxy buds4 pro"
+    ]
+  },
+  "filters": {
+    "price_brl": {
+      "min": 500,
+      "max": 1000
+    },
+    "size_ml": {
+      "min": null,
+      "max": null
+    }
+  },
+  "items": [
+    {
+      "id": "1515158770",
+      "url": "https://rs.olx.com.br/regioes-de-porto-alegre-torres-e-santa-cruz-do-sul/audio/fones-de-ouvido/galaxy-buds-4-pro-1515158770",
+      "title": "Galaxy Buds 4 Pro",
+      "source": "OLX",
+      "term": "galaxy buds4 pro",
+      "price_brl": 1000,
+      "location": "Porto Alegre -  RS",
+      "status": "not_seen",
+      "first_seen": "2026-07-03",
+      "last_seen": "2026-07-04",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-07-03T11:10:47.545Z",
+          "price_brl": 1000
+        }
+      ]
+    },
+    {
+      "id": "1515441717",
+      "url": "https://pr.olx.com.br/regiao-de-maringa/audio/fones-de-ouvido/galaxy-buds4-pro-1515441717",
+      "title": "Galaxy Buds4 Pro",
+      "source": "OLX",
+      "term": "galaxy buds4 pro",
+      "price_brl": 930,
+      "location": "Maringá -  PR",
+      "status": "not_seen",
+      "first_seen": "2026-07-04",
+      "last_seen": "2026-07-04",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-07-04T10:00:15.648Z",
+          "price_brl": 930
+        }
+      ]
+    },
+    {
+      "id": "1514634551",
+      "url": "https://pr.olx.com.br/regiao-de-maringa/audio/fones-de-ouvido/galaxy-buds4-pro-1514634551",
+      "title": "Galaxy Buds4 Pro",
+      "source": "OLX",
+      "term": "galaxy buds4 pro",
+      "price_brl": 969,
+      "location": "Maringá -  PR",
+      "status": "not_seen",
+      "first_seen": "2026-07-03",
+      "last_seen": "2026-07-03",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-07-03T11:10:47.545Z",
+          "price_brl": 969
+        }
+      ]
+    },
+    {
+      "id": "1515025151",
+      "url": "https://ce.olx.com.br/fortaleza-e-regiao/audio/fones-de-ouvido/galaxy-buds4-pro-lacrado-1515025151",
+      "title": "Galaxy Buds4 Pro Lacrado",
+      "source": "OLX",
+      "term": "galaxy buds4 pro",
+      "price_brl": 849,
+      "location": "Fortaleza -  CE",
+      "status": "not_seen",
+      "first_seen": "2026-07-03",
+      "last_seen": "2026-07-03",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-07-03T11:10:47.545Z",
+          "price_brl": 849
+        }
+      ]
+    },
+    {
+      "id": "1513681836",
+      "url": "https://pr.olx.com.br/regiao-de-maringa/audio/fones-de-ouvido/galaxy-buds4-pro-1513681836",
+      "title": "Galaxy Buds4 Pro",
+      "source": "OLX",
+      "term": "galaxy buds4 pro",
+      "price_brl": 999,
+      "location": "Maringá -  PR",
+      "status": "not_seen",
+      "first_seen": "2026-06-27",
+      "last_seen": "2026-06-30",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-27T10:00:03.530Z",
+          "price_brl": 999
+        }
+      ]
+    },
+    {
+      "id": "1514266714",
+      "url": "https://rs.olx.com.br/regioes-de-porto-alegre-torres-e-santa-cruz-do-sul/audio/fones-de-ouvido/galaxy-buds-4-pro-1514266714",
+      "title": "Galaxy Buds 4 Pro",
+      "source": "OLX",
+      "term": "galaxy buds4 pro",
+      "price_brl": 1000,
+      "location": "Porto Alegre -  RS",
+      "status": "not_seen",
+      "first_seen": "2026-06-30",
+      "last_seen": "2026-06-30",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-30T10:35:12.527Z",
+          "price_brl": 1000
+        }
+      ]
+    },
+    {
+      "id": "1513148074",
+      "url": "https://am.olx.com.br/regiao-de-manaus/audio/fones-de-ouvido/galaxy-buds-4-pro-fosco-1513148074",
+      "title": "Galaxy Buds 4 Pro Fosco",
+      "source": "OLX",
+      "term": "galaxy buds4 pro",
+      "price_brl": 750,
+      "location": "Manaus -  AM",
+      "status": "not_seen",
+      "first_seen": "2026-06-25",
+      "last_seen": "2026-06-26",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-25T10:00:02.969Z",
+          "price_brl": 750
+        }
+      ]
+    },
+    {
+      "id": "1512301049",
+      "url": "https://am.olx.com.br/regiao-de-manaus/audio/fones-de-ouvido/galaxy-buds-4-pro-rose-1512301049",
+      "title": "Galaxy Buds 4 PRO Rose",
+      "source": "OLX",
+      "term": "galaxy buds4 pro",
+      "price_brl": 900,
+      "location": "Manaus -  AM",
+      "status": "not_seen",
+      "first_seen": "2026-06-23",
+      "last_seen": "2026-06-26",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-23T11:04:53.839Z",
+          "price_brl": 900
+        }
+      ]
+    },
+    {
+      "id": "1512745503",
+      "url": "https://rj.olx.com.br/rio-de-janeiro-e-regiao/audio/fones-de-ouvido/galaxy-buds4-pro-1512745503",
+      "title": "Galaxy Buds4 Pro",
+      "source": "OLX",
+      "term": "galaxy buds4 pro",
+      "price_brl": 1000,
+      "location": "Rio de Janeiro -  RJ",
+      "status": "not_seen",
+      "first_seen": "2026-06-25",
+      "last_seen": "2026-06-25",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-25T10:00:02.969Z",
+          "price_brl": 1000
+        }
+      ]
+    },
+    {
+      "id": "1512843929",
+      "url": "https://ce.olx.com.br/fortaleza-e-regiao/audio/fones-de-ouvido/galaxy-buds-4-pro-novo-com-nf-1512843929",
+      "title": "Galaxy Buds 4 Pro Novo com NF",
+      "source": "OLX",
+      "term": "galaxy buds4 pro",
+      "price_brl": 850,
+      "location": "Fortaleza -  CE",
+      "status": "not_seen",
+      "first_seen": "2026-06-25",
+      "last_seen": "2026-06-25",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-25T10:00:02.969Z",
+          "price_brl": 850
+        }
+      ]
+    },
+    {
+      "id": "enjoei-145318064",
+      "url": "https://www.enjoei.com.br/p/fone-de-ouvido-samsung-galaxy-buds4-pro-145318064",
+      "title": "fone de ouvido samsung galaxy buds4 pro",
+      "source": "Enjoei",
+      "term": "galaxy buds4 pro",
+      "price_brl": 600,
+      "store_name": "Alcione",
+      "status": "not_seen",
+      "first_seen": "2026-06-24",
+      "last_seen": "2026-06-24",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-24T11:00:48.130Z",
+          "price_brl": 600
+        }
+      ]
+    },
+    {
+      "id": "enjoei-144874713",
+      "url": "https://www.enjoei.com.br/p/fone-de-ouvido-samsung-galaxy-buds4-pro-144874713",
+      "title": "fone de ouvido samsung galaxy buds4 pro",
+      "source": "Enjoei",
+      "term": "galaxy buds4 pro",
+      "price_brl": 600,
+      "store_name": "ticiane",
+      "status": "not_seen",
+      "first_seen": "2026-06-16",
+      "last_seen": "2026-06-17",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-16T19:01:00.404Z",
+          "price_brl": 600
+        }
+      ]
+    },
+    {
+      "id": "enjoei-144648647",
+      "url": "https://www.enjoei.com.br/p/fone-de-ouvido-samsung-galaxy-buds4-pro-144648647",
+      "title": "fone de ouvido samsung galaxy buds4 pro",
+      "source": "Enjoei",
+      "term": "galaxy buds4 pro",
+      "price_brl": 600,
+      "store_name": "Shayanna",
+      "status": "not_seen",
+      "first_seen": "2026-06-13",
+      "last_seen": "2026-06-13"
+    }
+  ],
+  "price_range_brl": {
+    "min": 500,
+    "max": 1000
+  }
+}

@@ -1,0 +1,384 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-07-12T12:00:00.000Z",
+  "run": {
+    "date": "2026-07-12",
+    "timezone": "UTC",
+    "partial": true,
+    "successful_term_count": 22,
+    "failed_term_count": 0,
+    "incomplete_term_count": 1,
+    "incomplete_coverage": [
+      "hx470"
+    ],
+    "scheduled_coverage": [
+      "9955hx3d",
+      "290hx",
+      "9955hx",
+      "285hx",
+      "275hx",
+      "aimax395",
+      "7945hx",
+      "7945hx3d",
+      "255hx",
+      "13980hx",
+      "8940hx",
+      "7940hx",
+      "13950hx",
+      "14900hx",
+      "13900hx",
+      "7845hx",
+      "8840hx",
+      "aimax390",
+      "14700hx",
+      "hx470",
+      "12900hx",
+      "12800hx"
+    ],
+    "successful_coverage": [
+      "9955hx3d",
+      "290hx",
+      "9955hx",
+      "285hx",
+      "275hx",
+      "aimax395",
+      "7945hx",
+      "7945hx3d",
+      "255hx",
+      "13980hx",
+      "8940hx",
+      "7940hx",
+      "13950hx",
+      "14900hx",
+      "13900hx",
+      "7845hx",
+      "8840hx",
+      "aimax390",
+      "14700hx",
+      "hx470",
+      "12900hx",
+      "12800hx"
+    ],
+    "failed_coverage": [
+      "hx470"
+    ],
+    "configured_coverage": [
+      "9955hx3d",
+      "290hx",
+      "9955hx",
+      "285hx",
+      "275hx",
+      "aimax395",
+      "7945hx",
+      "7945hx3d",
+      "255hx",
+      "13980hx",
+      "8940hx",
+      "7940hx",
+      "13950hx",
+      "14900hx",
+      "13900hx",
+      "7845hx",
+      "8840hx",
+      "aimax390",
+      "14700hx",
+      "hx470",
+      "12900hx",
+      "12800hx"
+    ]
+  },
+  "filters": {
+    "price_brl": {
+      "min": 1500,
+      "max": 8000
+    }
+  },
+  "items": [
+    {
+      "id": "143233627",
+      "url": "https://www.enjoei.com.br/p/notebook-premium-de-14-com-tela-oled-3-2k-ultra-7-255h-32gb-de-ram-e-1tb-de-ssd-143233627",
+      "title": "notebook premium de 14\" com tela oled 3.2k  ultra 7 255h, 32gb de ram e 1tb de ssd",
+      "brand": "dell",
+      "price_brl": 2961,
+      "original_price_brl": 3900,
+      "cpu": "Ultra 7 255H",
+      "ram_gb": 32,
+      "storage_gb": 1024,
+      "used": false,
+      "shipping_free": false,
+      "store_name": "",
+      "cpu_terms": [
+        "255hx"
+      ],
+      "status": "active",
+      "first_seen": "2026-05-27",
+      "last_seen": "2026-07-12",
+      "gpu": null,
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-17T12:00:00.000Z",
+          "price_brl": 3451
+        },
+        {
+          "at": "2026-06-22T12:00:00.000Z",
+          "price_brl": 3347
+        },
+        {
+          "at": "2026-06-27T12:00:00.000Z",
+          "price_brl": 3246
+        },
+        {
+          "at": "2026-07-02T12:00:00.000Z",
+          "price_brl": 3148
+        },
+        {
+          "at": "2026-07-07T12:00:00.000Z",
+          "price_brl": 3053
+        },
+        {
+          "at": "2026-07-12T12:00:00.000Z",
+          "price_brl": 2961
+        }
+      ]
+    },
+    {
+      "id": "145453110",
+      "url": "https://www.enjoei.com.br/p/strix-g-18-g814pm-s9010w-notebook-com-tela-de-18-polegadas-145453110",
+      "title": "strix g 18 g814pm-s9010w, notebook com tela de 18 polegadas",
+      "brand": "asus",
+      "price_brl": 5109,
+      "original_price_brl": 5109,
+      "cpu": "Ryzen 9 8940HX",
+      "ram_gb": 32,
+      "storage_gb": null,
+      "used": false,
+      "shipping_free": false,
+      "store_name": "IRENE",
+      "cpu_terms": [
+        "8940hx"
+      ],
+      "status": "active",
+      "first_seen": "2026-06-26",
+      "last_seen": "2026-07-12",
+      "gpu": null,
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-26T12:00:00.000Z",
+          "price_brl": 5109
+        }
+      ]
+    },
+    {
+      "id": "143242431",
+      "url": "https://www.enjoei.com.br/p/notebook-titan-autentico-novo-em-folha-ssd-de-4tb-64gb-de-ram-tela-17-3-4k-144hz-143242431",
+      "title": "notebook titan autêntico, novo em folha: ssd de 4tb, 64gb de ram, tela 17,3\" 4k 144hz",
+      "brand": "msi",
+      "price_brl": 5043,
+      "original_price_brl": 5199,
+      "cpu": "I9-13900HX",
+      "ram_gb": 64,
+      "storage_gb": 4096,
+      "used": false,
+      "shipping_free": false,
+      "store_name": "GERDERANE",
+      "cpu_terms": [
+        "13900hx"
+      ],
+      "status": "active",
+      "first_seen": "2026-05-27",
+      "last_seen": "2026-07-12",
+      "gpu": "UHD Graphics integrada",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-07-02T12:00:00.000Z",
+          "price_brl": 5043
+        }
+      ]
+    },
+    {
+      "id": "140828215",
+      "url": "https://www.enjoei.com.br/p/notebook-gamer-acer-predator-helios-neo-phn16-72-74vx-140828215",
+      "title": "notebook gamer acer predator helios neo / phn16-72-74vx",
+      "brand": "ácer",
+      "price_brl": 8000,
+      "original_price_brl": 8000,
+      "cpu": "I7-14700HX",
+      "ram_gb": null,
+      "storage_gb": 512,
+      "used": true,
+      "shipping_free": false,
+      "store_name": "sarah",
+      "cpu_terms": [
+        "14700hx"
+      ],
+      "status": "not_seen",
+      "first_seen": "2026-05-27",
+      "last_seen": "2026-07-03",
+      "gpu": "RTX 4070",
+      "out_of_scope_at": null,
+      "price_history": []
+    },
+    {
+      "id": "145497822",
+      "url": "https://www.enjoei.com.br/p/captiva-32gb-ram-gaming-de-alto-desempenho-notebook-145497822",
+      "title": "captiva 32gb ram, gaming de alto desempenho notebook",
+      "brand": "sem  marca",
+      "price_brl": 3700,
+      "original_price_brl": 3700,
+      "cpu": "Ryzen 9 9955HX",
+      "ram_gb": 32,
+      "storage_gb": 1024,
+      "used": false,
+      "shipping_free": false,
+      "store_name": "JOSE",
+      "cpu_terms": [
+        "9955hx"
+      ],
+      "status": "not_seen",
+      "first_seen": "2026-06-26",
+      "last_seen": "2026-06-30",
+      "gpu": "RTX 5080",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-26T12:00:00.000Z",
+          "price_brl": 3700
+        }
+      ]
+    },
+    {
+      "id": "145321602",
+      "url": "https://www.enjoei.com.br/p/notebook-legion-pro-7i-com-32-gb-de-ram-145321602",
+      "title": "notebook legion pro 7i com 32 gb de ram",
+      "brand": "lenovo",
+      "price_brl": 2696,
+      "original_price_brl": 2780,
+      "cpu": "I9-13900HX",
+      "ram_gb": 32,
+      "storage_gb": null,
+      "used": false,
+      "shipping_free": false,
+      "store_name": "ROSELI",
+      "cpu_terms": [
+        "13900hx"
+      ],
+      "status": "not_seen",
+      "first_seen": "2026-06-24",
+      "last_seen": "2026-06-30",
+      "gpu": null,
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-24T12:00:00.000Z",
+          "price_brl": 2780
+        },
+        {
+          "at": "2026-06-28T12:00:00.000Z",
+          "price_brl": 2696
+        }
+      ]
+    },
+    {
+      "id": "145434730",
+      "url": "https://www.enjoei.com.br/p/captiva-32gb-ram-gaming-de-alto-desempenho-notebook-145434730",
+      "title": "captiva 32gb ram, gaming de alto desempenho notebook",
+      "brand": "sem  marca",
+      "price_brl": 4325,
+      "original_price_brl": 4325,
+      "cpu": "Ryzen 9 9955HX",
+      "ram_gb": 32,
+      "storage_gb": 1024,
+      "used": false,
+      "shipping_free": false,
+      "store_name": "JOSE",
+      "cpu_terms": [
+        "9955hx"
+      ],
+      "status": "not_seen",
+      "first_seen": "2026-06-25",
+      "last_seen": "2026-06-25",
+      "gpu": "RTX 5080",
+      "out_of_scope_at": null,
+      "price_history": [
+        {
+          "at": "2026-06-25T12:00:00.000Z",
+          "price_brl": 4325
+        }
+      ]
+    },
+    {
+      "id": "144676648",
+      "url": "https://www.enjoei.com.br/p/strix-g-18-g814pm-s9010w-notebook-com-tela-de-18-polegadas-144676648",
+      "title": "strix g 18 g814pm-s9010w, notebook com tela de 18 polegadas",
+      "brand": "asus",
+      "price_brl": 6349,
+      "original_price_brl": 6349,
+      "cpu": "Ryzen 9 8940HX",
+      "ram_gb": 32,
+      "storage_gb": null,
+      "used": false,
+      "shipping_free": false,
+      "store_name": "IRENE",
+      "cpu_terms": [
+        "8940hx"
+      ],
+      "status": "not_seen",
+      "first_seen": "2026-06-14",
+      "last_seen": "2026-06-25",
+      "gpu": null,
+      "out_of_scope_at": null,
+      "price_history": []
+    },
+    {
+      "id": "143235809",
+      "url": "https://www.enjoei.com.br/p/notebook-pro-max-16-premium-intel-core-ultra-9-28h-64gb-ram-1tb-143235809",
+      "title": "notebook pro max 16 premium intel core ultra 9 28h 64gb ram 1tb",
+      "brand": "dell",
+      "price_brl": 4753,
+      "original_price_brl": 4900,
+      "cpu": "Ultra 9 285H",
+      "ram_gb": 64,
+      "storage_gb": 1024,
+      "used": false,
+      "shipping_free": false,
+      "store_name": "Mykaely",
+      "cpu_terms": [
+        "285hx"
+      ],
+      "status": "not_seen",
+      "first_seen": "2026-05-31",
+      "last_seen": "2026-06-16",
+      "gpu": null,
+      "out_of_scope_at": null,
+      "price_history": []
+    },
+    {
+      "id": "142077785",
+      "url": "https://www.enjoei.com.br/p/asus-16-rog-strix-g16-notebook-gamer-cinza-eclipse-142077785",
+      "title": "asus 16 rog strix g16 notebook gamer - cinza eclipse",
+      "brand": "asus",
+      "price_brl": 7500,
+      "original_price_brl": 7500,
+      "cpu": "Ultra 9 275HX",
+      "ram_gb": 32,
+      "storage_gb": 2048,
+      "used": false,
+      "shipping_free": false,
+      "store_name": "Juan",
+      "cpu_terms": [
+        "275hx"
+      ],
+      "status": "not_seen",
+      "first_seen": "2026-05-31",
+      "last_seen": "2026-06-13",
+      "gpu": "RTX 5070 TI"
+    }
+  ],
+  "price_range_brl": {
+    "min": 1500,
+    "max": 8000
+  }
+}
