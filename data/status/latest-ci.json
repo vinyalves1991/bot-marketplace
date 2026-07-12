@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-12T20:32:52.491Z",
+  "generated_at": "2026-07-12T21:38:52.944Z",
   "source": "ci",
   "delivery": {
     "email": "skipped",
@@ -21,9 +21,9 @@
       "fingerprint": "fp-2824dec66d8d917550a02df8",
       "channel": "whatsapp",
       "first_seen_at": "2026-07-12T20:32:52.491Z",
-      "last_seen_at": "2026-07-12T20:32:52.491Z",
+      "last_seen_at": "2026-07-12T21:38:52.944Z",
       "error": "CALLMEBOT_PHONE/CALLMEBOT_APIKEY não definidas",
-      "count": 1
+      "count": 2
     }
   ],
   "acknowledged_failure_ids": [
