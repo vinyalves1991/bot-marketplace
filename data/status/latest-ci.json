@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-07-12T19:01:15.788Z",
+  "generated_at": "2026-07-12T20:32:52.491Z",
   "source": "ci",
   "delivery": {
-    "email": "failed",
-    "email_error": "Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?[redacted] d75a77b69052e-51cba49439dsm53361461cf.27 - gsmtp",
-    "whatsapp": "sent"
+    "email": "skipped",
+    "whatsapp": "failed",
+    "whatsapp_error": "CALLMEBOT_PHONE/CALLMEBOT_APIKEY não definidas"
   },
   "pending_failures": [
     {
@@ -14,6 +14,15 @@
       "first_seen_at": "2026-07-12T19:01:15.788Z",
       "last_seen_at": "2026-07-12T19:01:15.788Z",
       "error": "Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?[redacted] d75a77b69052e-51cba49439dsm53361461cf.27 - gsmtp",
+      "count": 1
+    },
+    {
+      "id": "cc47504f-972c-4710-a14f-28253ddd4921",
+      "fingerprint": "fp-2824dec66d8d917550a02df8",
+      "channel": "whatsapp",
+      "first_seen_at": "2026-07-12T20:32:52.491Z",
+      "last_seen_at": "2026-07-12T20:32:52.491Z",
+      "error": "CALLMEBOT_PHONE/CALLMEBOT_APIKEY não definidas",
       "count": 1
     }
   ],
@@ -26,7 +35,7 @@
     "9afc0a68-4804-4db2-af9a-373c18a9a0e8",
     "7fdaba36-2fd0-4864-834c-fcad6591cd30"
   ],
-  "email": "failed",
-  "email_error": "Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?[redacted] d75a77b69052e-51cba49439dsm53361461cf.27 - gsmtp",
-  "whatsapp": "sent"
+  "email": "skipped",
+  "whatsapp": "failed",
+  "whatsapp_error": "CALLMEBOT_PHONE/CALLMEBOT_APIKEY não definidas"
 }
