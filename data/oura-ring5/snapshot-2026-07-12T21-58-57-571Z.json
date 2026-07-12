@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-07-12T21:58:57.571Z",
+  "run": {
+    "date": "2026-07-12",
+    "timezone": "UTC",
+    "id": "oura-ring-5",
+    "label": "Oura Ring 5",
+    "partial": true,
+    "errors": [],
+    "scheduled_coverage": [
+      "Enjoei:oura ring"
+    ],
+    "successful_coverage": [
+      "Enjoei:oura ring"
+    ],
+    "failed_coverage": [],
+    "configured_coverage": [
+      "Enjoei:oura ring",
+      "OLX:oura ring"
+    ]
+  },
+  "filters": {
+    "price_brl": {
+      "min": 1800,
+      "max": 2700
+    },
+    "size_ml": {
+      "min": null,
+      "max": null
+    }
+  },
+  "items": [],
+  "price_range_brl": {
+    "min": 1800,
+    "max": 2700
+  }
+}
