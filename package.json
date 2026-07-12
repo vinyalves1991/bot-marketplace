@@ -8,6 +8,7 @@
     "monitor:olx": "node scripts/monitor-olx-notebooks-por-cpu.mjs --headless",
     "monitor:olx-notebooks-por-cpu": "node scripts/monitor-olx-notebooks-por-cpu.mjs",
     "monitor:enjoei-tenis": "node scripts/monitor-enjoei-tenis.mjs",
+    "monitor:enjoei-jaqueta-north-face": "node scripts/monitor-enjoei-jaqueta-north-face.mjs",
     "monitor:enjoei-notebooks": "node scripts/monitor-enjoei-notebooks.mjs",
     "monitor:dockstations": "node scripts/monitor-dockstations.mjs",
     "monitor:fitbit": "node scripts/monitor-fitbit.mjs",

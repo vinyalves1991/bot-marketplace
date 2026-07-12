@@ -25,6 +25,7 @@ let runCommandFn = (...args) => runCommand(...args);
 const def = (env, fallback) => process.env[env] ?? path.join(process.env.USERPROFILE ?? process.env.HOME ?? "", ".codex", "automations", fallback);
 const OLX_DIR              = def("OLX_DATA_DIR",              "monitor-olx-notebooks-por-cpu");
 const ENJOEI_DIR           = def("ENJOEI_DATA_DIR",           "monitor-enjoei-tenis-42");
+const ENJOEI_JAQUETA_NF_DIR = def("ENJOEI_JAQUETA_NORTH_FACE_DATA_DIR", "monitor-enjoei-jaqueta-north-face");
 const ENJOEI_NOTEBOOKS_DIR = def("ENJOEI_NOTEBOOKS_DATA_DIR", "monitor-enjoei-notebooks");
 const DOCKSTATIONS_DIR     = def("DOCKSTATIONS_DATA_DIR",     "monitor-dockstations");
 const FITBIT_DIR           = def("FITBIT_DATA_DIR",           "monitor-fitbit");
@@ -88,6 +89,7 @@ export async function main({
     const onlyOlx            = args.includes("--only-olx");
     const skipOlx            = args.includes("--skip-olx") || process.env.SKIP_OLX === "1";
     const skipEnjoei         = args.includes("--skip-enjoei") || process.env.SKIP_ENJOEI === "1";
+    const skipJaquetaNF      = args.includes("--skip-jaqueta-north-face") || process.env.SKIP_JAQUETA_NORTH_FACE === "1";
     const skipDockstations   = args.includes("--skip-dockstations") || process.env.SKIP_DOCKSTATIONS === "1";
     const skipFitbit         = args.includes("--skip-fitbit") || process.env.SKIP_FITBIT === "1";
     const skipLifefactory    = args.includes("--skip-lifefactory") || process.env.SKIP_LIFEFACTORY === "1";
@@ -126,6 +128,9 @@ export async function main({
       jobs.push(["enjoei-tenis", () => runScript("monitor-enjoei-tenis.mjs", []), false]);
       jobs.push(["enjoei-notebooks", () => runScript("monitor-enjoei-notebooks.mjs", []), false]);
     }
+    if (!onlyOlx && !skipJaquetaNF) {
+      jobs.push(["enjoei-jaqueta-north-face", () => runScript("monitor-enjoei-jaqueta-north-face.mjs", []), false]);
+    }
     // Dockstations combina OLX (Playwright) + Enjoei (API) num único script e
     // trata falhas de cada fonte internamente, então roda independente dos flags
     // only-olx/skip-enjoei (assim funciona tanto no Task Scheduler local quanto no CI).
@@ -150,6 +155,7 @@ export async function main({
       if (name === "olx") { console.error(`OLX falhou: ${result.reason.message}`); errors.push(`OLX: ${result.reason.message}`); }
       if (name === "enjoei-tenis") { console.error(`Enjoei tênis falhou: ${result.reason.message}`); errors.push(`Enjoei tênis: ${result.reason.message}`); }
       if (name === "enjoei-notebooks") { console.error(`Enjoei NB falhou: ${result.reason.message}`); errors.push(`Enjoei NB: ${result.reason.message}`); }
+      if (name === "enjoei-jaqueta-north-face") { console.error(`Enjoei Jaqueta North Face falhou: ${result.reason.message}`); errors.push(`Enjoei Jaqueta North Face: ${result.reason.message}`); }
       if (name === "dockstations") { console.error(`Dockstations falhou: ${result.reason.message}`); errors.push(`Dockstations: ${result.reason.message}`); }
       if (name === "fitbit") { console.error(`Fitbit falhou: ${result.reason.message}`); errors.push(`Fitbit: ${result.reason.message}`); }
       if (name === "lifefactory") { console.error(`Lifefactory falhou: ${result.reason.message}`); errors.push(`Lifefactory: ${result.reason.message}`); }
@@ -167,10 +173,12 @@ export async function main({
   // --skip-monitors (reuso de relatórios para teste), não aplicamos o corte.
   const reportMinTime = skipMonitors ? null : runStart;
   const enjoeiOn = !onlyOlx && !skipEnjoei;
-  const [olxStd, enjoeiReport, enjoeiNbStd, dockReport, fitbitReport, lifefactoryReport, telaBook3Report, melangerReport, buds4ProReport, ouraReport] = await Promise.all([
+  const enjoeiJaquetaNfOn = !onlyOlx && !skipJaquetaNF;
+  const [olxStd, enjoeiReport, enjoeiNbStd, jaquetaNfReport, dockReport, fitbitReport, lifefactoryReport, telaBook3Report, melangerReport, buds4ProReport, ouraReport] = await Promise.all([
     skipOlx          ? null : readLatestReport(OLX_DIR, reportMinTime).catch(() => null),
     enjoeiOn         ? readLatestReport(ENJOEI_DIR, reportMinTime).catch(() => null) : null,
     enjoeiOn         ? readLatestReport(ENJOEI_NOTEBOOKS_DIR, reportMinTime).catch(() => null) : null,
+    enjoeiJaquetaNfOn ? readLatestReport(ENJOEI_JAQUETA_NF_DIR, reportMinTime).catch(() => null) : null,
     skipDockstations ? null : readLatestReport(DOCKSTATIONS_DIR, reportMinTime).catch(() => null),
     skipFitbit       ? null : readLatestReport(FITBIT_DIR, reportMinTime).catch(() => null),
     skipLifefactory  ? null : readLatestReport(LIFEFACTORY_DIR, reportMinTime).catch(() => null),
@@ -185,6 +193,7 @@ export async function main({
     { label: "OLX Notebooks",    report: olxStd,      newRe: /Novos an[úu]ncios v[aá]lidos[^:]*:\s*\*\*(\d+)\*\*/, newSec: "## Novos anúncios", priceSec: "## Mudanças de preço" },
     { label: "Enjoei Notebooks", report: enjoeiNbStd, newRe: /Novos notebooks[^:]*:\s*\*\*(\d+)\*\*/,              newSec: "## Novos notebooks", priceSec: "## Mudanças de preço" },
     { label: "Enjoei Tênis",     report: enjoeiReport, newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,                    newSec: "## Novos produtos",  priceSec: "## Mudancas de preco" },
+    { label: "Enjoei Jaqueta North Face", report: jaquetaNfReport, newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,        newSec: "## Novos produtos",  priceSec: "## Mudancas de preco" },
     { label: "Dockstations",     report: dockReport,   newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,                    newSec: "## Novos produtos",  priceSec: "## Mudanças de preço" },
     { label: "Fitbit Air",       report: fitbitReport, newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,                    newSec: "## Novos produtos",  priceSec: "## Mudanças de preço" },
     { label: "Lifefactory",      report: lifefactoryReport, newRe: /Novos produtos:\s*\*\*(\d+)\*\*/,               newSec: "## Novos produtos",  priceSec: "## Mudanças de preço" },

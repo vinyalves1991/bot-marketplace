@@ -18,6 +18,7 @@ Sistema modular de monitoramento diário (2× por dia, 07:00 e 16:00 BRT) de 8 m
 | **OLX Notebooks** | OLX (22 CPUs) | R$ 2.000–8.000 | CPU flagship Intel/AMD (filtro mudança até R$ 10k) |
 | **Enjoei Notebooks** | Enjoei (GraphQL) | R$ 1.500–8.000 | 22 CPUs (novo até R$ 8k) |
 | **Enjoei Tênis 42** | Enjoei (GraphQL) | até R$ 500 | Minimalistas, tamanho 42, 5 marcas |
+| **Enjoei Jaqueta North Face** | Enjoei (GraphQL) | R$ 200–300 | Jaqueta North Face masculina, tamanho P |
 | **Dockstations** | OLX + Enjoei | até R$ 500 | 3 modelos (SD25TB4, WD22TB4, 40AY0090BR), 4TB+ |
 | **Fitbit Air** | OLX + Enjoei | R$ 300–600 | Smartwatch Fitbit Air exato |
 | **Lifefactory** | OLX + Enjoei | R$ 25–75 | Garrafa térmica 500ml–1L (exclui mamadeira, bivolt OK) |
@@ -37,6 +38,7 @@ Sistema modular de monitoramento diário (2× por dia, 07:00 e 16:00 BRT) de 8 m
 npm run monitor:olx
 npm run monitor:enjoei-notebooks
 npm run monitor:enjoei-tenis
+npm run monitor:enjoei-jaqueta-north-face
 npm run monitor:dockstations
 npm run monitor:fitbit
 npm run monitor:lifefactory
@@ -84,6 +86,7 @@ setx CALLMEBOT_APIKEY "123456"                   # chave CallMeBot
 setx OLX_DATA_DIR                    "C:\caminho\data\olx"
 setx ENJOEI_DATA_DIR                 "C:\caminho\data\enjoei"
 setx ENJOEI_NOTEBOOKS_DATA_DIR       "C:\caminho\data\enjoei-notebooks"
+setx ENJOEI_JAQUETA_NORTH_FACE_DATA_DIR "C:\caminho\data\enjoei-jaqueta-north-face"
 setx DOCKSTATIONS_DATA_DIR           "C:\caminho\data\dockstations"
 setx FITBIT_DATA_DIR                 "C:\caminho\data\fitbit"
 setx LIFEFACTORY_DATA_DIR            "C:\caminho\data\lifefactory"

@@ -9,6 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const OLX_DIR              = process.env.OLX_DATA_DIR              ?? path.join(ROOT, "data", "olx");
 const ENJOEI_DIR           = process.env.ENJOEI_DATA_DIR           ?? path.join(ROOT, "data", "enjoei");
+const ENJOEI_JAQUETA_NF_DIR = process.env.ENJOEI_JAQUETA_NORTH_FACE_DATA_DIR ?? path.join(ROOT, "data", "enjoei-jaqueta-north-face");
 const ENJOEI_NOTEBOOKS_DIR = process.env.ENJOEI_NOTEBOOKS_DATA_DIR ?? path.join(ROOT, "data", "enjoei-notebooks");
 const DOCKSTATIONS_DIR     = process.env.DOCKSTATIONS_DATA_DIR     ?? path.join(ROOT, "data", "dockstations");
 const FITBIT_DIR           = process.env.FITBIT_DATA_DIR           ?? path.join(ROOT, "data", "fitbit");
@@ -69,10 +70,11 @@ async function main() {
       updated: await latestRunLabel(dir),
     };
   }));
-  const [olx, enjoeiNb, enjoei, dock, fitbit, lifefactory, telaBook3, melanger, buds4Pro, oura, oledMonitores] = await Promise.all([
+  const [olx, enjoeiNb, enjoei, jaquetaNf, dock, fitbit, lifefactory, telaBook3, melanger, buds4Pro, oura, oledMonitores] = await Promise.all([
     gather(OLX_DIR, "report-", "report-premium-", olxDetails),
     gather(ENJOEI_NOTEBOOKS_DIR, "report-", "report-premium-", enjoeiNbDetails),
     gather(ENJOEI_DIR, "report-", null),
+    gather(ENJOEI_JAQUETA_NF_DIR, "report-", null),
     gather(DOCKSTATIONS_DIR, "report-", null),
     gather(FITBIT_DIR, "report-", null),
     gather(LIFEFACTORY_DIR, "report-", null),
@@ -82,10 +84,11 @@ async function main() {
     gather(OURA_DIR, "report-", null),
     gather(OLED_MONITORES_DIR, "report-", null),
   ]);
-  const [olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated, buds4ProUpdated, ouraUpdated, oledMonitoresUpdated] = await Promise.all([
+  const [olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, jaquetaNfUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated, buds4ProUpdated, ouraUpdated, oledMonitoresUpdated] = await Promise.all([
     latestRunLabel(OLX_DIR),
     latestRunLabel(ENJOEI_NOTEBOOKS_DIR),
     latestRunLabel(ENJOEI_DIR),
+    latestRunLabel(ENJOEI_JAQUETA_NF_DIR),
     latestRunLabel(DOCKSTATIONS_DIR),
     latestRunLabel(FITBIT_DIR),
     latestRunLabel(LIFEFACTORY_DIR),
@@ -97,7 +100,7 @@ async function main() {
   ]);
   await fs.writeFile(
     OUTPUT,
-    buildHtml({ olx, enjoeiNb, mercadoLivre, mercadoLivreWatchlists, enjoei, dock, fitbit, lifefactory, telaBook3, melanger, buds4Pro, oura, oledMonitores, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated, buds4ProUpdated, ouraUpdated, oledMonitoresUpdated }),
+    buildHtml({ olx, enjoeiNb, mercadoLivre, mercadoLivreWatchlists, enjoei, jaquetaNf, dock, fitbit, lifefactory, telaBook3, melanger, buds4Pro, oura, oledMonitores, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, jaquetaNfUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated, buds4ProUpdated, ouraUpdated, oledMonitoresUpdated }),
     "utf8"
   );
   console.log(`Dashboard gerado: ${OUTPUT}`);
@@ -478,7 +481,7 @@ function e(s) {
   return (s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function buildHtml({ olx, enjoeiNb, mercadoLivre, mercadoLivreWatchlists, enjoei, dock, fitbit, lifefactory, telaBook3, melanger, buds4Pro, oura, oledMonitores, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated, buds4ProUpdated, ouraUpdated, oledMonitoresUpdated }) {
+function buildHtml({ olx, enjoeiNb, mercadoLivre, mercadoLivreWatchlists, enjoei, jaquetaNf, dock, fitbit, lifefactory, telaBook3, melanger, buds4Pro, oura, oledMonitores, olxUpdated, enjoeiNbUpdated, enjoeiTenisUpdated, jaquetaNfUpdated, dockUpdated, fitbitUpdated, lifefactoryUpdated, telaBook3Updated, melangerUpdated, buds4ProUpdated, ouraUpdated, oledMonitoresUpdated }) {
   // Ordenação em dois níveis: primeiro as fontes COM achados recentes (cards com
   // conteúdo), depois as vazias ("Nenhum run com novidades") — sempre no fundo,
   // mesmo que tenham rodado há pouco. Dentro de cada grupo, mais recente primeiro.
@@ -496,6 +499,7 @@ function buildHtml({ olx, enjoeiNb, mercadoLivre, mercadoLivreWatchlists, enjoei
     { chip: "OLX",              title: "OLX Notebooks",     sub: "R$ 2.000 – R$ 8.000",                          data: olx,         dpath: "data/olx",              upd: olxUpdated },
     { chip: "Enjoei Notebooks", title: "Enjoei Notebooks",  sub: "R$ 1.500 – R$ 8.000",                          data: enjoeiNb,    dpath: "data/enjoei-notebooks", upd: enjoeiNbUpdated },
     { chip: "Enjoei Tênis",     title: "Enjoei Tênis 42",   sub: "até R$ 500,00",                                data: enjoei,      dpath: "data/enjoei",           upd: enjoeiTenisUpdated },
+    { chip: "Jaqueta North Face", title: "Jaqueta North Face", sub: "Enjoei · masculina · tam. P · R$ 200 – R$ 300", data: jaquetaNf, dpath: "data/enjoei-jaqueta-north-face", upd: jaquetaNfUpdated },
     { chip: "Dockstations",     title: "Dockstations",      sub: "OLX + Enjoei · até R$ 500,00",                 data: dock,        dpath: "data/dockstations",     upd: dockUpdated },
     { chip: "Fitbit Air",       title: "Fitbit Air",        sub: "OLX + Enjoei · R$ 300 – R$ 600",               data: fitbit,      dpath: "data/fitbit",           upd: fitbitUpdated },
     { chip: "Lifefactory",      title: "Lifefactory",       sub: "OLX + Enjoei · 500ml–1L · R$ 25 – R$ 75",      data: lifefactory, dpath: "data/lifefactory",      upd: lifefactoryUpdated },
